@@ -10,39 +10,33 @@ missionNamespace setVariable ["RHD_AMBIENT_RUNNING", true, false];
 private _maxCivilians = 10;
 private _maxTraffic = 4;
 private _spawnRadius = 450;
+private _avoidRadius = 180;
 private _despawnRadius = 1100;
 private _tick = 20;
 
 private _civClasses = ["C_man_1","C_man_1_1_F","C_man_1_2_F","C_man_1_3_F"];
 private _vehicleClasses = ["C_Offroad_01_F","C_SUV_01_F","C_Hatchback_01_F","C_Hatchback_01_sport_F"];
-
 missionNamespace setVariable ["RHD_AMBIENT_CIVS", [], false];
 missionNamespace setVariable ["RHD_AMBIENT_VEHICLES", [], false];
 
 private _fnNearestPlayerDistance = {
     params ["_pos"];
     private _best = 99999;
-    {
-        if (alive _x) then {
-            private _d = _x distance2D _pos;
-            if (_d < _best) then {_best = _d;};
-        };
-    } forEach allPlayers;
+    {if (alive _x) then {private _d = _x distance2D _pos; if (_d < _best) then {_best = _d;};};} forEach allPlayers;
     _best
 };
 
 private _fnRoadPos = {
     params ["_centre"];
-    private _roads = _centre nearRoads _spawnRadius;
+    private _roads = (_centre nearRoads _spawnRadius) select {((_centre distance2D _x) > _avoidRadius)};
     if (_roads isEqualTo []) exitWith {[0,0,0]};
     private _pos = getPosATL (selectRandom _roads);
-    _pos set [2, 0];
+    _pos set [2,0];
     _pos
 };
 
 while {isServer} do {
     sleep _tick;
-
     private _civs = missionNamespace getVariable ["RHD_AMBIENT_CIVS", []];
     private _vehicles = missionNamespace getVariable ["RHD_AMBIENT_VEHICLES", []];
     _civs = _civs select {alive _x && {!isNull _x}};
@@ -67,7 +61,6 @@ while {isServer} do {
 
     _civs = _civs select {alive _x && {!isNull _x}};
     _vehicles = _vehicles select {alive _x && {!isNull _x}};
-
     if (allPlayers isEqualTo []) then {
         missionNamespace setVariable ["RHD_AMBIENT_CIVS", _civs, false];
         missionNamespace setVariable ["RHD_AMBIENT_VEHICLES", _vehicles, false];
@@ -113,7 +106,7 @@ while {isServer} do {
             _driver disableAI "TARGET";
             _driver disableAI "AUTOTARGET";
             _driver disableAI "AUTOCOMBAT";
-            _driver doMove ((_pos getPos [300 + random 300, getDir _vehicle]));
+            _driver doMove (_pos getPos [300 + random 300, getDir _vehicle]);
             _vehicles pushBack _vehicle;
             _civs pushBack _driver;
         };
