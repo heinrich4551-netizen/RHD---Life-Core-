@@ -1,0 +1,13 @@
+name = "RHD - LifeCore";
+author = "LT. Toad";
+actionName = "RHD - LifeCore on GitHub";
+action = "https://github.com/heinrich4551-netizen/RHD---Life-Core-";
+logo = "assets\branding\RHDLifeCore.jpg";
+logoOver = "assets\branding\RHDLifeCore.jpg";
+picture = "assets\branding\RHDLifeCore.jpg";
+tooltip = "RHD - LifeCore";
+tooltipOwned = "RHD - LifeCore | Antistasi Ultimate Life RP";
+overview = "RHD - LifeCore is the Life RP layer for the Antistasi Ultimate campaign world.";
+dlcColor[] = {0.12,0.12,0.12,1};
+logoTitle = "assets\branding\RHDLifeCore.jpg";
+logoSmall = "assets\branding\RHDLifeCore.jpg";
