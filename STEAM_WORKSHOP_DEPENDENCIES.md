@@ -19,6 +19,7 @@ This guide is written for server owners and mission editors who may be new to Ar
 The following Steam Workshop IDs were supplied for this project and are recorded here so they are not lost during server-pack creation:
 
 ```text
+1123403138
 2618183963
 2618122951
 2623374243
@@ -27,20 +28,21 @@ The following Steam Workshop IDs were supplied for this project and are recorded
 
 ### Verification status
 
-I will not guess the titles, required addons, or transitive Workshop dependencies for those four items. Live Steam Workshop metadata is not available in this development environment right now, so publishing a guessed name or dependency chain would be unsafe.
+I will not guess the titles, required addons, or transitive Workshop dependencies for these five items. Live Steam Workshop metadata is not available in this development environment right now, so publishing a guessed name or dependency chain would be unsafe.
 
-Before calling these four items **verified RHD dependencies**, confirm their Workshop titles and dependencies from the Steam pages and then add the exact addon names / `CfgPatches` identifiers to the dependency matrix below.
+Before calling these items **verified RHD dependencies**, confirm their Workshop titles and dependencies from the Steam pages and then add the exact addon names / `CfgPatches` identifiers to the dependency matrix below.
 
-### Dependency matrix for the four requested Workshop items
+### Dependency matrix for the additional requested Workshop items
 
 | Workshop ID | Verified title | Required by RHD? | RHD use planned | Dependency chain verified? |
 |---:|---|---|---|---|
+| `1123403138` | **Pending Steam verification** | Pending | Integrate only after addon API/assets are confirmed | **NO** |
 | `2618183963` | **Pending Steam verification** | Pending | Integrate only after addon API/assets are confirmed | **NO** |
 | `2618122951` | **Pending Steam verification** | Pending | Integrate only after addon API/assets are confirmed | **NO** |
 | `2623374243` | **Pending Steam verification** | Pending | Integrate only after addon API/assets are confirmed | **NO** |
 | `2623373810` | **Pending Steam verification** | Pending | Integrate only after addon API/assets are confirmed | **NO** |
 
-Do not add guessed `CfgPatches` names to `description.ext`. Steam Workshop IDs alone cannot be used by Arma's mission `CfgRemoteExec` / `CfgFunctions` system as addon dependency identifiers.
+Do not add guessed `CfgPatches` names to `description.ext`. Steam Workshop IDs alone cannot be used by Arma's mission configuration as addon dependency identifiers.
 
 ## Official RHD dependencies
 
@@ -99,7 +101,7 @@ For the currently verified full RHD feature set:
 
 The mission itself is not an addon PBO, so it does not belong in a normal `@Mod` folder.
 
-For the four user-supplied Workshop IDs, add them only after the titles and transitive dependencies are verified.
+For the five user-supplied Workshop IDs, add them only after the titles and transitive dependencies are verified.
 
 ## Steam Workshop release checklist
 
@@ -109,12 +111,13 @@ Your Workshop page should contain a visible block similar to this:
 RHD - LifeCore
 Author: LT. Toad
 
-REQUIRED MODS
+VERIFIED REQUIRED MODS
 - CBA_A3 (Workshop 450814997)
 - ACE3 (Workshop 463939057)
 - cTab+ (Workshop 2262006564)
 
-RHD-INTEGRATION ITEMS TO VERIFY
+ADDITIONAL REQUESTED WORKSHOP ITEMS - VERIFY BEFORE RELEASE
+- Workshop 1123403138
 - Workshop 2618183963
 - Workshop 2618122951
 - Workshop 2623374243
@@ -134,7 +137,7 @@ Install CBA_A3, ACE3, cTab+ and any verified requested Workshop dependencies thr
 
 1. Install Arma 3.
 2. Subscribe to CBA_A3, ACE3 and cTab+.
-3. Add the four requested Workshop IDs only after verifying their titles and dependencies.
+3. Verify the five requested Workshop IDs before adding them to the server preset.
 4. Start Arma 3 and verify the selected mods load without errors.
 5. Open Eden Editor (3DEN).
 6. Create a multiplayer mission on your selected terrain.
