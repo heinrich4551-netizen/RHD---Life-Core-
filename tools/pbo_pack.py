@@ -8,19 +8,28 @@ from pathlib import Path
 
 
 def write_entry(handle, name: str, size: int) -> None:
+    """Write a standard uncompressed PBO directory entry."""
     handle.write(name.replace(os.sep, "/").encode("utf-8") + b"\x00")
+    # packing method, original size, reserved, timestamp, data size
     handle.write(struct.pack("<IIIII", 0, size, 0, 0, size))
 
 
 def pack_directory(source: Path, output: Path) -> None:
     if not source.is_dir():
         raise SystemExit(f"Source directory does not exist: {source}")
+
     files = sorted(p for p in source.rglob("*") if p.is_file())
     output.parent.mkdir(parents=True, exist_ok=True)
+
     with output.open("wb") as handle:
         for path in files:
             write_entry(handle, path.relative_to(source).as_posix(), path.stat().st_size)
-        handle.write(b"\x00")
+
+        # PBO directory terminator: empty filename followed by the five
+        # uint32 header fields. Omitting these 20 bytes makes the first bytes
+        # of file data get interpreted as a directory entry by Arma 3.
+        handle.write(b"\x00" + b"\x00" * 20)
+
         for path in files:
             handle.write(path.read_bytes())
 
