@@ -1,0 +1,11 @@
+name = "RHD - LifeCore"
+prefix = "rhd"
+version = "2.1.0"
+
+[hemtt.build]
+
+[hemtt.release]
+archive_name = "RHD-LifeCore-{version}"
+
+[properties]
+author = "LT. Toad"
