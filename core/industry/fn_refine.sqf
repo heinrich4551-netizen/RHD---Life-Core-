@@ -1,5 +1,7 @@
 params ["_unit", "_input", ["_amount", 1], ["_marker", ""]];
 if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
+if (owner _unit != remoteExecutedOwner) exitWith {};
+if (_amount < 1 || {_amount > 100}) exitWith {};
 if (_marker isEqualTo "" || {!(_marker in allMapMarkers)} || {_unit distance2D (getMarkerPos _marker) > 15}) exitWith {};
 if !((toLower _marker find "rhd_refine_") == 0) exitWith {};
 if !(_unit getVariable ["RHD_JOB", "civ"] isEqualTo "refiner") exitWith {["You must be a refinery worker to refine materials.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
