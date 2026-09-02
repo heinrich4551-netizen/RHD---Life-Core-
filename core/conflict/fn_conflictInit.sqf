@@ -2,23 +2,30 @@
     RHD - LifeCore | CONFLICT INITIALIZER
     Author: LT. Toad
     ---------------------------------------------------------------------------
-    This is the startup hook for the RHD district-pressure system.
+    RHD conflict is now an RP layer around the Antistasi Ultimate campaign.
+
+    The A3A engine owns the strategic war. RHD adds civilian/Life pressure and
+    exposes district information to the cTab player tablet.
 
     BEGINNER EDITORS:
     Do NOT change tuning values here.
-    Change conflict settings in `core/fn_init.sqf` under
-    "ANTISTASI-STYLE DISTRICT PRESSURE" so all easy-to-edit server settings
-    stay in one location.
-
-    The system is RHD-owned and only inspired by persistent-world pressure
-    concepts from Antistasi Ultimate. Antistasi Ultimate is not loaded.
+    Change them in `core/fn_init.sqf` under the Antistasi/Conflict section.
     ---------------------------------------------------------------------------
 */
 
 if (!isServer) exitWith {false};
 
-// Create the shared district state before the director starts.
+// Create the shared RHD district state early so the UI can safely query it.
 missionNamespace setVariable ["RHD_CONFLICT_ZONES", createHashMap, true];
 
-[] spawn RHD_fnc_conflictDirector;
+// Do not start a second strategic simulation. Wait for the A3A campaign core.
+[] spawn {
+    waitUntil {
+        sleep 1;
+        missionNamespace getVariable ["RHD_A3A_BASE_READY", false]
+    };
+
+    [] spawn RHD_fnc_conflictDirector;
+};
+
 true
