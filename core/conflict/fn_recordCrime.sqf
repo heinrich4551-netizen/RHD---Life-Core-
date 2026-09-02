@@ -1,14 +1,10 @@
 /*
-    RHD - LifeCore | Record a crime / district pressure event
+    RHD - LifeCore | Record Crime
     Author: LT. Toad
 
-    Server authoritative. This updates the local RHD district pressure AND,
-    when Antistasi Ultimate is ready, feeds the crime into the A3A aggression
-    system so criminal activity has consequences in the wider campaign.
-
-    USAGE
-    -----
-    [_unit, 10] call RHD_fnc_recordCrime;
+    Server authoritative. Crime increases local RHD Life pressure and, when
+    the Antistasi campaign is ready, feeds a controlled aggression increase into
+    the A3A strategic campaign.
 */
 
 params ["_unit", ["_amount", 10]];
@@ -48,11 +44,11 @@ if (_changed) then {
 };
 
 // ============================================================================
-// ANTISTASI ULTIMATE CAMPAIGN PRESSURE
+// ANTISTASI ULTIMATE STRATEGIC PRESSURE
 // ============================================================================
 if (missionNamespace getVariable ["RHD_A3A_BASE_READY", false]) then {
     private _duration = missionNamespace getVariable ["RHD_A3A_CRIME_AGGRESSION_MINUTES", 10];
-    [_amount, _duration] call RHD_fnc_addAggression;
+    [_amount, _duration] call RHD_fnc_antistasiAddAggression;
 };
 
 _changed
