@@ -25,7 +25,7 @@ private _emsAction = [
     [0,0,0],
     3
 ] call ace_interact_menu_fnc_createAction;
-[player, 0, ["ACE_TapShoulderRight"], _emsAction] call ace_interact_menu_fnc_addActionToObject;
+["CAManBase", 0, ["ACE_TapShoulderRight"], _emsAction, true] call ace_interact_menu_fnc_addActionToClass;
 
 private _adminVehicleAction = [
     "RHD_AdminVehicle",
