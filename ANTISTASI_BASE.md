@@ -1,75 +1,60 @@
-# Antistasi Ultimate as the RHD - LifeCore Base
+# Antistasi Ultimate Integration — RHD LifeCore
 
-**RHD - LifeCore**  
-**Author: LT. Toad**
+**RHD - LifeCore | Author: LT. Toad | Version 2.1.1**
 
-RHD - LifeCore is now designed as a **Life RP layer on top of the Antistasi Ultimate campaign framework**.
+Antistasi Ultimate is an **optional integration**, not the base dependency of RHD.
 
-## Architecture
+## Supported modes
 
-The base layer is responsible for the persistent multiplayer world:
+```text
+STANDALONE
+  RHD Life RP runs by itself.
+  A3A is not required.
 
-- Campaign lifecycle and save/load state.
-- Strategic zones, cities and faction control.
-- Dynamic aggression and enemy activity.
-- Enemy attack / defence resource pools.
-- Garrisons, patrols, QRFs, convoys and dynamic attacks.
-- Headquarters / Petros state.
-- Arsenal and faction equipment systems.
-- Existing Antistasi support, mission and event systems.
-- World-specific initialization and map analysis.
+ANTISTASI
+  A3A is installed and the RHD Antistasi Ultimate Bridge module is placed.
+  A3A remains authoritative for strategic campaign state.
+```
 
-RHD adds the Life RP layer around that world:
-
-- Player identity, cash and bank accounts.
-- Jobs and pay.
-- Farming, mining and refining.
-- Shops and market pricing.
-- Police / EMS RP.
-- ACE interactions.
-- cTab player tablet.
-- Separate UID-gated RHD administration.
-- RHD branding and billboard advertising.
-- Crime records and Life RP consequences.
+RHD's own state includes player identity, cash/bank, jobs, virtual resources, shops, Police/EMS RP, district pressure, tablet, branding and UID-gated administration.
 
 ## How RHD uses A3A
 
-The RHD bridge waits for the Antistasi campaign to report `serverInitDone` before enabling the base integration. This prevents the Life systems from creating a second competing strategic simulation.
+When the optional bridge is enabled, RHD waits for the Antistasi campaign to report `serverInitDone` before exposing campaign-backed state. This keeps RHD from creating a second strategic simulation alongside A3A.
 
-RHD also calls documented/public A3A functions for selected world interactions, including:
+Selected RHD operations may use public A3A interfaces for aggression/resources/safe vehicle spawning when those interfaces exist.
 
-```text
-A3A_fnc_addAggression
-A3A_fnc_addEnemyResources
-A3A_fnc_spawnVehicleAtMarker
-```
-
-Crime events can therefore increase the Antistasi Occupant aggression model. Server administration can use Antistasi-safe vehicle spawning rather than bypassing the base campaign systems.
-
-## Source base
-
-A pinned Git submodule points to the Antistasi Ultimate `unstable` source tree used as the development base:
+For vehicle purchases:
 
 ```text
-vendor/antistasi-ultimate
+A3A active + public safe spawn available -> A3A safe spawn
+A3A absent or bridge unused               -> RHD base-game safe spawn fallback
 ```
 
-This keeps the exact upstream revision visible without silently copying the complete upstream repository into the RHD project history.
+## 3DEN bridge module
 
-## Licensing boundary
+Place:
 
-The upstream Antistasi Ultimate repository contains MIT-licensed Antistasi Ultimate / Plus / Community Edition code, but also identifies separately licensed integrated content under APL-ND.
+`Systems -> RHD - LifeCore -> RHD - LifeCore | Antistasi Ultimate Bridge (Optional)`
 
-RHD must not modify or redistribute those restricted components. The upstream `LICENSE` file names the restricted locations, including `Tools\\StreetArtist` and `A3-Antistasi\\Garage`.
+The bridge exposes three editor settings:
 
-See `LICENSES/ANTISTASI_ULTIMATE_LICENSE.txt` and `THIRD_PARTY_NOTICES.md`.
+```text
+Use Antistasi Ultimate when installed
+Create Antistasi HQ Anchors
+Enable Antistasi Terrain Adapter
+```
 
-## Beginner rule
+Do not place this module just because A3A happens to be installed. Omit it for a pure standalone RHD mission.
 
-For normal mission editing:
+## Terrain handling
 
-- Use **Eden** for map placement.
-- Use **`core/fn_init.sqf`** for RHD gameplay configuration.
-- Leave `vendor/antistasi-ultimate` alone unless you are developing the underlying campaign base.
+When A3A is active, its terrain-specific `mapInfo` should remain the preferred source of strategic map metadata. RHD can provide a generic fallback through the bridge for common infrastructure detection.
 
-Advanced developers can work against the pinned A3A source and extend RHD's bridge without changing the Life RP public API.
+A generic fallback is not a replacement for terrain-specific A3A data for unusual airports, building layouts, faction definitions or other specialized campaign behavior.
+
+## Source boundary
+
+The pinned Git submodule under `vendor/antistasi-ultimate` is a development/auditing reference. It is not copied into the RHD runtime package and does not turn A3A into a hard dependency.
+
+See `LICENSES/ANTISTASI_ULTIMATE_LICENSE.txt` and `THIRD_PARTY_NOTICES.md` for distribution boundaries.
