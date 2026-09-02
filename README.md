@@ -18,6 +18,8 @@ RHD - LifeCore is a terrain-agnostic, 3DEN-first Arma 3 Life framework built aro
 
 The supplied Kavala artwork is used as the mission overview/loading artwork. The in-game mission name and author are `RHD - LifeCore` and `LT. Toad`.
 
+`Land_Billboard_F` objects are automatically branded with the RHD artwork at server startup. Individual billboards can opt out with the Eden variable `rhd_billboard_skip = true`.
+
 ## External projects
 
 RHD - LifeCore integrates with external projects through their supported interfaces rather than bundling their entire addons into the mission.
@@ -33,6 +35,8 @@ RHD includes an **RHD-owned Conflict layer inspired by high-level Antistasi-styl
 
 This separation is intentional: Antistasi Ultimate is a complete persistent multiplayer scenario rather than a small mission library. RHD keeps the Life RP economy, identity, jobs and server rules under its own codebase while using compatible design concepts for the world-pressure layer.
 
+The Antistasi Ultimate repository currently describes the main project as MIT-licensed while identifying separately licensed integrated components, including APL-ND material. RHD does not copy those restricted components. fileciteturn345file0
+
 ## Included gameplay
 
 - Persistent player identity, cash, bank, inventory, licenses, jobs and jail state.
@@ -45,6 +49,7 @@ This separation is intentional: Antistasi Ultimate is a complete persistent mult
 - Bank, fuel, farming, mining and refining location systems driven by Eden markers.
 - RHD Conflict districts using `rhd_zone_*` markers.
 - Crime pressure recording and police presence pressure reduction.
+- Automatic RHD branding on `Land_Billboard_F` objects.
 - Lightweight ambient civilians and traffic with hard performance caps.
 - Rare roadside incidents and temporary Police/EMS dispatch events.
 - UID-gated unified administration with server-side privilege validation.
@@ -56,7 +61,7 @@ This separation is intentional: Antistasi Ultimate is a complete persistent mult
 Most server owners only need two places:
 
 **1. Eden Editor**  
-Place the map objects, NPCs, vehicles and RHD markers.
+Place the map objects, NPCs, vehicles, RHD markers and billboards.
 
 **2. `core/fn_init.sqf`**  
 Change the clearly marked server settings such as admin UIDs, jobs, pay rates, item prices, recipes and conflict tuning.
@@ -96,22 +101,20 @@ Use Steam64 IDs only.
 
 ## Dependencies
 
-For the requested full feature set, install these external mods on the client/server as appropriate:
+For the currently verified full feature set, install:
 
 - Arma 3
 - CBA_A3
 - cTab+
 - ACE3
 
-**Antistasi Ultimate is not a dependency.** Its concepts are implemented in RHD's own `core/conflict` layer.
+Antistasi Ultimate is **not** a dependency. Its persistent-world ideas are implemented by the RHD-owned `core/conflict` layer.
 
-See `STEAM_WORKSHOP_DEPENDENCIES.md` for Workshop IDs, links and load-order guidance.
+The four additional Steam Workshop IDs requested by the project owner are recorded in `STEAM_WORKSHOP_DEPENDENCIES.md`. Their titles, addon class identifiers and transitive dependency chains are not guessed because live Steam metadata is unavailable in this development environment.
 
 ## Licensing and attribution
 
 See `THIRD_PARTY_NOTICES.md` for project-by-project licensing boundaries.
-
-Antistasi Ultimate's main project license is MIT, but its repository also identifies separately licensed APL-ND components. RHD does not copy or redistribute those restricted components. fileciteturn345file0
 
 The RHD admin interface keeps attribution for its XEAT_AdminTool structural reference. cTab+ and ACE3 remain external dependencies.
 
@@ -134,4 +137,6 @@ core/ui/               -> cTab player interface
 core/ace/              -> ACE3 integration
 core/admin/            -> separate administration
 core/ambient/          -> civilians, traffic and incidents
+core/branding/         -> automatic RHD billboard branding
+assets/branding/       -> RHD - LifeCore artwork
 ```
