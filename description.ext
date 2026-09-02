@@ -18,7 +18,7 @@ class CfgFunctions
         class Industry { file="core\\industry"; class serverGather {server=1;}; class requestGather {}; class refine {server=1;}; class requestRefine {}; };
         class RP { file="core\\rp"; class ticket {server=1;}; class requestTicket {}; class heal {server=1;}; class requestHeal {}; class dispatch {server=1;}; class receiveDispatch {}; };
         class Services { file="core\\services"; class requestRefuel {}; class refuel {server=1;}; };
-        class UI { file="core\\ui"; class openMenu {}; class keyHandler {}; class refresh {}; class requestBuy {}; class requestSell {}; class setTheme {}; class initHud {}; };
+        class UI { file="core\\ui"; class openMenu {}; class keyHandler {}; class refresh {}; class requestBuy {}; class requestSell {}; class setTheme {}; class initHud {}; class ctabOpen {}; class ctabBuild {}; class ctabPage {}; class ctabClear {}; class ctabClose {}; };
         class Admin { file="core\\admin"; class isAdmin {}; class adminOpenMenu {}; class adminExecuteFromMenu {}; class execute {server=1;}; class adminFreeze {}; class adminSpectate {}; };
         class ACE { file="core\\ace"; class aceInit {}; };
         class Ambient { file="core\\ambient"; class director {server=1;}; class events {server=1;}; };
@@ -38,6 +38,8 @@ class CfgRemoteExec
     };
 };
 
+#include "core\\ui\\ctab.hpp"
+
 class RscTitles
 {
     class RHD_HUD
@@ -47,24 +49,6 @@ class RscTitles
     };
 };
 
-class RHD_F6
-{
-    idd=7600; movingEnable=0; enableSimulation=1;
-    class controlsBackground { class Background:RscText {idc=7601;x=.24*safezoneW+safezoneX;y=.15*safezoneH+safezoneY;w=.52*safezoneW;h=.70*safezoneH;colorBackground[]={0,0,0,.88};}; class Header:RscText {idc=7602;x=.25*safezoneW+safezoneX;y=.16*safezoneH+safezoneY;w=.50*safezoneW;h=.07*safezoneH;text="RHD LIFE | PLAYER DASHBOARD";sizeEx=.030;}; };
-    class controls { class Info:RscStructuredText {idc=7603;x=.27*safezoneW+safezoneX;y=.26*safezoneH+safezoneY;w=.46*safezoneW;h=.43*safezoneH;}; class Close:RscButton {idc=7604;x=.63*safezoneW+safezoneX;y=.76*safezoneH+safezoneY;w=.12*safezoneW;h=.045*safezoneH;text="CLOSE";action="closeDialog 0";}; class Classic:RscButton {idc=7605;x=.27*safezoneW+safezoneX;y=.72*safezoneH+safezoneY;w=.13*safezoneW;h=.04*safezoneH;text="CLASSIC";action="[0] call RHD_fnc_setTheme";}; class Tablet:RscButton {idc=7606;x=.405*safezoneW+safezoneX;y=.72*safezoneH+safezoneY;w=.13*safezoneW;h=.04*safezoneH;text="TABLET";action="[1] call RHD_fnc_setTheme";}; class Ops:RscButton {idc=7607;x=.54*safezoneW+safezoneX;y=.72*safezoneH+safezoneY;w=.08*safezoneW;h=.04*safezoneH;text="OPS";action="[2] call RHD_fnc_setTheme";}; class Theme:RscText {idc=7608;x=.27*safezoneW+safezoneX;y=.685*safezoneH+safezoneY;w=.46*safezoneW;h=.03*safezoneH;text="UI STYLE: CLASSIC LIFE";sizeEx=.018;}; };
-};
-class RHD_F7
-{
-    idd=7700; movingEnable=0; enableSimulation=1;
-    class controlsBackground { class Background:RscText {idc=7701;x=.28*safezoneW+safezoneX;y=.20*safezoneH+safezoneY;w=.44*safezoneW;h=.58*safezoneH;colorBackground[]={0,0,0,.82};}; };
-    class controls { class Title:RscText {idc=7702;x=.30*safezoneW+safezoneX;y=.22*safezoneH+safezoneY;w=.40*safezoneW;h=.05*safezoneH;text="RHD LIFE | JOBS";sizeEx=.028;}; class Jobs:RscListbox {idc=7703;x=.31*safezoneW+safezoneX;y=.30*safezoneH+safezoneY;w=.38*safezoneW;h=.30*safezoneH;}; class Select:RscButton {idc=7704;x=.44*safezoneW+safezoneX;y=.65*safezoneH+safezoneY;w=.15*safezoneW;h=.05*safezoneH;text="SELECT JOB";action="[] call RHD_fnc_startWork";}; class Close:RscButton {idc=7705;x=.58*safezoneW+safezoneX;y=.70*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";}; };
-};
-class RHD_F8
-{
-    idd=7805; movingEnable=0; enableSimulation=1;
-    class controlsBackground { class Background:RscText {idc=7806;x=.20*safezoneW+safezoneX;y=.12*safezoneH+safezoneY;w=.60*safezoneW;h=.76*safezoneH;colorBackground[]={0,0,0,.84};}; };
-    class controls { class Title:RscText {idc=7807;x=.23*safezoneW+safezoneX;y=.15*safezoneH+safezoneY;w=.54*safezoneW;h=.05*safezoneH;text="RHD SHOP";sizeEx=.030;}; class Items:RscListbox {idc=7808;x=.23*safezoneW+safezoneX;y=.23*safezoneH+safezoneY;w=.54*safezoneW;h=.48*safezoneH;}; class Buy:RscButton {idc=7809;x=.31*safezoneW+safezoneX;y=.75*safezoneH+safezoneY;w=.14*safezoneW;h=.05*safezoneH;text="BUY";action="[lbCurSel 7808] call RHD_fnc_requestBuy";}; class Sell:RscButton {idc=7810;x=.47*safezoneW+safezoneX;y=.75*safezoneH+safezoneY;w=.14*safezoneW;h=.05*safezoneH;text="SELL";action="[lbCurSel 7808] call RHD_fnc_requestSell";}; class Close:RscButton {idc=7811;x=.64*safezoneW+safezoneX;y=.81*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";}; };
-};
 class RHD_ADMIN
 {
     idd=8500; movingEnable=1; enableSimulation=1;
@@ -75,7 +59,7 @@ class RHD_ADMIN
         class PlayersLabel:RscText {idc=8503;x=.402031*safezoneW+safezoneX;y=.302*safezoneH+safezoneY;w=.103125*safezoneW;h=.022*safezoneH;text="PLAYERS";};
         class Players:RscListbox {idc=8504;x=.402031*safezoneW+safezoneX;y=.335*safezoneH+safezoneY;w=.103125*safezoneW;h=.154*safezoneH;};
         class ActionsLabel:RscText {idc=8505;x=.510312*safezoneW+safezoneX;y=.302*safezoneH+safezoneY;w=.103125*safezoneW;h=.022*safezoneH;text="ADMIN ACTIONS";};
-        class Actions:RscListbox {idc=8506;x=.510312*safezoneW+safezoneX;y=.335*safezoneH+safezoneY;w=.103125*safezoneW;h=.154*safezoneH;};
+        class Actions:RscListbox {idc=8506;x=.510312*safezoneW+safezoneY;w=.103125*safezoneW;h=.154*safezoneH;};
         class Execute:RscButton {idc=8507;x=.402031*safezoneW+safezoneX;y=.500*safezoneH+safezoneY;w=.211406*safezoneW;h=.033*safezoneH;text="EXECUTE";colorBackground[]={.06,.52,.28,.95};colorBackgroundActive[]={.04,.35,.18,.95};action="[] call RHD_fnc_adminExecuteFromMenu";};
         class ValueLabel:RscText {idc=8509;x=.402031*safezoneW+safezoneX;y=.544*safezoneH+safezoneY;w=.0464063*safezoneW;h=.022*safezoneH;text="VALUE";};
         class Value:RscEdit {idc=8510;x=.453594*safezoneW+safezoneX;y=.544*safezoneH+safezoneY;w=.159844*safezoneW;h=.022*safezoneH;text="1";};
