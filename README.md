@@ -42,25 +42,23 @@ Mission identity is **RHD - LifeCore** and the mission author is **LT. Toad**. T
 
 ## Antistasi Ultimate-inspired conflict layer
 
-Antistasi Ultimate describes itself as an Arma 3 persistent multiplayer scenario focused on guerrilla warfare and expanding persistent gameplay, templates, maps and features. fileciteturn344file0L2-L5
+Antistasi Ultimate is a persistent Arma 3 multiplayer scenario focused on guerrilla warfare and expanded persistent gameplay. RHD uses that *style of persistent world pressure* as design inspiration for its own **Conflict** layer.
 
-RHD - LifeCore uses that *style of persistent world pressure* as design inspiration for its own **Conflict** layer:
+The RHD implementation provides:
 
-- `rhd_zone_*` markers define districts in Eden.
-- Districts track criminal/public-order **heat** from 0-100.
-- Nearby Police jobs reduce heat over time.
-- Districts with higher pressure become `CONTESTED` or `CRIMINAL PRESSURE`.
-- Each district tracks a supply value for future jobs/events.
-- Crime scripts can add heat server-side with `RHD_fnc_recordCrime`.
-- The player cTab tablet exposes district status in the **DISTRICTS** page.
+- `rhd_zone_*` markers that define districts in Eden.
+- District criminal/public-order **heat** from 0-100.
+- Nearby Police jobs that reduce heat over time.
+- `ORDERLY`, `CONTESTED` and `CRIMINAL PRESSURE` district states.
+- A district supply value for future jobs and events.
+- Server-side `RHD_fnc_recordCrime` support for adding pressure from gameplay systems.
+- A **DISTRICTS** page in the player cTab tablet.
 
-The implementation is RHD-owned SQF. It does **not** load Antistasi Ultimate's PBOs or require the Antistasi Ultimate mod to run.
+The implementation is RHD-owned SQF. It does **not** load Antistasi Ultimate PBOs or require Antistasi Ultimate to run.
 
 ## Licensing / third-party code
 
-The main Antistasi Ultimate project is MIT licensed, but its repository explicitly identifies some integrated components as separately licensed APL-ND material, including StreetArtist and the Håkon Rydland Garage. APL-ND material cannot be distributed as modified derivatives. fileciteturn343file0L2-L6
-
-For that reason, RHD - LifeCore does **not** copy or modify those restricted Antistasi components. See `THIRD_PARTY_NOTICES.md` for attribution and integration boundaries.
+The main Antistasi Ultimate project is MIT licensed, but its repository also identifies some integrated components as separately licensed APL-ND material. RHD does not copy or modify those restricted components. See `THIRD_PARTY_NOTICES.md` for the exact integration boundary and attribution.
 
 ## Beginner editing
 
@@ -103,13 +101,13 @@ Experienced developers can work directly in:
 
 ## cTab+
 
-RHD uses [cTab+](https://github.com/jetelain/cTab) as the player-facing tablet surface. cTab exposes the mission-facing `cTab_fnc_open` function, and RHD hosts its own controls on `cTab_Tablet_dlg`. fileciteturn274file0L2-L6
+RHD uses [cTab+](https://github.com/jetelain/cTab) as the player-facing tablet surface. The mission opens cTab's `cTab_Tablet_dlg` through its mission-facing function and places RHD-owned controls on that display.
 
 cTab+ requires CBA_A3. Keep cTab+ installed as an external Workshop mod; do not copy its PBOs into this mission.
 
 ## ACE3
 
-RHD detects ACE3 at runtime. ACE supplies the interaction layer for the RHD Life Tablet, RHD Administration and contextual EMS actions. RHD keeps LifeCore's business rules and privileged validation on the server.
+RHD detects ACE3 at runtime. ACE supplies the interaction layer for the RHD Life Tablet, RHD Administration and contextual EMS actions. RHD keeps LifeCore business rules and privileged validation on the server.
 
 ## Administration
 
