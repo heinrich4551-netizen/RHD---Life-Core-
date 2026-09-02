@@ -9,6 +9,18 @@ missionNamespace setVariable ["RHD_VERSION", "2.1.0-A3A", true];
 missionNamespace setVariable ["RHD_DISPLAY_NAME", "RHD - LifeCore", true];
 missionNamespace setVariable ["RHD_AUTHOR", "LT. Toad", true];
 
+// Safe defaults: no RHD-only system can operate until the 3DEN Life module runs.
+missionNamespace setVariable ["RHD_LIFE_MODULE_READY", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_ECONOMY", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_JOBS", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_INDUSTRY", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_RP", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_PERSISTENCE", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_AMBIENT", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_BRANDING", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_TABLET", false, true];
+missionNamespace setVariable ["RHD_LIFE_ENABLE_CONFLICT", false, true];
+
 // ADMINISTRATORS - replace the example IDs with trusted Steam64 IDs.
 missionNamespace setVariable ["RHD_ADMIN_UIDS", [], true];
 
