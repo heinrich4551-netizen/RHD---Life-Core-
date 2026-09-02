@@ -1,0 +1,92 @@
+version=53;
+class Mission
+{
+    addOns[] = {"rhd_lifecore"};
+    addOnsAuto[] = {"rhd_lifecore"};
+    randomSeed=123456;
+    scenarioData = "";
+    class Intel
+    {
+        timeOfChanges=1800;
+        startWeather=0.35;
+        startWind=0.15;
+        startWaves=0.20;
+        startDate[]={2035,6,24,8,0};
+        forecastWeather=0.35;
+        forecastWind=0.15;
+        forecastWaves=0.20;
+        forecastDate[]={2035,6,24,12,0};
+        startFog=0.03;
+        forecastFog=0.03;
+        hour=8;
+        minute=0;
+    };
+    class Entities
+    {
+        items=23;
+
+        class Item0
+        {
+            dataType="Object";
+            class PositionInfo
+            {
+                position[]={3623.0,0,12950.0};
+                angles[]={0,0,0};
+            };
+            side="Civilian";
+            flags=7;
+            class Attributes
+            {
+                skill=0.50;
+                rank="PRIVATE";
+                isPlayer=1;
+                isPlayable=1;
+            };
+            type="C_man_1";
+            id=1;
+        };
+
+        class Item1
+        {
+            dataType="Object";
+            class PositionInfo {position[]={3623.0,0,12950.0};angles[]={0,0,0};};
+            side="Logic";
+            flags=7;
+            class Attributes {};
+            type="RHD_Module_AntistasiBase";
+            id=2;
+        };
+
+        class Item2
+        {
+            dataType="Object";
+            class PositionInfo {position[]={3630.0,0,12960.0};angles[]={0,0,0};};
+            side="Logic";
+            flags=7;
+            class Attributes {};
+            type="RHD_Module_LifeCore";
+            id=3;
+        };
+
+        class Item3 {dataType="Marker";position[]={3623.0,12950.0,0};name="rhd_shop_kavala";type="mil_dot";colorName="ColorBlue";a=1;b=1;id=4;};
+        class Item4 {dataType="Marker";position[]={3650.0,12960.0,0};name="rhd_bank_kavala";type="mil_dot";colorName="ColorGreen";a=1;b=1;id=5;};
+        class Item5 {dataType="Marker";position[]={3710.0,12990.0,0};name="rhd_fuel_kavala";type="mil_dot";colorName="ColorYellow";a=1;b=1;id=6;};
+        class Item6 {dataType="Marker";position[]={3550.0,13050.0,0};name="rhd_farm_apples_kavala";type="mil_dot";colorName="ColorOrange";a=1;b=1;id=7;};
+        class Item7 {dataType="Marker";position[]={3500.0,13120.0,0};name="rhd_farm_cannabis_kavala";type="mil_dot";colorName="ColorRed";a=1;b=1;id=8;};
+        class Item8 {dataType="Marker";position[]={3700.0,13100.0,0};name="rhd_farm_coca_kavala";type="mil_dot";colorName="ColorRed";a=1;b=1;id=9;};
+        class Item9 {dataType="Marker";position[]={3800.0,13020.0,0};name="rhd_farm_corn_kavala";type="mil_dot";colorName="ColorOrange";a=1;b=1;id=10;};
+        class Item10 {dataType="Marker";position[]={3900.0,13120.0,0};name="rhd_farm_grapes_kavala";type="mil_dot";colorName="ColorOrange";a=1;b=1;id=11;};
+        class Item11 {dataType="Marker";position[]={4000.0,13000.0,0};name="rhd_farm_peaches_kavala";type="mil_dot";colorName="ColorOrange";a=1;b=1;id=12;};
+        class Item12 {dataType="Marker";position[]={4300.0,13300.0,0};name="rhd_mine_iron_kavala";type="mil_dot";colorName="ColorGrey";a=1;b=1;id=13;};
+        class Item13 {dataType="Marker";position[]={4500.0,13200.0,0};name="rhd_mine_copper_kavala";type="mil_dot";colorName="ColorGrey";a=1;b=1;id=14;};
+        class Item14 {dataType="Marker";position[]={4700.0,13400.0,0};name="rhd_mine_gold_kavala";type="mil_dot";colorName="ColorYellow";a=1;b=1;id=15;};
+        class Item15 {dataType="Marker";position[]={4900.0,13300.0,0};name="rhd_mine_diamond_kavala";type="mil_dot";colorName="ColorBlue";a=1;b=1;id=16;};
+        class Item16 {dataType="Marker";position[]={5100.0,13200.0,0};name="rhd_mine_oil_kavala";type="mil_dot";colorName="ColorBrown";a=1;b=1;id=17;};
+        class Item17 {dataType="Marker";position[]={5200.0,13000.0,0};name="rhd_refine_iron_kavala";type="mil_dot";colorName="ColorGrey";a=1;b=1;id=18;};
+        class Item18 {dataType="Marker";position[]={5250.0,12900.0,0};name="rhd_refine_copper_kavala";type="mil_dot";colorName="ColorGrey";a=1;b=1;id=19;};
+        class Item19 {dataType="Marker";position[]={5300.0,12800.0,0};name="rhd_refine_gold_kavala";type="mil_dot";colorName="ColorYellow";a=1;b=1;id=20;};
+        class Item20 {dataType="Marker";position[]={5350.0,12700.0,0};name="rhd_refine_oil_kavala";type="mil_dot";colorName="ColorBrown";a=1;b=1;id=21;};
+        class Item21 {dataType="Marker";position[]={3623.0,12950.0,0};name="rhd_zone_kavala";type="mil_circle";colorName="ColorOrange";a=0.5;b=0.5;id=22;};
+        class Item22 {dataType="Marker";position[]={3650.0,12850.0,0};name="rhd_jail_kavala";type="mil_dot";colorName="ColorRed";a=1;b=1;id=23;};
+    };
+};
