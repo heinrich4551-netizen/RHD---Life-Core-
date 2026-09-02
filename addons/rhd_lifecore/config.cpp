@@ -35,6 +35,7 @@ class CfgFunctions
             file = "\rhd_lifecore\functions\modules";
             class moduleAntistasiBase {};
             class moduleLifeCore {};
+            class terrainAudit {server = 1;};
         };
     };
 };
