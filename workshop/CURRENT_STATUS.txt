@@ -1,0 +1,1 @@
+The source tree now contains Workshop dependency metadata, an Altis mission source, and a CI mission-PBO packaging helper. The authoritative build artifact is produced by GitHub Actions after CI runs.
