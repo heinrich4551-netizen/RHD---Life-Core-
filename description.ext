@@ -36,9 +36,16 @@ respawnDelay = 5;
 respawnTemplates[] = {"MenuPosition"};
 joinUnassigned = 1;
 
-// Generic fallback used only when the current terrain has no A3A mapInfo entry.
+// ---------------------------------------------------------------------------
+// ANTISTASI MISSION COMPATIBILITY
+// ---------------------------------------------------------------------------
+// Antistasi Ultimate's pre-JIP check requires a mission-side A3A class.
+// The current A3A branch requires mission version 10.0.0 or newer; this
+// mission advertises the current verified development revision here.
 class A3A
 {
+    version[] = {11,9,12};
+
     class mapInfo
     {
         class generic
@@ -172,8 +179,6 @@ class CfgFunctions
             class adminSpectate {};
         };
 
-        // Function names intentionally include "antistasi" so the public RHD
-        // namespace is unambiguous when reading RPT logs and scripts.
         class Antistasi
         {
             file = "core\\antistasi";
@@ -241,7 +246,6 @@ class CfgRemoteExec
     };
 };
 
-// cTab player tablet. cTab remains an external required addon.
 #include "core\\ui\\ctab.hpp"
 
 class RscTitles
@@ -273,7 +277,7 @@ class RscTitles
     };
 };
 
-// Separate administrator interface. No item or admin hotkey is required.
+// Separate administrator panel. No item or admin hotkey is required.
 class RHD_ADMIN
 {
     idd = 8500;
