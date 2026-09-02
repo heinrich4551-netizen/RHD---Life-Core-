@@ -2,49 +2,104 @@
 
 **Author: LT. Toad**
 
-This is the **"I don't understand Arma 3 scripting yet"** guide.
+This guide is for editors who are new to Arma 3 scripting.
 
-## The four places you need to know
+## 1. Place the two RHD modules in 3DEN
 
-### 1. Eden Editor (3DEN)
+### Antistasi Ultimate Base
 
-Use Eden for the map.
+`Systems -> RHD - LifeCore -> Antistasi Ultimate Base`
 
-Place buildings, vehicles, NPCs, service locations, RHD markers and `Land_Billboard_F` objects here.
+Place one at the campaign start / HQ location. Keep the three default options enabled.
 
-Do not edit `mission.sqm` by hand.
+This module starts the installed Antistasi Ultimate campaign. A3A remains responsible for strategic world state, campaign persistence, faction control, garrisons, patrols, QRFs, attacks, aggression, resources, HQ/Petros, arsenal and strategic background systems.
 
-### 2. `core/fn_init.sqf`
+### Life RP Systems
 
-This is the **main beginner configuration file**.
+`Systems -> RHD - LifeCore -> Life RP Systems`
 
-Use it for:
+Place one anywhere. Keep the options enabled for the features you want.
+
+This module controls the RHD-only systems around the A3A campaign: economy, jobs, industry, police/EMS, persistence, ambient life, branding, cTab and Life RP district pressure.
+
+## 2. Set up the map in Eden
+
+Use Eden for all map-specific setup. Do not hard-code terrain coordinates into SQF.
+
+RHD location markers:
+
+```text
+rhd_shop_
+rhd_bank_
+rhd_fuel_
+rhd_farm_
+rhd_mine_
+rhd_refine_
+rhd_zone_
+rhd_jail_
+```
+
+See `3DEN_SETUP.md` for the exact naming examples.
+
+## 3. Configure gameplay values
+
+Edit only:
+
+`core/fn_init.sqf`
+
+This is where you change:
 
 - Admin Steam64 IDs
-- Job names and salaries
-- Item names and prices
+- Job names and pay
+- RHD virtual market prices
 - Refining recipes
 - Gatherable resources
-- Antistasi bridge tuning
+- Dynamic shop price multipliers
+- Exact vehicle/item price overrides
+- Antistasi crime/aggression tuning
 - RHD district pressure tuning
 
-### 3. `STEAM_WORKSHOP_DEPENDENCIES.md`
+## 4. Shop content is automatic
 
-Use this for the required Steam/Arma 3 mod stack.
+The RHD shop reads the live Arma 3 configuration at runtime.
 
-The full RHD build requires **Antistasi Ultimate + CBA_A3 + ACE3 + cTab+**, in addition to Arma 3 itself.
+The vehicle shop includes public land/air/ship vehicles in the active modset.
 
-The five additional Workshop IDs requested by the project owner are listed there as pending verification until their official Steam metadata can be checked.
+The equipment shop includes public weapons, magazines, gear, goggles and backpacks in the active modset.
 
-### 4. `ANTISTASI_BASE.md`
+This means the same RHD shop automatically sees base-game content and public content from loaded dependency mods without a hard-coded class list for every addon.
 
-Read this before changing the campaign integration.
+## 5. Player tablet
 
-Antistasi Ultimate is now the strategic foundation. RHD is intentionally a Life RP layer around it rather than a second competing strategic war system.
+Use ACE Self Actions -> `RHD LifeCore Tablet`.
 
----
+The tablet contains:
 
-## Branding
+```text
+STATUS
+JOBS
+MARKET
+VEHICLES
+EQUIPMENT
+BANK
+SERVICES
+DISTRICTS
+CAMPAIGN
+```
+
+The `CAMPAIGN` page reports the A3A-backed strategic world.
+
+## 6. Admin
+
+Administration is separate from cTab.
+
+Use ACE Self Actions -> `RHD Administration`.
+
+No admin item and no dedicated admin hotkey are required.
+
+Admin access is configured by Steam64 ID in `core/fn_init.sqf`.
+
+## 7. Branding
 
 Mission name:
 
@@ -54,187 +109,47 @@ Author:
 
 `LT. Toad`
 
-Branding artwork:
+Artwork:
 
 `assets/branding/RHDLifeCore.jpg`
 
-Every `Land_Billboard_F` placed in the mission is automatically given the RHD artwork on server startup.
+Normal `Land_Billboard_F` objects placed in Eden are automatically branded when billboard branding is enabled.
 
-To leave one billboard unchanged, set this object variable in Eden:
+Set this object variable to opt out a single billboard:
 
 ```sqf
 rhd_billboard_skip = true
 ```
 
----
+## 8. Terrain support
 
-## Where do I edit each thing?
+RHD is designed around Antistasi Ultimate rather than replacing it.
 
-| I want to change... | Edit... |
-|---|---|
-| Town layout | Eden Editor |
-| Farming/mining locations | Eden Editor / `3DEN_SETUP.md` |
-| District/conflict locations | Eden Editor / `3DEN_SETUP.md` |
-| Billboards | Eden Editor (`Land_Billboard_F`) |
-| Item price | `core/fn_init.sqf` |
-| Job pay | `core/fn_init.sqf` |
-| Refining output | `core/fn_init.sqf` |
-| Admin access | `core/fn_init.sqf` |
-| A3A crime/aggression bridge | `core/fn_init.sqf` |
-| Conflict heat/radius | `core/fn_init.sqf` |
-| Player tablet pages | `core/ui/` |
-| ACE interactions | `core/ace/` |
-| Admin actions | `core/admin/` |
-| Antistasi integration | `core/antistasi/` |
-| Shops | `core/economy/` |
-| Banking | `core/bank/` |
-| Jobs | `core/jobs/` |
-| Farming/mining/refining code | `core/industry/` |
-| District pressure | `core/conflict/` |
-| Police/EMS/RP | `core/rp/` |
-| Vehicle services | `core/services/` |
-| Ambient civilians/events | `core/ambient/` |
-| Mission function registration | `description.ext` |
+A3A mapInfo is used when the active terrain provides it. The RHD Antistasi Base module can install a generic fallback for terrains without a mapInfo entry.
 
----
+The fallback improves generic terrain compatibility but cannot invent terrain-specific airports, special buildings, factions or map data. Those cases still need terrain-specific A3A mapInfo and in-game validation.
 
-## Editing rules for beginners
+## 9. What not to edit
 
-### Safe to edit
+Do not edit `mission.sqm` by hand.
 
-Changing values in `core/fn_init.sqf` is the safest way to customize the economy, jobs, Antistasi bridge tuning and district pressure.
+Do not put terrain coordinates in `core/fn_init.sqf`.
 
-Changing marker names/positions in Eden is also safe as long as you keep the documented prefixes.
+Do not rename `fn_*.sqf` files casually.
 
-### Think before editing
+Do not move economy or admin validation to client-only code.
 
-`description.ext`, `core/ui/ctab.hpp`, `core/admin/`, `core/ace/`, and network/security code affect the whole mission.
+Do not copy external A3A, ACE3, CBA_A3 or cTab PBOs into the mission folder.
 
-Make a backup before changing them.
+## 10. Final test
 
-### Keep server authority
-
-Do not move money, inventory, job, admin or transaction validation from server-side functions to the client.
-
-### Keep A3A as the strategic authority
-
-Do not create a second system that tries to replace A3A strategic zones, garrisons, attacks, aggression or campaign persistence.
-
-Use the RHD bridge in `core/antistasi/` to communicate with the installed A3A campaign.
-
----
-
-## Example: add a new job
-
-Open `core/fn_init.sqf`, find the `JOBS` section and add:
-
-```sqf
-["mechanic", ["Mechanic", 50]],
-```
-
-The job ID is the internal name. The second value is the player-facing name. The final value is pay per minute.
-
----
-
-## Example: change a shop price
-
-Find the item in `ITEMS`:
-
-```sqf
-["apple", ["Apple", 5, 2, "food"]],
-```
-
-The values mean:
-
-```text
-Apple = display name
-5     = buy price
-2     = sell price
-food  = category
-```
-
----
-
-## Example: add an admin
-
-Find `RHD_ADMIN_UIDS` in `core/fn_init.sqf` and enter the trusted Steam64 ID(s).
-
-```sqf
-missionNamespace setVariable [
-    "RHD_ADMIN_UIDS",
-    ["76561198012345678"],
-    true
-];
-```
-
-Do not use a player's display name.
-
----
-
-## Example: add a district
-
-In Eden, create a marker named:
-
-```text
-rhd_zone_kavala
-```
-
-The RHD district layer tracks Life RP heat around the A3A strategic world.
-
-The cTab **DISTRICTS** page reads the resulting state.
-
----
-
-## Example: add a shop
-
-In Eden, create a marker named:
-
-```text
-rhd_shop_kavala
-```
-
-Move it to the shop location.
-
----
-
-## Example: add another farming location
-
-Create a marker with the appropriate prefix, such as:
-
-```text
-rhd_farm_apples_west
-```
-
-The scripts discover the prefix automatically, so multiple locations are supported.
-
----
-
-## Test after every important edit
-
-1. Save the edited file.
-2. Start a local multiplayer preview.
-3. Check the feature you changed.
-4. Check the RPT/log for script errors.
-5. Test the same modset on a dedicated server.
-
----
-
-## Project design philosophy
-
-```text
-ANTISTASI ULTIMATE -> strategic persistent world
-        |
-        +-> RHD - LifeCore -> Life RP layer
-                              |
-                              +-> economy
-                              +-> jobs
-                              +-> crime
-                              +-> police / EMS
-                              +-> services
-                              +-> cTab tablet
-                              +-> ACE interaction
-                              +-> separate admin
-                              +-> RHD branding
-```
-
-The goal is to keep RHD understandable without sacrificing the power of the Antistasi campaign base.
+1. Load Arma 3 with Antistasi Ultimate, CBA_A3, ACE3, cTab+ and the RHD addon.
+2. Open the mission in Eden.
+3. Place the two RHD modules.
+4. Place at least one `rhd_shop_*` marker.
+5. Add the other RHD locations you want.
+6. Save the mission in Eden.
+7. Run a local multiplayer preview.
+8. Confirm Antistasi reaches its campaign startup state.
+9. Confirm the RHD tablet, shop and ACE interactions.
+10. Then test the identical modset on the dedicated server.
