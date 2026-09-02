@@ -1,45 +1,37 @@
 # RHD - LifeCore — Steam Workshop & Dependency Guide
 
-**Author: LT. Toad**
+**Author: LT. Toad | Published profile: Altis + Antistasi Ultimate**
 
 ## Hard external dependencies
 
-RHD - LifeCore has exactly two required external Arma 3 Workshop dependencies:
+The published RHD - LifeCore mod requires these external Arma 3 Workshop items:
 
-| Component | Steam Workshop ID | Role |
-|---|---:|---|
-| CBA_A3 | `450814997` | Shared Arma 3 framework used by the RHD integration layer |
-| cTab+ | `2262006564` | RHD player tablet interface |
+| Component | Steam Workshop ID | Role | Required |
+|---|---:|---|---|
+| CBA_A3 | `450814997` | Shared framework | **Yes** |
+| cTab+ | `2262006564` | RHD player tablet/UI host | **Yes** |
+| Antistasi Ultimate | `3020755032` | Strategic campaign framework for the published scenario | **Yes** |
+| ACE3 | — | Optional interaction enhancement | No |
 
-Arma 3 itself is, of course, required because RHD is an Arma 3 addon/mission framework.
-
-## Optional enhancements
-
-These do **not** belong in `CfgPatches.requiredAddons[]` and are detected at runtime:
-
-- Antistasi Ultimate / A3A: enables the Antistasi campaign bridge, campaign status, strategic-state integration and A3A-backed district information.
-- ACE3: enables ACE Self Actions and contextual EMS/admin interactions.
-- Other equipment/vehicle mods: automatically contribute public Arma configuration classes to the RHD shop/catalogue when installed and loaded.
-
-RHD therefore remains usable with only Arma 3 + CBA_A3 + cTab+. Optional integrations enhance the experience without becoming hard loading dependencies.
-
-## Architecture rule
-
-The RHD addon hard dependency declaration is limited to:
+The RHD addon declaration is:
 
 ```cpp
-requiredAddons[] = {"cba_main", "ctab_core"};
+requiredAddons[] = {"cba_main", "ctab_core", "A3A_core"};
 ```
 
-Antistasi and ACE are guarded with runtime checks before their functions/classes are used. The Antistasi bridge falls back to a standalone RHD mode when `A3A_core` is not installed.
+## Steam Workshop publishing requirement
 
-## cTab integration
+When creating/updating the RHD Workshop item, add these three Workshop IDs as **required dependencies** in Steam's dependency settings:
 
-The player tablet is built on cTab+'s tablet display and uses RHD-owned controls/pages. The core does not copy cTab source into RHD.
+```text
+450814997  CBA_A3
+2262006564 cTab+
+3020755032 Antistasi Ultimate
+```
 
-## CBA integration
+Do not mark ACE3 as a required dependency.
 
-CBA is treated as the shared framework dependency. RHD does not embed CBA files or replace CBA functionality.
+Steam maintains dependency metadata separately from the mod files. The RHD `CfgPatches` declaration provides a second runtime safeguard inside Arma 3.
 
 ## Recommended load order
 
@@ -47,16 +39,54 @@ CBA is treated as the shared framework dependency. RHD does not embed CBA files 
 Arma 3
   -> CBA_A3
   -> cTab+
-  -> optional Antistasi Ultimate / ACE3 / other content mods
+  -> Antistasi Ultimate
   -> RHD - LifeCore
+  -> optional ACE3 / other mission content
 ```
 
-The exact launcher order can vary, but all hard dependencies must be loaded before RHD.
+The exact Launcher ordering may vary, but all required dependencies must be loaded with RHD.
 
-## Mission vs external mods
+## What RHD owns
 
-RHD does not redistribute CBA_A3, cTab+, ACE3 or Antistasi PBOs. Install those through Steam Workshop / their normal distribution channel.
+RHD provides:
 
-## Licensing
+```text
+Life RP player state
+cash and banking
+jobs and salaries
+farming / mining / refining
+virtual market
+vehicle/equipment shops
+police / EMS RP
+district crime/heat layer
+ambient life
+cTab RHD tablet
+UID-gated administration
+RHD clothing
+RHD branding
+```
 
-See `THIRD_PARTY_NOTICES.md` and the files under `LICENSES/` for the project's third-party licensing boundary.
+## What Antistasi Ultimate owns
+
+A3A remains authoritative for:
+
+```text
+campaign lifecycle
+strategic zone state
+faction control
+garrisons / patrols / QRFs
+aggression
+campaign resources
+HQ/Petros
+campaign persistence
+```
+
+RHD integrates with this state rather than implementing a second strategic campaign engine.
+
+## ACE3
+
+ACE3 is detected at runtime. RHD adds ACE interaction surfaces when ACE3 is installed but does not require ACE3 for addon loading.
+
+## Distribution boundary
+
+RHD does not redistribute the PBOs of CBA_A3, cTab+, Antistasi Ultimate or ACE3. Install those dependencies through Steam Workshop or their normal distribution channel.
