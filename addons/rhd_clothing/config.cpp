@@ -43,30 +43,32 @@ class CfgWeapons
     class U_C_Poloshirt_burgundy;
     class U_C_Poloshirt_yellow;
     class U_C_Poloshirt_stripped;
-    class U_C_Poloshirt_tricolour;
 
     class RHD_Top_TShirt_Tan: U_C_Poloshirt_white
     {
         scope = 2;
         scopeArsenal = 2;
         displayName = "RHD Top | T-Shirt | Tan";
-        descriptionShort = "RHD civilian top preset using the Arma 3 stock civilian uniform model.";
+        descriptionShort = "RHD civilian top preset using a stock Arma 3 civilian uniform model.";
+        hiddenSelectionsTextures[] = {"#(rgb,8,8,3)color(0.62,0.50,0.34,1)"};
     };
 
-    class RHD_Top_TShirt_Olive: U_C_Poloshirt_tricolour
+    class RHD_Top_TShirt_Olive: U_C_Poloshirt_white
     {
         scope = 2;
         scopeArsenal = 2;
         displayName = "RHD Top | T-Shirt | Olive";
-        descriptionShort = "RHD civilian top preset using a stock Arma 3 civilian uniform.";
+        descriptionShort = "RHD civilian top preset using a stock Arma 3 civilian uniform model.";
+        hiddenSelectionsTextures[] = {"#(rgb,8,8,3)color(0.30,0.35,0.23,1)"};
     };
 
-    class RHD_Top_TShirt_Black: U_C_Poloshirt_burgundy
+    class RHD_Top_TShirt_Black: U_C_Poloshirt_white
     {
         scope = 2;
         scopeArsenal = 2;
         displayName = "RHD Top | T-Shirt | Black";
-        descriptionShort = "RHD civilian top preset using the Arma 3 stock civilian uniform model.";
+        descriptionShort = "RHD civilian top preset using a stock Arma 3 civilian uniform model.";
+        hiddenSelectionsTextures[] = {"#(rgb,8,8,3)color(0.07,0.07,0.07,1)"};
     };
 
     class RHD_Top_Polo_White: U_C_Poloshirt_white
