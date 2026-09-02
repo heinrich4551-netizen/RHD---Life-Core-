@@ -10,7 +10,7 @@ class CfgFunctions
     class RHD
     {
         tag = "RHD";
-        class Core { file="core"; class init {preInit=1;}; class initPlayer {postInit=1;}; class initActions {}; class savePlayer {server=1;}; class loadPlayer {server=1;}; class getItemCount {}; class addItem {}; class removeItem {}; class addCash {server=1;}; class removeCash {server=1;}; class notify {}; };
+        class Core { file="core"; class init {preInit=1;}; class initPlayer {postInit=1;}; class initActions {}; class savePlayer {server=1;}; class loadPlayer {server=1;}; class getItemCount {server=1;}; class addItem {server=1;}; class removeItem {server=1;}; class addCash {server=1;}; class removeCash {server=1;}; class notify {}; };
         class Economy { file="core\\economy"; class serverBuy {server=1;}; class serverSell {server=1;}; class shopOpen {}; };
         class Bank { file="core\\bank"; class deposit {server=1;}; class withdraw {server=1;}; class requestDeposit {}; class requestWithdraw {}; };
         class Jobs { file="core\\jobs"; class setJob {server=1;}; class startWork {}; class stopWork {}; };
