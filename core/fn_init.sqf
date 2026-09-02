@@ -1,8 +1,11 @@
 if (!isServer) exitWith {};
 
-missionNamespace setVariable ["RHD_VERSION", "1.0.0", true];
+missionNamespace setVariable ["RHD_VERSION", "1.1.0", true];
 missionNamespace setVariable ["RHD_DB", createHashMap];
 missionNamespace setVariable ["RHD_SHOPS", createHashMap];
+
+/* Server owners: add Steam64 UIDs here. Admin UI and privileged actions are UID-gated. */
+missionNamespace setVariable ["RHD_ADMIN_UIDS", [], true];
 missionNamespace setVariable ["RHD_JOBS", createHashMapFromArray [
     ["civ", ["Civilian", 0]], ["farmer", ["Farmer", 25]], ["miner", ["Miner", 35]],
     ["refiner", ["Refinery Worker", 45]], ["police", ["Police", 60]], ["medic", ["EMS", 60]]
@@ -26,6 +29,7 @@ missionNamespace setVariable ["RHD_GATHER", createHashMapFromArray [
     ["iron_ore", 1], ["copper_ore", 1], ["gold_ore", 1], ["diamond", 1], ["oil_sand", 1]
 ], true];
 publicVariable "RHD_VERSION";
+publicVariable "RHD_ADMIN_UIDS";
 publicVariable "RHD_ITEMS";
 publicVariable "RHD_RECIPES";
 publicVariable "RHD_GATHER";
