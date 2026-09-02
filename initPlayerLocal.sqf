@@ -2,22 +2,28 @@
     RHD - LifeCore | PLAYER CLIENT BOOTSTRAP
     Author: LT. Toad
 
-    RHD-only client features are enabled by the 3DEN Life RP Systems module.
+    The RHD Life RP Systems 3DEN module is required for player features.
 */
+
+private _moduleTimeout = missionNamespace getVariable ["RHD_STANDALONE_INIT_TIMEOUT_SECONDS", 15];
+private _moduleDeadline = time + _moduleTimeout;
 
 waitUntil {
     sleep 0.25;
-    missionNamespace getVariable ["RHD_LIFE_MODULE_READY", false]
+    missionNamespace getVariable ["RHD_LIFE_MODULE_READY", false] || {time > _moduleDeadline}
 };
 
-// RHD player identity/inventory only starts when the Life module exists.
+if !(missionNamespace getVariable ["RHD_LIFE_MODULE_READY", false]) exitWith {
+    diag_log "[RHD-LIFECORE] ERROR: RHD Life RP Systems module was not initialized. Place one RHD Life RP Systems module in 3DEN.";
+};
+
+// RHD player identity/inventory starts only after the Life module is enabled.
 [] call RHD_fnc_initPlayer;
 
 waitUntil {!isNull findDisplay 46};
 (findDisplay 46) displayAddEventHandler ["KeyDown", "_this call RHD_fnc_keyHandler"];
 
-// ACE setup is always called so the separate admin surface still works even
-// when the server owner disables the player tablet in 3DEN.
+// ACE setup is optional; the RHD function performs its own presence check.
 [] call RHD_fnc_aceInit;
 
 [] spawn {
@@ -26,6 +32,6 @@ waitUntil {!isNull findDisplay 46};
     if (missionNamespace getVariable ["RHD_LIFE_ENABLE_TABLET", true]) then {
         sleep 1;
         [] call RHD_fnc_initHud;
-        ["RHD - LifeCore loaded. Use ACE Self Actions -> RHD LifeCore Tablet.", "info"] call RHD_fnc_notify;
+        ["RHD - LifeCore loaded. Use the configured RHD tablet access path.", "info"] call RHD_fnc_notify;
     };
 };
