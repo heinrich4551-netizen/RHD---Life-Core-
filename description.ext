@@ -5,120 +5,51 @@ respawnOnStart = -1;
 respawnDelay = 5;
 respawnTemplates[] = {"MenuPosition"};
 joinUnassigned = 1;
-
 class CfgFunctions
 {
     class RHD
     {
         tag = "RHD";
-        class Core
-        {
-            file = "core";
-            class init {preInit = 1;};
-            class initPlayer {postInit = 1;};
-            class savePlayer {server = 1;};
-            class loadPlayer {server = 1;};
-            class getItemCount {};
-            class addItem {};
-            class removeItem {};
-            class addCash {server = 1;};
-            class removeCash {server = 1;};
-            class notify {};
-        };
-        class Economy
-        {
-            file = "core\\economy";
-            class serverBuy {server = 1;};
-            class serverSell {server = 1;};
-            class shopOpen {};
-        };
-        class Jobs
-        {
-            file = "core\\jobs";
-            class setJob {server = 1;};
-            class startWork {};
-            class stopWork {};
-        };
-        class Industry
-        {
-            file = "core\\industry";
-            class serverGather {server = 1;};
-            class requestGather {};
-            class refine {server = 1;};
-            class requestRefine {};
-        };
-        class RP
-        {
-            file = "core\\rp";
-            class ticket {server = 1;};
-            class requestTicket {};
-            class heal {server = 1;};
-            class requestHeal {};
-        };
-        class UI
-        {
-            file = "core\\ui";
-            class openMenu {};
-            class keyHandler {};
-            class refresh {};
-            class requestBuy {};
-            class requestSell {};
-        };
+        class Core { file="core"; class init {preInit=1;}; class initPlayer {postInit=1;}; class savePlayer {server=1;}; class loadPlayer {server=1;}; class getItemCount {}; class addItem {}; class removeItem {}; class addCash {server=1;}; class removeCash {server=1;}; class notify {}; };
+        class Economy { file="core\\economy"; class serverBuy {server=1;}; class serverSell {server=1;}; class shopOpen {}; };
+        class Jobs { file="core\\jobs"; class setJob {server=1;}; class startWork {}; class stopWork {}; };
+        class Industry { file="core\\industry"; class serverGather {server=1;}; class requestGather {}; class refine {server=1;}; class requestRefine {}; };
+        class RP { file="core\\rp"; class ticket {server=1;}; class requestTicket {}; class heal {server=1;}; class requestHeal {}; };
+        class UI { file="core\\ui"; class openMenu {}; class keyHandler {}; class refresh {}; class requestBuy {}; class requestSell {}; };
     };
 };
-
 class CfgRemoteExec
 {
     class Functions
     {
-        mode = 2;
-        jip = 1;
-        class RHD_fnc_notify {allowedTargets = 0;};
-        class RHD_fnc_openMenu {allowedTargets = 1;};
-        class RHD_fnc_shopOpen {allowedTargets = 1;};
-        class RHD_fnc_serverBuy {allowedTargets = 2;};
-        class RHD_fnc_serverSell {allowedTargets = 2;};
-        class RHD_fnc_setJob {allowedTargets = 2;};
-        class RHD_fnc_serverGather {allowedTargets = 2;};
-        class RHD_fnc_refine {allowedTargets = 2;};
-        class RHD_fnc_ticket {allowedTargets = 2;};
-        class RHD_fnc_heal {allowedTargets = 2;};
+        mode=2; jip=1;
+        class RHD_fnc_notify {allowedTargets=0;};
+        class RHD_fnc_openMenu {allowedTargets=1;};
+        class RHD_fnc_shopOpen {allowedTargets=1;};
+        class RHD_fnc_serverBuy {allowedTargets=2;};
+        class RHD_fnc_serverSell {allowedTargets=2;};
+        class RHD_fnc_setJob {allowedTargets=2;};
+        class RHD_fnc_serverGather {allowedTargets=2;};
+        class RHD_fnc_refine {allowedTargets=2;};
+        class RHD_fnc_ticket {allowedTargets=2;};
+        class RHD_fnc_heal {allowedTargets=2;};
     };
 };
-
 class RHD_F6
 {
     idd=7600; movingEnable=0; enableSimulation=1;
     class controlsBackground { class Background: RscText {idc=7601;x=.28*safezoneW+safezoneX;y=.20*safezoneH+safezoneY;w=.44*safezoneW;h=.58*safezoneH;colorBackground[]={0,0,0,.82};}; };
-    class controls
-    {
-        class Title: RscText {idc=7602;x=.30*safezoneW+safezoneX;y=.22*safezoneH+safezoneY;w=.40*safezoneW;h=.05*safezoneH;text="RHD LIFE | PLAYER";sizeEx=.028;};
-        class Info: RscStructuredText {idc=7603;x=.31*safezoneW+safezoneX;y=.30*safezoneH+safezoneY;w=.38*safezoneW;h=.26*safezoneH;};
-        class Close: RscButton {idc=7604;x=.58*safezoneW+safezoneX;y=.70*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";};
-    };
+    class controls { class Title: RscText {idc=7602;x=.30*safezoneW+safezoneX;y=.22*safezoneH+safezoneY;w=.40*safezoneW;h=.05*safezoneH;text="RHD LIFE | PLAYER";sizeEx=.028;}; class Info: RscStructuredText {idc=7603;x=.31*safezoneW+safezoneX;y=.30*safezoneH+safezoneY;w=.38*safezoneW;h=.26*safezoneH;}; class Close: RscButton {idc=7604;x=.58*safezoneW+safezoneX;y=.70*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";}; };
 };
 class RHD_F7
 {
     idd=7700; movingEnable=0; enableSimulation=1;
     class controlsBackground { class Background: RscText {idc=7701;x=.28*safezoneW+safezoneX;y=.20*safezoneH+safezoneY;w=.44*safezoneW;h=.58*safezoneH;colorBackground[]={0,0,0,.82};}; };
-    class controls
-    {
-        class Title: RscText {idc=7702;x=.30*safezoneW+safezoneX;y=.22*safezoneH+safezoneY;w=.40*safezoneW;h=.05*safezoneH;text="RHD LIFE | JOBS";sizeEx=.028;};
-        class Jobs: RscListbox {idc=7703;x=.31*safezoneW+safezoneX;y=.30*safezoneH+safezoneY;w=.38*safezoneW;h=.30*safezoneH;};
-        class Select: RscButton {idc=7704;x=.44*safezoneW+safezoneX;y=.65*safezoneH+safezoneY;w=.15*safezoneW;h=.05*safezoneH;text="SELECT JOB";action="[] call RHD_fnc_startWork";};
-        class Close: RscButton {idc=7705;x=.58*safezoneW+safezoneX;y=.70*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";};
-    };
+    class controls { class Title: RscText {idc=7702;x=.30*safezoneW+safezoneX;y=.22*safezoneH+safezoneY;w=.40*safezoneW;h=.05*safezoneH;text="RHD LIFE | JOBS";sizeEx=.028;}; class Jobs: RscListbox {idc=7703;x=.31*safezoneW+safezoneX;y=.30*safezoneH+safezoneY;w=.38*safezoneW;h=.30*safezoneH;}; class Select: RscButton {idc=7704;x=.44*safezoneW+safezoneX;y=.65*safezoneH+safezoneY;w=.15*safezoneW;h=.05*safezoneH;text="SELECT JOB";action="[] call RHD_fnc_startWork";}; class Close: RscButton {idc=7705;x=.58*safezoneW+safezoneX;y=.70*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";}; };
 };
 class RHD_F8
 {
     idd=7805; movingEnable=0; enableSimulation=1;
     class controlsBackground { class Background: RscText {idc=7806;x=.20*safezoneW+safezoneX;y=.12*safezoneH+safezoneY;w=.60*safezoneW;h=.76*safezoneH;colorBackground[]={0,0,0,.84};}; };
-    class controls
-    {
-        class Title: RscText {idc=7807;x=.23*safezoneW+safezoneX;y=.15*safezoneH+safezoneY;w=.54*safezoneW;h=.05*safezoneH;text="RHD SHOP";sizeEx=.030;};
-        class Items: RscListbox {idc=7808;x=.23*safezoneW+safezoneX;y=.23*safezoneH+safezoneY;w=.54*safezoneW;h=.48*safezoneH;};
-        class Buy: RscButton {idc=7809;x=.31*safezoneW+safezoneX;y=.75*safezoneH+safezoneY;w=.14*safezoneW;h=.05*safezoneH;text="BUY";action="[lbCurSel 7808] call RHD_fnc_requestBuy";};
-        class Sell: RscButton {idc=7810;x=.47*safezoneW+safezoneX;y=.75*safezoneH+safezoneY;w=.14*safezoneW;h=.05*safezoneH;text="SELL";action="[lbCurSel 7808] call RHD_fnc_requestSell";};
-        class Close: RscButton {idc=7811;x=.64*safezoneW+safezoneX;y=.81*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";};
-    };
+    class controls { class Title: RscText {idc=7807;x=.23*safezoneW+safezoneX;y=.15*safezoneH+safezoneY;w=.54*safezoneW;h=.05*safezoneH;text="RHD SHOP";sizeEx=.030;}; class Items: RscListbox {idc=7808;x=.23*safezoneW+safezoneX;y=.23*safezoneH+safezoneY;w=.54*safezoneW;h=.48*safezoneH;}; class Buy: RscButton {idc=7809;x=.31*safezoneW+safezoneX;y=.75*safezoneH+safezoneY;w=.14*safezoneW;h=.05*safezoneH;text="BUY";action="[lbCurSel 7808] call RHD_fnc_requestBuy";}; class Sell: RscButton {idc=7810;x=.47*safezoneW+safezoneX;y=.75*safezoneH+safezoneY;w=.14*safezoneW;h=.05*safezoneH;text="SELL";action="[lbCurSel 7808] call RHD_fnc_requestSell";}; class Close: RscButton {idc=7811;x=.64*safezoneW+safezoneX;y=.81*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";}; };
 };
