@@ -1,4 +1,4 @@
-#define RHD_VERSION_TEXT "2.2.0"
+#define RHD_VERSION_TEXT "2.2.1"
 
 class CfgPatches
 {
@@ -7,8 +7,6 @@ class CfgPatches
         name = "RHD - LifeCore";
         author = "LT. Toad";
         requiredVersion = 2.20;
-        // Published RHD Workshop package hard-depends on CBA_A3, cTab+ and Antistasi Ultimate.
-        // ACE3 remains an optional runtime enhancement.
         requiredAddons[] = {"cba_main", "ctab_core", "A3A_core"};
         units[] = {"RHD_Module_AntistasiBase","RHD_Module_LifeCore"};
         weapons[] = {};
@@ -31,10 +29,12 @@ class CfgFunctions
     {
         class Modules
         {
-            file = "\\rhd\\addons\\rhd_lifecore\\functions\\modules";
+            // Relative paths keep the addon self-contained inside its PBO.
+            file = "functions/modules";
             class moduleAntistasiBase {};
             class moduleLifeCore {};
             class terrainAudit {server = 1;};
+            class terrainFallback {};
         };
     };
 };
