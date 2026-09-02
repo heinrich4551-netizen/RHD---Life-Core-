@@ -1,37 +1,23 @@
 /*
-    RHD - LifeCore | Conflict Layer Initializer
+    RHD - LifeCore | CONFLICT INITIALIZER
     Author: LT. Toad
+    ---------------------------------------------------------------------------
+    This is the startup hook for the RHD district-pressure system.
 
-    PURPOSE
-    -------
-    Provides an RHD implementation of a persistent district-pressure layer.
-    The design is inspired by the persistent world / territory pressure
-    style used by Antistasi Ultimate, but the implementation is written for
-    RHD LifeCore and does NOT load Antistasi Ultimate at runtime.
+    BEGINNER EDITORS:
+    Do NOT change tuning values here.
+    Change conflict settings in `core/fn_init.sqf` under
+    "ANTISTASI-STYLE DISTRICT PRESSURE" so all easy-to-edit server settings
+    stay in one location.
 
-    BEGINNER SETTINGS
-    -----------------
-    Change the values below to control how strongly crime and police activity
-    affect each rhd_zone_* district.
+    The system is RHD-owned and only inspired by persistent-world pressure
+    concepts from Antistasi Ultimate. Antistasi Ultimate is not loaded.
+    ---------------------------------------------------------------------------
 */
 
 if (!isServer) exitWith {false};
 
-// How often the district system updates.
-missionNamespace setVariable ["RHD_CONFLICT_ENABLE", true, true];
-missionNamespace setVariable ["RHD_CONFLICT_UPDATE_SECONDS", 60, true];
-
-// Radius around each rhd_zone_* marker that counts as the district.
-missionNamespace setVariable ["RHD_CONFLICT_ZONE_RADIUS", 400, true];
-
-// Heat is the district's criminal/public-order pressure from 0 to 100.
-missionNamespace setVariable ["RHD_CONFLICT_MAX_HEAT", 100, true];
-missionNamespace setVariable ["RHD_CONFLICT_HEAT_DECAY_WITH_POLICE", 1.5, true];
-missionNamespace setVariable ["RHD_CONFLICT_HEAT_GROWTH_NO_POLICE", 0.25, true];
-
-// Supply is a generic district resource value for future jobs/events.
-missionNamespace setVariable ["RHD_CONFLICT_START_SUPPLY", 100, true];
-
+// Create the shared district state before the director starts.
 missionNamespace setVariable ["RHD_CONFLICT_ZONES", createHashMap, true];
 
 [] spawn RHD_fnc_conflictDirector;
