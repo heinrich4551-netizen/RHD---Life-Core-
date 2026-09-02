@@ -1,0 +1,29 @@
+RHD - LifeCore | Steam Workshop Required Items
+================================================
+
+When publishing RHD - LifeCore to Steam Workshop, mark these Workshop items
+as REQUIRED DEPENDENCIES in the Steam Workshop uploader/website:
+
+1. CBA_A3
+   Workshop ID: 450814997
+   Required by: RHD LifeCore addon configuration
+
+2. cTab+
+   Workshop ID: 2262006564
+   Required by: RHD LifeCore tablet/UI integration
+
+3. Antistasi Ultimate
+   Workshop ID: 3020755032
+   Required by: the published RHD Altis scenario and A3A bridge
+
+ACE3 is NOT required by RHD. It is an optional runtime enhancement.
+
+IMPORTANT
+---------
+Steam Workshop dependency relationships are publisher metadata. They are not
+created merely by adding a text file to the mod. The RHD addon itself also
+hard-declares cba_main, ctab_core and A3A_core in CfgPatches so Arma 3 will
+reject an incomplete required-addon loadout.
+
+Recommended published load order:
+CBA_A3 -> cTab+ -> Antistasi Ultimate -> RHD - LifeCore
