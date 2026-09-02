@@ -1,0 +1,13 @@
+name = "RHD - LifeCore";
+author = "LT. Toad";
+actionName = "RHD - LifeCore on GitHub";
+action = "https://github.com/heinrich4551-netizen/RHD---Life-Core-";
+logo = "assets\\branding\\RHDLifeCore.jpg";
+logoOver = "assets\\branding\\RHDLifeCore.jpg";
+picture = "assets\\branding\\RHDLifeCore.jpg";
+tooltip = "RHD - LifeCore";
+tooltipOwned = "RHD - LifeCore | Altis Life RP + Antistasi Ultimate";
+overview = "RHD - LifeCore | Altis Life RP scenario powered by Antistasi Ultimate.";
+dlcColor[] = {0.12,0.12,0.12,1};
+logoTitle = "assets\\branding\\RHDLifeCore.jpg";
+logoSmall = "assets\\branding\\RHDLifeCore.jpg";
