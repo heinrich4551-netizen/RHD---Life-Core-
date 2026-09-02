@@ -1,10 +1,12 @@
-# RHD Life Core — Editor Quickstart
+# RHD - LifeCore — Editor Quickstart
+
+**Author: LT. Toad**
 
 This is the **"I don't understand Arma 3 scripting yet"** guide.
 
 ## The three places you need to know
 
-### 1. Eden Editor
+### 1. Eden Editor (3DEN)
 
 Use Eden for the map.
 
@@ -25,14 +27,33 @@ You can change:
 - Sell prices
 - Refining recipes
 - Gatherable resources
+- District pressure settings
 
-This file contains comments showing exactly what each value means.
+The file contains comments showing exactly what each value means.
 
 ### 3. `STEAM_WORKSHOP_DEPENDENCIES.md`
 
 Use this file when setting up the Steam Workshop collection and server mod preset.
 
-It lists the required Arma 3 dependencies and Workshop IDs.
+It lists Arma 3, CBA_A3, ACE3 and cTab+ requirements and their Workshop IDs.
+
+---
+
+## Branding
+
+The mission name is:
+
+`RHD - LifeCore`
+
+Author:
+
+`LT. Toad`
+
+The mission loading/overview artwork is:
+
+`assets/branding/RHDLifeCore.jpg`
+
+You normally do not need to edit the branding files.
 
 ---
 
@@ -42,10 +63,12 @@ It lists the required Arma 3 dependencies and Workshop IDs.
 |---|---|
 | Town layout | Eden Editor |
 | Farming/mining locations | Eden Editor / `3DEN_SETUP.md` |
+| District/conflict locations | Eden Editor / `3DEN_SETUP.md` |
 | Item price | `core/fn_init.sqf` |
 | Job pay | `core/fn_init.sqf` |
 | Refining output | `core/fn_init.sqf` |
 | Admin access | `core/fn_init.sqf` |
+| Conflict heat/radius | `core/fn_init.sqf` |
 | Player tablet pages | `core/ui/` |
 | ACE interactions | `core/ace/` |
 | Admin actions | `core/admin/` |
@@ -53,6 +76,7 @@ It lists the required Arma 3 dependencies and Workshop IDs.
 | Banking | `core/bank/` |
 | Jobs | `core/jobs/` |
 | Farming/mining/refining code | `core/industry/` |
+| District pressure | `core/conflict/` |
 | Police/EMS/RP | `core/rp/` |
 | Vehicle services | `core/services/` |
 | Ambient civilians/events | `core/ambient/` |
@@ -64,13 +88,13 @@ It lists the required Arma 3 dependencies and Workshop IDs.
 
 ### Safe to edit
 
-Changing values in `core/fn_init.sqf` is the safest way to customize the economy.
+Changing values in `core/fn_init.sqf` is the safest way to customize the economy, jobs and district pressure.
 
 Changing marker names/positions in Eden is also safe as long as you keep the documented prefixes.
 
 ### Think before editing
 
-`description.ext`, `core/ui/ctab.hpp`, `core/admin/`, and network/security functions affect the whole mission.
+`description.ext`, `core/ui/ctab.hpp`, `core/admin/`, `core/ace/`, and network/security functions affect the whole mission.
 
 Make a backup before changing them.
 
@@ -121,23 +145,11 @@ Apple = display name
 food  = category
 ```
 
-To sell apples for $4 instead of $2:
-
-```sqf
-["apple", ["Apple", 5, 4, "food"]],
-```
-
 ---
 
 ## Example: add an admin
 
-Find:
-
-```sqf
-missionNamespace setVariable ["RHD_ADMIN_UIDS", [], true];
-```
-
-Replace it with:
+Find `RHD_ADMIN_UIDS` in `core/fn_init.sqf` and enter the trusted Steam64 ID(s).
 
 ```sqf
 missionNamespace setVariable [
@@ -151,19 +163,29 @@ Do not use a player's display name.
 
 ---
 
+## Example: add a district
+
+In Eden, create a marker named:
+
+```text
+rhd_zone_kavala
+```
+
+Move it to the center of the district.
+
+The RHD Conflict layer will track the district and display its status on the cTab **DISTRICTS** page.
+
+---
+
 ## Example: add a shop on the map
 
-In Eden, create a marker.
-
-Give it a name like:
+In Eden, create a marker named:
 
 ```text
 rhd_shop_kavala
 ```
 
 Move it to the shop location.
-
-The RHD shop system will find the marker by its prefix.
 
 ---
 
@@ -193,16 +215,12 @@ The script searches by the `rhd_farm_` prefix, so you can have multiple location
 
 RHD deliberately separates:
 
-**Map setup** → Eden
+**Map setup** -> Eden  
+**Beginner configuration** -> `core/fn_init.sqf`  
+**Player UI** -> `core/ui/`  
+**ACE integration** -> `core/ace/`  
+**Administration** -> `core/admin/`  
+**Conflict/district system** -> `core/conflict/`  
+**Game systems** -> their own `core/<system>/` folders
 
-**Beginner configuration** → `core/fn_init.sqf`
-
-**UI** → `core/ui/`
-
-**ACE** → `core/ace/`
-
-**Administration** → `core/admin/`
-
-**Game systems** → their own `core/<system>/` folders
-
-This keeps the mission understandable without removing the ability for advanced developers to extend it.
+The goal is to keep RHD - LifeCore understandable without removing the ability for advanced developers to extend it.
