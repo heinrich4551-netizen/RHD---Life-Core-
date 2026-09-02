@@ -1,123 +1,118 @@
-# RHD Life Core — Steam Workshop & Dependency Guide
+# RHD - LifeCore — Steam Workshop & Dependency Guide
 
-This file is written for server owners and mission editors who may not know Arma 3 modding yet.
+**Author: LT. Toad**
 
-## Required software
+This guide is written for server owners and mission editors who may be new to Arma 3.
 
-### Arma 3
-RHD Life Core is an **Arma 3 mission**. The game itself is required.
+## Dependency summary
+
+| Software | Required? | Purpose | Steam Workshop ID |
+|---|---|---|---:|
+| **Arma 3** | YES | Base game | — |
+| **CBA_A3** | YES | cTab+ dependency and shared mod support | `450814997` |
+| **ACE3** | YES for the full RHD feature set | ACE interaction layer, EMS interactions and RHD Administration | `463939057` |
+| **cTab+** | YES | RHD player tablet | `2262006564` |
+| **Antistasi Ultimate** | NO | Design reference only; RHD does not require it at runtime | — |
+
+## Official Workshop links
 
 ### CBA_A3
-**Required when using the cTab tablet integration.**
 
-Steam Workshop item ID: `450814997`
-
-Workshop URL:
+Steam Workshop ID: `450814997`  
 https://steamcommunity.com/sharedfiles/filedetails/?id=450814997
 
-The current cTab+ project documentation lists CBA_A3 3.15 or later as a requirement. Use a current CBA_A3 release rather than an old download.
-
-### cTab+
-**Required for the RHD player tablet.**
-
-Steam Workshop collection/mod ID referenced by the cTab+ project:
-`2262006564`
-
-Workshop URL:
-https://steamcommunity.com/workshop/filedetails/?id=2262006564
-
-RHD uses cTab's existing tablet interface and opens `cTab_Tablet_dlg` at runtime. RHD does not redistribute cTab PBOs.
+cTab+ documents CBA_A3 3.15 or later as a requirement. Use a current supported CBA_A3 release.
 
 ### ACE3
-**Required for the ACE-dependent RHD features.**
 
-Steam Workshop item ID: `463939057`
-
-Workshop URL:
+Steam Workshop ID: `463939057`  
 https://steamcommunity.com/sharedfiles/filedetails/?id=463939057
 
-RHD uses ACE interaction APIs for the RHD Life Tablet, RHD Administration and contextual EMS interactions.
+RHD uses ACE3 for its interaction layer. Core LifeCore systems remain RHD-owned and server-authoritative.
 
-## Recommended server mod load order
+### cTab+
 
-Use the following order when launching the server and clients:
+Steam Workshop item/collection referenced by the upstream cTab+ project: `2262006564`  
+https://steamcommunity.com/workshop/filedetails/?id=2262006564
 
-1. `Arma 3`
-2. `CBA_A3`
-3. `ACE3`
-4. `cTab+`
-5. `RHD Life Core` mission
+RHD opens cTab's existing `cTab_Tablet_dlg` and places RHD-owned controls on it. RHD does not redistribute cTab PBOs.
 
-The exact launcher order can vary by server setup, but the required dependency chain must be present on the client and server where applicable.
+### Antistasi Ultimate
 
-## Steam Workshop checklist
+Source project:  
+https://github.com/Antistasi-Ultimate-Community/A3-Antistasi-Ultimate
 
-For a Workshop release, make the Workshop page say clearly that players need:
+**Do not add Antistasi Ultimate to the required mod list for RHD - LifeCore.**
 
-- Arma 3
-- CBA_A3
-- ACE3
-- cTab+
+RHD implements its own district-pressure/conflict layer inspired by persistent-world ideas. The RHD implementation lives in `core/conflict/`.
 
-Recommended Workshop description block:
+## Client/server mod setup
+
+For the full RHD feature set, make sure the following are installed on the client and the dedicated server where applicable:
+
+1. CBA_A3
+2. ACE3
+3. cTab+
+4. RHD - LifeCore mission
+
+The mission itself is not an addon PBO, so it does not belong in a normal `@Mod` folder.
+
+## Steam Workshop release checklist
+
+Your Workshop page should contain a visible block similar to this:
 
 ```text
-REQUIRED DEPENDENCIES
+RHD - LifeCore
+Author: LT. Toad
 
-Arma 3
-CBA_A3
-ACE3
-cTab+
+REQUIRED MODS
+- CBA_A3 (Workshop 450814997)
+- ACE3 (Workshop 463939057)
+- cTab+ (Workshop 2262006564)
 
-CBA_A3 Workshop:
-https://steamcommunity.com/sharedfiles/filedetails/?id=450814997
-
-ACE3 Workshop:
-https://steamcommunity.com/sharedfiles/filedetails/?id=463939057
-
-cTab+ Workshop:
-https://steamcommunity.com/workshop/filedetails/?id=2262006564
+Arma 3 is required.
+Antistasi Ultimate is NOT required.
 ```
 
-## Mission versus mod dependencies
+Keep the same dependency list in your server's mod preset/collection.
 
-RHD Life Core is distributed as a **mission**, not as an addon PBO. That means Steam Workshop does not automatically behave like an Arma addon dependency graph declared in `CfgPatches`.
+## Mission vs addon dependencies
 
-The dependency list therefore needs to be visible on the Workshop page and in the server documentation. Server owners should add the three external mods to their mod preset/collection.
+RHD - LifeCore is a mission framework rather than a standalone addon PBO. Do not copy external addon PBOs into the RHD mission directory.
 
-Do **not** copy `@cTab`, `@ACE3`, or `@CBA_A3` into the RHD mission folder.
+Install CBA_A3, ACE3 and cTab+ through their normal Workshop/mod distribution channels.
 
-## 3DEN setup
+## First-time setup
 
-The mission remains 3DEN-first. Create the mission in Eden, copy the RHD mission files into the mission folder, place your markers/objects, then save the mission.
+1. Install Arma 3.
+2. Subscribe to CBA_A3, ACE3 and cTab+.
+3. Start Arma 3 and verify the three mods load without errors.
+4. Open Eden Editor (3DEN).
+5. Create a multiplayer mission on your selected terrain.
+6. Copy the RHD - LifeCore mission files into that mission folder.
+7. Edit `core/fn_init.sqf` and add the trusted administrator Steam64 IDs.
+8. Place the RHD markers described in `3DEN_SETUP.md`.
+9. Save the mission in Eden so `mission.sqm` is generated/updated.
+10. Test locally, then test on a dedicated server.
 
-`mission.sqm` should be generated by Eden.
+## Troubleshooting
 
-## Admin access
+### cTab tablet does not open
 
-RHD administration is intentionally separate from the player tablet. Admins do **not** need:
+Check that CBA_A3 and cTab+ are loaded and that the client has the same versions as the server. RHD reports an error when cTab is not detected.
 
-- an inventory item
-- a special admin weapon
-- an admin action-menu item
-- an admin-specific hotkey
+### Admin menu does not appear
 
-Admins use ACE Self Actions to access `RHD Administration`, and the server verifies the Steam64 UID again before any privileged action is executed.
+Check that ACE3 is loaded and that the administrator's Steam64 ID was entered in the `RHD_ADMIN_UIDS` section of `core/fn_init.sqf`.
 
-## First-time editor checklist
+### Districts are empty
 
-If you are new to Arma 3 mission editing, the normal workflow is:
+Add one or more Eden markers named with the `rhd_zone_` prefix, for example `rhd_zone_kavala`.
 
-1. Install the required Steam Workshop mods.
-2. Open Arma 3 Eden Editor.
-3. Choose your terrain.
-4. Copy the contents of this repository into the mission folder.
-5. Place RHD markers and named objects as described in `3DEN_SETUP.md`.
-6. Open `core/fn_init.sqf` and edit the clearly marked `RHD_ADMIN_UIDS` list.
-7. Save the mission in Eden.
-8. Test locally first.
-9. Test with a dedicated server before publishing.
+### The mission has missing external assets
 
-## Important
+Do not copy cTab/ACE3/Antistasi addon folders into the mission. Install the external mods normally instead.
 
-The dependency IDs above are documented from the upstream cTab+ README and the established Arma Workshop IDs used by these projects. Always check the linked Workshop page before a public server rollout in case the upstream project changes its packaging or dependency requirements.
+## Development note
+
+The external projects are credited in `THIRD_PARTY_NOTICES.md`. RHD's player UI, Life systems, administration and district-pressure implementation are maintained as RHD code.
