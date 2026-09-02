@@ -47,6 +47,14 @@ class CfgFunctions
             class refine {server = 1;};
             class requestRefine {};
         };
+        class RP
+        {
+            file = "core\\rp";
+            class ticket {server = 1;};
+            class requestTicket {};
+            class heal {server = 1;};
+            class requestHeal {};
+        };
         class UI
         {
             file = "core\\ui";
@@ -73,6 +81,8 @@ class CfgRemoteExec
         class RHD_fnc_setJob {allowedTargets = 2;};
         class RHD_fnc_serverGather {allowedTargets = 2;};
         class RHD_fnc_refine {allowedTargets = 2;};
+        class RHD_fnc_ticket {allowedTargets = 2;};
+        class RHD_fnc_heal {allowedTargets = 2;};
     };
 };
 
