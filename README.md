@@ -35,8 +35,6 @@ RHD includes an **RHD-owned Conflict layer inspired by high-level Antistasi-styl
 
 This separation is intentional: Antistasi Ultimate is a complete persistent multiplayer scenario rather than a small mission library. RHD keeps the Life RP economy, identity, jobs and server rules under its own codebase while using compatible design concepts for the world-pressure layer.
 
-The Antistasi Ultimate repository currently describes the main project as MIT-licensed while identifying separately licensed integrated components, including APL-ND material. RHD does not copy those restricted components. fileciteturn345file0
-
 ## Included gameplay
 
 - Persistent player identity, cash, bank, inventory, licenses, jobs and jail state.
