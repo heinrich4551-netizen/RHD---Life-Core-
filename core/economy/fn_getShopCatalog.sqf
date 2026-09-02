@@ -50,19 +50,23 @@ if (_page isEqualTo "VEHICLES") then {
 // EQUIPMENT
 // ============================================================================
 if (_page isEqualTo "EQUIPMENT") then {
-    // Weapons and items.
+    // Weapons, uniforms and other CfgWeapons equipment.
     {
         private _class = configName _x;
         private _name = getText (_x >> "displayName");
 
         if (getNumber (_x >> "scope") >= 2 && {_name isNotEqualTo ""}) then {
             private _kind = [_class] call BIS_fnc_itemType;
-            private _shopType = switch (_kind param [0, ""]) do {
+            private _kind0 = _kind param [0, ""];
+            private _itemSubType = _kind param [1, ""];
+            private _shopType = switch (_kind0) do {
                 case "Weapon": {"WEAPON"};
                 case "Magazine": {"MAGAZINE"};
                 case "Mine": {"MAGAZINE"};
                 case "Item": {"ITEM"};
-                case "Equipment": {"ITEM"};
+                case "Equipment": {
+                    if (_itemSubType isEqualTo "Uniform") then {"UNIFORM"} else {"ITEM"}
+                };
                 default {""};
             };
 
