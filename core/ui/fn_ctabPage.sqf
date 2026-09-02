@@ -160,9 +160,7 @@ switch (_page) do {
     // DISTRICTS / WORLD PRESSURE
     // ------------------------------------------------------------------------
     case "DISTRICTS": {
-        _content ctrlSetStructuredText parseText [
-            "<t size='1.15'><b>DISTRICT PRESSURE</b></t><br/>Districts react to local criminal pressure and police presence.<br/>Use rhd_zone_* markers in Eden to define districts."
-        ];
+        _content ctrlSetStructuredText parseText "<t size='1.15'><b>DISTRICT PRESSURE</b></t><br/>Districts react to local criminal pressure and police presence.<br/>Use rhd_zone_* markers in Eden to define districts.";
 
         private _zones = allMapMarkers select {(_x find "rhd_zone_") isEqualTo 0};
         if (_zones isEqualTo []) then {
