@@ -1,4 +1,4 @@
-#define RHD_VERSION_TEXT "2.1.0-A3A"
+#define RHD_VERSION_TEXT "2.1.1"
 
 class CfgPatches
 {
@@ -7,7 +7,9 @@ class CfgPatches
         name = "RHD - LifeCore";
         author = "LT. Toad";
         requiredVersion = 2.20;
-        requiredAddons[] = {"A3A_core", "cba_main", "ace_main", "ctab_core"};
+        // ONLY hard external addon dependencies: CBA_A3 and cTab+.
+        // Antistasi Ultimate and ACE3 are optional runtime enhancements.
+        requiredAddons[] = {"cba_main", "ctab_core"};
         units[] = {
             "RHD_Module_AntistasiBase",
             "RHD_Module_LifeCore"
@@ -48,7 +50,7 @@ class CfgVehicles
     {
         scope = 2;
         scopeCurator = 2;
-        displayName = "RHD - LifeCore | Antistasi Ultimate Base";
+        displayName = "RHD - LifeCore | Antistasi Ultimate Bridge (Optional)";
         icon = "iconObjectCircle";
         portrait = "iconObjectCircle";
         category = "RHD_LifeCore";
@@ -61,8 +63,8 @@ class CfgVehicles
         {
             class RHD_A3A_AutoStart
             {
-                displayName = "Start Antistasi Campaign";
-                tooltip = "Starts the Antistasi Ultimate campaign engine from this mission module.";
+                displayName = "Use Antistasi Ultimate when installed";
+                tooltip = "When A3A_core is present, this module bridges RHD to Antistasi Ultimate. Without it, RHD operates standalone.";
                 property = "RHD_A3A_AutoStart";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_A3A_AutoStart', _value, true]";
@@ -72,8 +74,8 @@ class CfgVehicles
 
             class RHD_A3A_CreateHQ
             {
-                displayName = "Create Safe HQ Anchors";
-                tooltip = "Creates the editor-independent HQ anchor objects required by Antistasi. A3A repositions them during campaign startup.";
+                displayName = "Create Antistasi HQ Anchors";
+                tooltip = "Creates A3A host anchors only when Antistasi Ultimate is installed and active.";
                 property = "RHD_A3A_CreateHQ";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_A3A_CreateHQ', _value, true]";
@@ -83,8 +85,8 @@ class CfgVehicles
 
             class RHD_A3A_TerrainFallback
             {
-                displayName = "Enable Generic Terrain Fallback";
-                tooltip = "Installs the RHD terrain adapter before campaign startup when the active terrain has no A3A mapInfo entry.";
+                displayName = "Enable Antistasi Terrain Adapter";
+                tooltip = "Applies the RHD terrain adapter to an active Antistasi campaign; no effect in standalone mode.";
                 property = "RHD_A3A_TerrainFallback";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_A3A_TerrainFallback', _value, true]";
@@ -156,7 +158,7 @@ class CfgVehicles
             class RHD_EnablePersistence
             {
                 displayName = "Enable Life RP Persistence";
-                tooltip = "Saves RHD cash, bank, job and virtual inventory independently of the A3A campaign save.";
+                tooltip = "Saves RHD cash, bank, job and virtual inventory independently of Antistasi.";
                 property = "RHD_EnablePersistence";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnablePersistence', _value, true]";
@@ -189,7 +191,7 @@ class CfgVehicles
             class RHD_EnableTablet
             {
                 displayName = "Enable cTab Player Tablet";
-                tooltip = "Adds the RHD LifeCore tablet to ACE Self Actions.";
+                tooltip = "Uses the required cTab+ tablet interface and keeps ACE3 as an optional enhancement.";
                 property = "RHD_EnableTablet";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnableTablet', _value, true]";
