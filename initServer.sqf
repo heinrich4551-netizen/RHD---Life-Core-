@@ -2,81 +2,105 @@
     RHD - LifeCore | SERVER BOOTSTRAP
     Author: LT. Toad
     ---------------------------------------------------------------------------
-    BASE
-    ----
-    RHD waits for the Antistasi Ultimate campaign core and then starts the
-    Life RP layer around that world state.
+    SERVER STARTUP ORDER
+    --------------------
+    1. 3DEN Antistasi Ultimate Base module starts the A3A campaign.
+    2. RHD waits for A3A serverInitDone.
+    3. 3DEN Life RP Systems module decides which RHD-only systems start.
 
-    NORMAL SERVER OWNERS:
-    You normally do not need to edit this file.
-
-    USE INSTEAD:
-    - core/fn_init.sqf       -> jobs, items, prices, admins and tuning
-    - 3DEN_SETUP.md          -> map locations, district markers and billboards
-    - ANTISTASI_BASE.md      -> how the A3A foundation is used
+    This file intentionally contains no map coordinates or shop locations.
     ---------------------------------------------------------------------------
 */
 
-// ============================================================================
-// ANTISTASI ULTIMATE BASE
-// ============================================================================
-[] spawn {
-    private _baseReady = [] call RHD_fnc_initBase;
+if (!isServer) exitWith {};
 
-    if (!_baseReady) exitWith {
-        diag_log "[RHD-LIFECORE] Server startup stopped because the Antistasi Ultimate base was not ready.";
-    };
+// ============================================================================
+// WAIT FOR THE 3DEN ANTISTASI BASE MODULE
+// ============================================================================
+private _moduleDeadline = time + 120;
+waitUntil {
+    sleep 0.25;
+    missionNamespace getVariable ["RHD_A3A_MODULE_STARTED", false] || {time > _moduleDeadline}
+};
 
-    // ========================================================================
-    // RHD BRANDING
-    // ========================================================================
+if !(missionNamespace getVariable ["RHD_A3A_MODULE_STARTED", false]) exitWith {
+    diag_log "[RHD-LIFECORE] ERROR: Place the RHD - LifeCore | Antistasi Ultimate Base module in 3DEN.";
+};
+
+// Wait for the actual Antistasi campaign to complete its own startup.
+private _baseReady = [] call RHD_fnc_initBase;
+if (!_baseReady) exitWith {
+    diag_log "[RHD-LIFECORE] ERROR: Antistasi Ultimate did not reach serverInitDone. RHD startup cancelled.";
+};
+
+// ============================================================================
+// WAIT FOR THE 3DEN RHD LIFE MODULE
+// ============================================================================
+private _lifeDeadline = time + 60;
+waitUntil {
+    sleep 0.25;
+    missionNamespace getVariable ["RHD_LIFE_MODULE_READY", false] || {time > _lifeDeadline}
+};
+
+if !(missionNamespace getVariable ["RHD_LIFE_MODULE_READY", false]) exitWith {
+    diag_log "[RHD-LIFECORE] ERROR: Place the RHD - LifeCore | Life RP Systems module in 3DEN.";
+};
+
+// ============================================================================
+// RHD-ONLY SYSTEMS
+// ============================================================================
+if (missionNamespace getVariable ["RHD_LIFE_ENABLE_BRANDING", true]) then {
     [] spawn {
         sleep 1;
         [] call compileFinal preprocessFileLineNumbers "core\\branding\\fn_applyBillboards.sqf";
     };
+};
 
-    // ========================================================================
-    // AMBIENT WORLD SYSTEMS
-    // ========================================================================
-    [] spawn RHD_fnc_director; // Ambient civilians / traffic.
-    [] spawn RHD_fnc_events;   // Rare roadside micro-events.
+if (missionNamespace getVariable ["RHD_LIFE_ENABLE_ECONOMY", true]) then {
+    // The actual catalogue is generated locally from the active Arma modset.
+    missionNamespace setVariable ["RHD_SHOP_SERVER_READY", true, true];
+};
+
+if (missionNamespace getVariable ["RHD_LIFE_ENABLE_AMBIENT", true]) then {
+    [] spawn RHD_fnc_director;
+    [] spawn RHD_fnc_events;
+};
+
+if (missionNamespace getVariable ["RHD_LIFE_ENABLE_CONFLICT", true]) then {
+    [] spawn RHD_fnc_conflictInit;
 };
 
 // ============================================================================
-// PLAYER PERSISTENCE
+// LIFE RP PERSISTENCE
 // ============================================================================
-// Life RP data is kept separate from the Antistasi campaign save so each layer
-// can evolve without corrupting the other. The world/war state remains A3A.
-addMissionEventHandler ["PlayerConnected", {
-    params ["_id", "_uid", "_name", "_jip", "_owner"];
+if (missionNamespace getVariable ["RHD_LIFE_ENABLE_PERSISTENCE", true]) then {
+    addMissionEventHandler ["PlayerConnected", {
+        params ["_id", "_uid", "_name", "_jip", "_owner"];
+        if (_uid isEqualTo "") exitWith {};
 
-    if (_uid isEqualTo "") exitWith {};
+        [_uid] spawn {
+            params ["_uid"];
+            sleep 5;
+            [_uid] call RHD_fnc_loadPlayer;
+        };
+    }];
 
-    [_uid] spawn {
-        params ["_uid"];
-        sleep 5;
-        [_uid] call RHD_fnc_loadPlayer;
-    };
-}];
+    addMissionEventHandler ["PlayerDisconnected", {
+        params ["_id", "_uid", "_name", "_jip", "_owner"];
+        if (_uid isEqualTo "") exitWith {};
+        [_uid] call RHD_fnc_savePlayer;
+    }];
 
-addMissionEventHandler ["PlayerDisconnected", {
-    params ["_id", "_uid", "_name", "_jip", "_owner"];
+    [] spawn {
+        while {isServer} do {
+            sleep 180;
 
-    if (_uid isEqualTo "") exitWith {};
-    [_uid] call RHD_fnc_savePlayer;
-}];
-
-// Periodic autosave protects Life RP data during long server sessions.
-[] spawn {
-    while {isServer} do {
-        sleep 180;
-
-        {
-            private _uid = getPlayerUID _x;
-
-            if (_uid != "") then {
-                [_uid] call RHD_fnc_savePlayer;
-            };
-        } forEach allPlayers;
+            {
+                private _uid = getPlayerUID _x;
+                if (_uid != "") then {
+                    [_uid] call RHD_fnc_savePlayer;
+                };
+            } forEach allPlayers;
+        };
     };
 };
