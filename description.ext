@@ -2,16 +2,19 @@
     RHD - LifeCore | Mission Configuration
     Author: LT. Toad
     ---------------------------------------------------------------------------
+    BASE FRAMEWORK
+    --------------
+    RHD runs as a Life RP layer on top of the Antistasi Ultimate campaign core.
+
     BEGINNER EDITORS:
-    - You normally do NOT need to edit this file.
-    - Change gameplay values in: core/fn_init.sqf
-    - Change map locations in: Eden Editor (3DEN)
-    - Read setup/dependencies in: EDITOR_QUICKSTART.md and STEAM_WORKSHOP_DEPENDENCIES.md
+    - Edit core/fn_init.sqf for gameplay settings.
+    - Edit the map in Eden / 3DEN.
+    - Read ANTISTASI_BASE.md before changing the campaign integration.
 
     ADVANCED DEVELOPERS:
-    - CfgFunctions registers SQF functions.
+    - CfgFunctions registers RHD bridge functions and Life systems.
     - CfgRemoteExec controls networked functions.
-    - cTab UI definitions are included from core/ui/ctab.hpp.
+    - The A3A campaign engine is supplied by the required Antistasi Ultimate addon.
     ---------------------------------------------------------------------------
 */
 
@@ -149,7 +152,17 @@ class CfgFunctions
             class aceInit {};
         };
 
-        // Antistasi-inspired persistent district pressure layer.
+        // RHD / Antistasi Ultimate campaign bridge.
+        class Antistasi
+        {
+            file = "core\\antistasi";
+            class initBase {server = 1;};
+            class addAggression {server = 1;};
+            class addResources {server = 1;};
+            class spawnVehicle {server = 1;};
+            class getStatus {};
+        };
+
         class Conflict
         {
             file = "core\\conflict";
@@ -193,11 +206,16 @@ class CfgRemoteExec
         class RHD_fnc_receiveDispatch {allowedTargets = 1;};
         class RHD_fnc_refuel {allowedTargets = 2;};
 
-        // Admin requests are still UID-verified on the server.
+        // Admin requests are UID-verified again on the server.
         class RHD_fnc_adminOpenMenu {allowedTargets = 1;};
         class RHD_fnc_execute {allowedTargets = 2;};
         class RHD_fnc_adminFreeze {allowedTargets = 1;};
         class RHD_fnc_adminSpectate {allowedTargets = 1;};
+
+        // Antistasi bridge calls are server-only.
+        class RHD_fnc_antistasiAddAggression {allowedTargets = 2;};
+        class RHD_fnc_antistasiAddResources {allowedTargets = 2;};
+        class RHD_fnc_antistasiSpawnVehicle {allowedTargets = 2;};
     };
 };
 
