@@ -1,0 +1,19 @@
+RHD - LifeCore | Workshop package layout
+
+@RHD-LifeCore/
+  addons/
+    rhd_rhd_lifecore.pbo
+    rhd_rhd_clothing.pbo
+  Missions/
+    RHD_LifeCore.Altis.pbo
+  assets/branding/RHDLifeCore.jpg
+  mod.cpp
+  meta.cpp
+
+Hard dependencies:
+  CBA_A3 450814997
+  cTab+ 2262006564
+  Antistasi Ultimate 3020755032
+
+Optional:
+  ACE3
