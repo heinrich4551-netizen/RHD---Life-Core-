@@ -1,0 +1,14 @@
+# Antistasi Ultimate License Notice
+
+RHD - LifeCore uses and integrates with the Antistasi Ultimate project as its campaign/world base.
+
+The upstream repository is:
+https://github.com/Antistasi-Ultimate-Community/A3-Antistasi-Ultimate
+
+The upstream project license identifies MIT-licensed Antistasi Ultimate / Antistasi Plus / Antistasi Community Edition code and separately licensed integrated components.
+
+The MIT portions permit copying, modification and distribution provided the copyright and permission notice are retained. The upstream license also identifies APL-ND material that must not be modified and distributed as a derivative.
+
+RHD therefore keeps the upstream source available as a pinned development submodule and does not intentionally copy or modify the separately licensed components.
+
+Upstream copyright notices remain the property of their respective authors and projects.

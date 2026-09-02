@@ -1,0 +1,3 @@
+[submodule "vendor/antistasi-ultimate"]
+	path = vendor/antistasi-ultimate
+	url = https://github.com/Antistasi-Ultimate-Community/A3-Antistasi-Ultimate.git
