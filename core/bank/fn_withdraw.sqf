@@ -1,13 +1,23 @@
+/* RHD - LifeCore | Withdraw | Server */
 params ["_unit", ["_amount", 100]];
 if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
 if (owner _unit != remoteExecutedOwner) exitWith {};
+if !(missionNamespace getVariable ["RHD_LIFE_ENABLE_ECONOMY", false]) exitWith {};
 if (_amount < 1 || {_amount > 10000}) exitWith {};
-private _bankNear = false;
-{if (_unit distance2D (getMarkerPos _x) <= 18) exitWith {_bankNear = true;};} forEach (allMapMarkers select {(_x find "rhd_bank_") isEqualTo 0});
-if (!_bankNear) exitWith {["You are not at an RHD bank.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
+
+private _bankNear = allMapMarkers findIf {
+    (_x find "rhd_bank_") isEqualTo 0 && {_unit distance2D (getMarkerPos _x) <= 18}
+};
+if (_bankNear < 0) exitWith {
+    ["You are not at an RHD bank.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit];
+};
+
 private _qty = floor _amount;
 private _bank = _unit getVariable ["RHD_BANK", 0];
-if (_bank < _qty) exitWith {["Insufficient bank balance.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
+if (_bank < _qty) exitWith {
+    ["Insufficient bank balance.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit];
+};
+
 _unit setVariable ["RHD_BANK", _bank - _qty, true];
 _unit setVariable ["RHD_CASH", (_unit getVariable ["RHD_CASH", 0]) + _qty, true];
 [format ["Withdrew $%1.", _qty], "success"] remoteExecCall ["RHD_fnc_notify", owner _unit];
