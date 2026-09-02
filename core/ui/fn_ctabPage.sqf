@@ -7,9 +7,7 @@
     STATUS | JOBS | MARKET | VEHICLES | EQUIPMENT | BANK | SERVICES |
     DISTRICTS | CAMPAIGN
 
-    VEHICLES and EQUIPMENT are dynamically generated from the active Arma 3
-    configuration. This includes base-game content and any loaded dependency
-    mod content that exposes public classes.
+    VEHICLES and EQUIPMENT are generated from the active Arma 3 configuration.
 */
 
 disableSerialization;
@@ -17,8 +15,6 @@ disableSerialization;
 private _page = param [0, "STATUS"];
 private _display = uiNamespace getVariable ["cTab_Tablet_dlg", displayNull];
 private _ctrls = uiNamespace getVariable ["RHD_CTAB_CTRLS", []];
-
-// Control indexes are defined in fn_ctabBuild.sqf.
 if (isNull _display || {count _ctrls < 17}) exitWith {false};
 
 private _content = _ctrls select 11;
@@ -35,7 +31,6 @@ switch (_page) do {
     case "STATUS": {
         private _a3a = call RHD_fnc_getStatus;
         private _baseState = if (_a3a param [0, false]) then {"ONLINE"} else {"WAITING"};
-
         _content ctrlSetStructuredText parseText format [
             "<t size='1.25'><b>%1</b></t><br/><br/><t color='#BFD7EA'>JOB</t>  %2<br/><t color='#BFD7EA'>CASH</t>  $%3<br/><t color='#BFD7EA'>BANK</t>  $%4<br/><t color='#BFD7EA'>STATUS</t>  %5<br/><t color='#BFD7EA'>A3A WORLD</t>  %6<br/><br/><t size='1.1'><b>INVENTORY</b></t><br/>%7",
             name player,
@@ -64,6 +59,10 @@ switch (_page) do {
     };
 
     case "JOBS": {
+        if !(missionNamespace getVariable ["RHD_LIFE_ENABLE_JOBS", true]) exitWith {
+            _content ctrlSetStructuredText parseText "<t size='1.15'><b>JOBS DISABLED</b></t><br/>Enable Jobs on the RHD Life RP Systems module in 3DEN.";
+            _status ctrlSetText "JOBS: disabled by 3DEN configuration.";
+        };
         _content ctrlSetStructuredText parseText "<t size='1.15'><b>EMPLOYMENT</b></t><br/>Select an available job below.";
         private _jobs = missionNamespace getVariable ["RHD_JOBS", createHashMap];
         private _keys = keys _jobs;
@@ -82,10 +81,11 @@ switch (_page) do {
         _status ctrlSetText format ["CURRENT JOB: %1", player getVariable ["RHD_JOB", "civ"]];
     };
 
-    // ------------------------------------------------------------------------
-    // RHD VIRTUAL MARKET
-    // ------------------------------------------------------------------------
     case "MARKET": {
+        if !(missionNamespace getVariable ["RHD_LIFE_ENABLE_ECONOMY", true]) exitWith {
+            _content ctrlSetStructuredText parseText "<t size='1.15'><b>MARKET DISABLED</b></t><br/>Enable Economy / Shops on the RHD Life RP Systems module in 3DEN.";
+            _status ctrlSetText "MARKET: disabled by 3DEN configuration.";
+        };
         _content ctrlSetStructuredText parseText "<t size='1.15'><b>RHD MARKET</b></t><br/>Virtual Life RP goods configured in core/fn_init.sqf.";
         private _items = missionNamespace getVariable ["RHD_ITEMS", createHashMap];
         private _keys = keys _items;
@@ -97,80 +97,59 @@ switch (_page) do {
         } forEach _keys;
         _primary ctrlSetText "BUY x1";
         _primary ctrlShow true;
-        _primary ctrlSetEventHandler ["ButtonClick", "[lbCurSel 9808] call RHD_fnc_requestBuy"];
+        _primary ctrlSetEventHandler ["ButtonClick", "[lbCurSel 9812] call RHD_fnc_requestBuy"];
         _secondary ctrlSetText "SELL x1";
         _secondary ctrlShow true;
-        _secondary ctrlSetEventHandler ["ButtonClick", "[lbCurSel 9808] call RHD_fnc_requestSell"];
+        _secondary ctrlSetEventHandler ["ButtonClick", "[lbCurSel 9812] call RHD_fnc_requestSell"];
         _status ctrlSetText "MARKET: virtual Life RP inventory.";
     };
 
-    // ------------------------------------------------------------------------
-    // BASE GAME + LOADED MOD VEHICLES
-    // ------------------------------------------------------------------------
     case "VEHICLES": {
-        if !(missionNamespace getVariable ["RHD_SHOP_AUTO_IMPORT", true]) exitWith {
-            _content ctrlSetStructuredText parseText "<t size='1.15'><b>VEHICLE SHOP DISABLED</b></t><br/>Enable RHD_SHOP_AUTO_IMPORT in core/fn_init.sqf.";
-            _status ctrlSetText "VEHICLE SHOP: disabled by server configuration.";
+        if !(missionNamespace getVariable ["RHD_LIFE_ENABLE_ECONOMY", true]) exitWith {
+            _content ctrlSetStructuredText parseText "<t size='1.15'><b>VEHICLE SHOP DISABLED</b></t><br/>Enable Economy / Shops on the RHD Life RP Systems module in 3DEN.";
+            _status ctrlSetText "VEHICLES: disabled by 3DEN configuration.";
         };
-
         _content ctrlSetStructuredText parseText "<t size='1.15'><b>VEHICLE SHOP</b></t><br/>Base Arma 3 and loaded addon/mod vehicles with public scope are available.";
         private _catalog = ["VEHICLES"] call RHD_fnc_getShopCatalog;
-
         {
-            private _name = _x select 0;
-            private _class = _x select 1;
-            private _price = _x select 3;
-            private _i = _list lbAdd format ["%1 | $%2", _name, _price];
-            _list lbSetData [_i, _class];
+            private _i = _list lbAdd format ["%1 | $%2", _x select 0, _x select 3];
+            _list lbSetData [_i, _x select 1];
         } forEach _catalog;
-
         _primary ctrlSetText "BUY VEHICLE";
         _primary ctrlShow true;
         _primary ctrlSetEventHandler ["ButtonClick", "[lbCurSel 9812] call RHD_fnc_requestBuyVehicle"];
-
         _secondary ctrlSetText "REFRESH";
         _secondary ctrlShow true;
         _secondary ctrlSetEventHandler ["ButtonClick", "[\"VEHICLES\"] call RHD_fnc_ctabPage"];
-        _status ctrlSetText format ["VEHICLE SHOP: %1 classes loaded from current modset.", count _catalog];
+        _status ctrlSetText format ["VEHICLE SHOP: %1 public classes loaded from current modset.", count _catalog];
     };
 
-    // ------------------------------------------------------------------------
-    // BASE GAME + LOADED MOD EQUIPMENT
-    // ------------------------------------------------------------------------
     case "EQUIPMENT": {
-        if !(missionNamespace getVariable ["RHD_SHOP_AUTO_IMPORT", true]) exitWith {
-            _content ctrlSetStructuredText parseText "<t size='1.15'><b>EQUIPMENT SHOP DISABLED</b></t><br/>Enable RHD_SHOP_AUTO_IMPORT in core/fn_init.sqf.";
-            _status ctrlSetText "EQUIPMENT SHOP: disabled by server configuration.";
+        if !(missionNamespace getVariable ["RHD_LIFE_ENABLE_ECONOMY", true]) exitWith {
+            _content ctrlSetStructuredText parseText "<t size='1.15'><b>EQUIPMENT SHOP DISABLED</b></t><br/>Enable Economy / Shops on the RHD Life RP Systems module in 3DEN.";
+            _status ctrlSetText "EQUIPMENT: disabled by 3DEN configuration.";
         };
-
-        _content ctrlSetStructuredText parseText "<t size='1.15'><b>EQUIPMENT SHOP</b></t><br/>Weapons, magazines, goggles, backpacks and public gear from the active modset.";
+        _content ctrlSetStructuredText parseText "<t size='1.15'><b>EQUIPMENT SHOP</b></t><br/>Weapons, magazines, gear, goggles and backpacks from the active modset.";
         private _catalog = ["EQUIPMENT"] call RHD_fnc_getShopCatalog;
-
         {
-            private _name = _x select 0;
-            private _class = _x select 1;
-            private _kind = _x select 2;
-            private _price = _x select 3;
-            private _i = _list lbAdd format ["%1 | $%2", _name, _price];
-            _list lbSetData [_i, format ["%1|%2", _kind, _class]];
+            private _i = _list lbAdd format ["%1 | $%2", _x select 0, _x select 3];
+            _list lbSetData [_i, format ["%1|%2", _x select 2, _x select 1]];
         } forEach _catalog;
-
         _primary ctrlSetText "BUY EQUIPMENT";
         _primary ctrlShow true;
         _primary ctrlSetEventHandler ["ButtonClick", "[lbCurSel 9812] call RHD_fnc_requestBuyEquipment"];
-
         _secondary ctrlSetText "REFRESH";
         _secondary ctrlShow true;
         _secondary ctrlSetEventHandler ["ButtonClick", "[\"EQUIPMENT\"] call RHD_fnc_ctabPage"];
-        _status ctrlSetText format ["EQUIPMENT SHOP: %1 classes loaded from current modset.", count _catalog];
+        _status ctrlSetText format ["EQUIPMENT SHOP: %1 public classes loaded from current modset.", count _catalog];
     };
 
     case "BANK": {
-        _content ctrlSetStructuredText parseText format [
-            "<t size='1.15'><b>BANKING</b></t><br/><br/>Cash: $%1<br/>Bank: $%2<br/><br/>Transactions are server-authoritative.",
-            player getVariable ["RHD_CASH", 0],
-            player getVariable ["RHD_BANK", 0]
-        ];
+        if !(missionNamespace getVariable ["RHD_LIFE_ENABLE_RP", true]) exitWith {
+            _content ctrlSetStructuredText parseText "<t size='1.15'><b>BANKING DISABLED</b></t><br/>Enable Police / EMS / RP on the RHD Life RP Systems module in 3DEN.";
+            _status ctrlSetText "BANKING: disabled by 3DEN configuration.";
+        };
+        _content ctrlSetStructuredText parseText format ["<t size='1.15'><b>BANKING</b></t><br/><br/>Cash: $%1<br/>Bank: $%2<br/><br/>Transactions are server-authoritative.", player getVariable ["RHD_CASH", 0], player getVariable ["RHD_BANK", 0]];
         _primary ctrlSetText "DEPOSIT $100";
         _primary ctrlShow true;
         _primary ctrlSetEventHandler ["ButtonClick", "[] call RHD_fnc_requestDeposit"];
@@ -181,18 +160,22 @@ switch (_page) do {
     };
 
     case "SERVICES": {
-        _content ctrlSetStructuredText parseText "<t size='1.15'><b>PUBLIC SERVICES</b></t><br/>Available actions depend on your job and nearby RHD locations.";
+        _content ctrlSetStructuredText parseText "<t size='1.15'><b>PUBLIC SERVICES</b></t><br/>Use ACE interactions for contextual actions. Farming and refining are configured in 3DEN locations.";
         _primary ctrlSetText "GATHER";
         _primary ctrlShow true;
         _primary ctrlSetEventHandler ["ButtonClick", "[] call RHD_fnc_requestGather"];
         _secondary ctrlSetText "REFINE";
         _secondary ctrlShow true;
         _secondary ctrlSetEventHandler ["ButtonClick", "[] call RHD_fnc_requestRefine"];
-        _status ctrlSetText "Use ACE interactions for contextual medical and vehicle actions.";
+        _status ctrlSetText "SERVICES: RHD Life RP systems.";
     };
 
     case "DISTRICTS": {
-        _content ctrlSetStructuredText parseText "<t size='1.15'><b>DISTRICT PRESSURE</b></t><br/>Districts react to Life RP criminal pressure and the wider Antistasi campaign state.<br/>A3A strategic markers and optional rhd_zone_* markers are supported.";
+        if !(missionNamespace getVariable ["RHD_LIFE_ENABLE_CONFLICT", true]) exitWith {
+            _content ctrlSetStructuredText parseText "<t size='1.15'><b>DISTRICT PRESSURE DISABLED</b></t><br/>Enable Life District Pressure on the RHD Life RP Systems module in 3DEN.";
+            _status ctrlSetText "DISTRICTS: disabled by 3DEN configuration.";
+        };
+        _content ctrlSetStructuredText parseText "<t size='1.15'><b>DISTRICT PRESSURE</b></t><br/>Districts react to Life RP criminal pressure and the wider Antistasi campaign state.";
         private _zones = missionNamespace getVariable ["RHD_A3A_ZONE_MARKERS", []];
         if (_zones isEqualTo []) then {_zones = allMapMarkers select {(_x find "rhd_zone_") isEqualTo 0};};
         if (_zones isEqualTo []) then {
@@ -208,12 +191,7 @@ switch (_page) do {
                     private _idx = _list lbAdd format ["%1 | INITIALIZING", _label];
                     _list lbSetData [_idx, _marker];
                 } else {
-                    private _name = _data select 0;
-                    private _control = _data select 1;
-                    private _heat = _data select 2;
-                    private _supply = _data select 3;
-                    private _police = _data select 5;
-                    private _idx = _list lbAdd format ["%1 | %2 | HEAT %3 | SUPPLY %4 | POLICE %5", _name, _control, _heat, _supply, _police];
+                    private _idx = _list lbAdd format ["%1 | %2 | HEAT %3 | SUPPLY %4 | POLICE %5", _data select 0, _data select 1, _data select 2, _data select 3, _data select 5];
                     _list lbSetData [_idx, _marker];
                 };
             } forEach _zones;
@@ -232,9 +210,8 @@ switch (_page) do {
         private _attack = _a3a param [6, 0];
         private _defence = _a3a param [7, 0];
         private _hqText = if (isNull _hq) then {"Not available"} else {format ["%1m away", round (player distance2D _hq)]};
-
         _content ctrlSetStructuredText parseText format [
-            "<t size='1.20'><b>ANTISTASI CAMPAIGN</b></t><br/><br/><t color='#BFD7EA'>BASE</t>  %1<br/><t color='#BFD7EA'>VERSION</t>  %2<br/><t color='#BFD7EA'>STARTUP</t>  %3<br/><t color='#BFD7EA'>AGGRESSION</t>  %4<br/><t color='#BFD7EA'>A3A ZONES</t>  %5<br/><t color='#BFD7EA'>ATTACK RESOURCES</t>  %6<br/><t color='#BFD7EA'>DEFENCE RESOURCES</t>  %7<br/><t color='#BFD7EA'>HQ / PETROS</t>  %8<br/><br/><t size='1.05'>RHD - LifeCore uses the Antistasi campaign for the strategic world, while LifeCore supplies the civilian economy, jobs and RP systems.</t>",
+            "<t size='1.20'><b>ANTISTASI CAMPAIGN</b></t><br/><br/><t color='#BFD7EA'>BASE</t> %1<br/><t color='#BFD7EA'>VERSION</t> %2<br/><t color='#BFD7EA'>STARTUP</t> %3<br/><t color='#BFD7EA'>AGGRESSION</t> %4<br/><t color='#BFD7EA'>A3A ZONES</t> %5<br/><t color='#BFD7EA'>ATTACK RESOURCES</t> %6<br/><t color='#BFD7EA'>DEFENCE RESOURCES</t> %7<br/><t color='#BFD7EA'>HQ / PETROS</t> %8<br/><br/><t size='1.05'>RHD - LifeCore uses the Antistasi campaign for the strategic world, while LifeCore supplies the civilian economy, jobs and RP systems.</t>",
             if (_ready) then {"ONLINE"} else {"WAITING"}, _version, _startup, _aggression, count _zones, _attack, _defence, _hqText
         ];
         _status ctrlSetText "ANTISTASI BASE: strategic campaign state supplied by A3A.";
