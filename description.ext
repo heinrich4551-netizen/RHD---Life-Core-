@@ -36,9 +36,7 @@ respawnDelay = 5;
 respawnTemplates[] = {"MenuPosition"};
 joinUnassigned = 1;
 
-// ---------------------------------------------------------------------------
-// GENERIC A3A MAPINFO FALLBACK
-// ---------------------------------------------------------------------------
+// Generic fallback used only when the current terrain has no A3A mapInfo entry.
 class A3A
 {
     class mapInfo
@@ -64,7 +62,7 @@ class A3A
 };
 
 // ============================================================================
-// RHD FUNCTION REGISTRATION
+// RHD FUNCTIONS
 // ============================================================================
 class CfgFunctions
 {
@@ -100,7 +98,6 @@ class CfgFunctions
             class requestBuyEquipment {};
             class shopBuyVehicle {server = 1;};
             class shopBuyItem {server = 1;};
-            class shopDeliverItem {};
         };
 
         class Bank
@@ -175,19 +172,15 @@ class CfgFunctions
             class adminSpectate {};
         };
 
-        class ACE
-        {
-            file = "core\\ace";
-            class aceInit {};
-        };
-
+        // Function names intentionally include "antistasi" so the public RHD
+        // namespace is unambiguous when reading RPT logs and scripts.
         class Antistasi
         {
             file = "core\\antistasi";
             class initBase {server = 1;};
-            class addAggression {server = 1;};
-            class addResources {server = 1;};
-            class spawnVehicle {server = 1;};
+            class antistasiAddAggression {server = 1;};
+            class antistasiAddResources {server = 1;};
+            class antistasiSpawnVehicle {server = 1;};
             class getStatus {};
         };
 
@@ -245,18 +238,12 @@ class CfgRemoteExec
 
         class RHD_fnc_shopBuyVehicle {allowedTargets = 2;};
         class RHD_fnc_shopBuyItem {allowedTargets = 2;};
-        class RHD_fnc_shopDeliverItem {allowedTargets = 1;};
     };
 };
 
-// ============================================================================
-// cTab PLAYER TABLET
-// ============================================================================
+// cTab player tablet. cTab remains an external required addon.
 #include "core\\ui\\ctab.hpp"
 
-// ============================================================================
-// ALWAYS-ON STATUS HUD
-// ============================================================================
 class RscTitles
 {
     class RHD_HUD
@@ -286,9 +273,7 @@ class RscTitles
     };
 };
 
-// ============================================================================
-// SEPARATE ADMIN PANEL
-// ============================================================================
+// Separate administrator interface. No item or admin hotkey is required.
 class RHD_ADMIN
 {
     idd = 8500;
