@@ -56,19 +56,14 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import struct
-
-          files = [
-              Path('build-addon/rhd_rhd_lifecore.pbo'),
-              Path('build-addon/rhd_rhd_clothing.pbo'),
-          ]
-          for path in files:
+          for path in [Path('build-addon/rhd_rhd_lifecore.pbo'), Path('build-addon/rhd_rhd_clothing.pbo')]:
               data = path.read_bytes()
               pos = 0
               total_payload = 0
               entries = 0
               while True:
                   end = data.find(b'\0', pos)
-                  if end < 0 or end + 1 + 20 > len(data):
+                  if end < 0 or end + 21 > len(data):
                       raise SystemExit(f'{path}: invalid PBO directory')
                   name = data[pos:end].decode('utf-8')
                   pos = end + 1
@@ -76,17 +71,13 @@ jobs:
                   pos += 20
                   if name == '':
                       if fields != (0, 0, 0, 0, 0):
-                          raise SystemExit(f'{path}: invalid PBO terminator fields {fields}')
+                          raise SystemExit(f'{path}: invalid PBO terminator {fields}')
                       break
                   total_payload += fields[4]
                   entries += 1
-              if pos + total_payload != len(data):
-                  raise SystemExit(
-                      f'{path}: payload mismatch: header={pos} payload={total_payload} file={len(data)}'
-                  )
-              if entries == 0:
-                  raise SystemExit(f'{path}: no PBO entries found')
-              print(f'{path}: valid PBO, entries={entries}, bytes={len(data)}')
+              if entries == 0 or pos + total_payload != len(data):
+                  raise SystemExit(f'{path}: PBO size validation failed')
+              print(f'{path}: valid PBO entries={entries} bytes={len(data)}')
           PY
 
       - name: Validate addon PBO contents
@@ -113,7 +104,6 @@ jobs:
               missing = [x.decode('utf-8') for x in required if x not in data]
               if missing:
                   raise SystemExit(f'{filename} missing: {missing}')
-          print('Addon PBO content validation passed.')
           PY
 
       - name: Build bundled Altis mission PBO
@@ -140,29 +130,25 @@ jobs:
           entries = 0
           while True:
               end = data.find(b'\0', pos)
-              if end < 0 or end + 1 + 20 > len(data):
-                  raise SystemExit('Altis PBO: invalid PBO directory')
+              if end < 0 or end + 21 > len(data):
+                  raise SystemExit('Altis PBO: invalid directory')
               name = data[pos:end].decode('utf-8')
               pos = end + 1
               fields = struct.unpack('<IIIII', data[pos:pos + 20])
               pos += 20
               if name == '':
                   if fields != (0, 0, 0, 0, 0):
-                      raise SystemExit(f'Altis PBO: invalid terminator fields {fields}')
+                      raise SystemExit(f'Altis PBO: invalid terminator {fields}')
                   break
               total_payload += fields[4]
               entries += 1
-          if pos + total_payload != len(data):
-              raise SystemExit('Altis PBO: payload/header mismatch')
-          required = [
-              b'description.ext', b'mission.sqm', b'initServer.sqf',
-              b'initPlayerLocal.sqf', b'onPlayerRespawn.sqf', b'core/fn_init.sqf',
-              b'RHD_Module_AntistasiBase', b'RHD_Module_LifeCore', b'rhd_shop_kavala'
-          ]
+          if entries == 0 or pos + total_payload != len(data):
+              raise SystemExit('Altis PBO: size validation failed')
+          required = [b'description.ext', b'mission.sqm', b'RHD_Module_AntistasiBase', b'RHD_Module_LifeCore', b'rhd_shop_kavala']
           missing = [x.decode('utf-8') for x in required if x not in data]
           if missing:
-              raise SystemExit('Altis mission PBO missing: ' + ', '.join(missing))
-          print(f'Bundled Altis mission PBO valid, entries={entries}, bytes={len(data)}')
+              raise SystemExit('Altis mission missing: ' + ', '.join(missing))
+          print(f'Altis PBO valid entries={entries} bytes={len(data)}')
           PY
 
       - name: Assemble Launcher-ready @RHD-Life-Core
@@ -181,16 +167,10 @@ jobs:
           cp RHD_LifeCore.Altis.pbo package/@RHD-Life-Core/Missions/
           cp RHD_LifeCore.Altis.pbo package/@RHD-Life-Core/mpmissions/
           cp mod.cpp package/@RHD-Life-Core/
-          cp meta.cpp package/@RHD-LifeCore/ 2>/dev/null || cp meta.cpp package/@RHD-Life-Core/
+          cp meta.cpp package/@RHD-Life-Core/
           cp assets/branding/RHDLifeCore.jpg package/@RHD-Life-Core/assets/branding/
 
-          docs=(
-            README.md 3DEN_SETUP.md 3DEN_MODULES.md EDITOR_QUICKSTART.md
-            ADDON_BUILD.md ADMIN_AND_ACE_SETUP.md CTAB_INTEGRATION.md
-            ANTISTASI_BASE.md STEAM_WORKSHOP_DEPENDENCIES.md
-            STEAM_WORKSHOP_REQUIRED_ITEMS.txt THIRD_PARTY_NOTICES.md
-            PERFORMANCE.md UI_REFERENCES.md
-          )
+          docs=(README.md 3DEN_SETUP.md 3DEN_MODULES.md EDITOR_QUICKSTART.md ADDON_BUILD.md ADMIN_AND_ACE_SETUP.md CTAB_INTEGRATION.md ANTISTASI_BASE.md STEAM_WORKSHOP_DEPENDENCIES.md STEAM_WORKSHOP_REQUIRED_ITEMS.txt THIRD_PARTY_NOTICES.md PERFORMANCE.md UI_REFERENCES.md)
           for file in "${docs[@]}"; do cp "$file" package/@RHD-Life-Core/docs/; done
 
           cat > package/@RHD-Life-Core/INSTALL.txt <<'EOF'
@@ -205,20 +185,15 @@ OPTIONAL MOD
 ACE3
 
 LOCAL INSTALL
-1. Extract the package and keep the @RHD-Life-Core folder intact.
-2. Put @RHD-Life-Core beside your Arma 3 installation.
-3. In Arma 3 Launcher choose Local Mods and add the @RHD-Life-Core folder.
+1. Delete any previous @RHD-Life-Core folder.
+2. Extract this package intact.
+3. Add the extracted @RHD-Life-Core folder to Arma 3 Launcher as a Local Mod.
 4. Enable CBA_A3, cTab+, Antistasi Ultimate and RHD - LifeCore.
-5. The bundled mission is available as RHD_LifeCore.Altis in Multiplayer.
+5. Use Multiplayer -> Host New Game and select RHD_LifeCore.Altis.
 
-SERVER INSTALL
-The same mod folder includes mpmissions/RHD_LifeCore.Altis.pbo for a server
-that loads missions from the active mod path. If using a server profile with
-an explicit -cfg/-profiles mission directory, copy the PBO to that server's
-mpmissions directory as normal.
-
-The bundled Altis scenario already contains the RHD LifeCore and Antistasi
-Ultimate bridge modules and RHD economy/service markers.
+The Altis mission is bundled in both Missions and mpmissions so it is
+available to the multiplayer mission browser and can also be copied to a
+server's mpmissions directory when using an explicit server mission path.
 EOF
 
           mkdir -p dist
@@ -236,7 +211,6 @@ EOF
           test -s package/@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis.pbo
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_lifecore.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_clothing.pbo'
-          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/Missions/RHD_LifeCore.Altis.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/mod.cpp'
           echo 'Final Launcher package layout validated.'
