@@ -32,7 +32,7 @@ class CfgFunctions
     {
         class Modules
         {
-            file = "\rhd_lifecore\functions\modules";
+            file = "\\rhd\\addons\\rhd_lifecore\\functions\\modules";
             class moduleAntistasiBase {};
             class moduleLifeCore {};
             class terrainAudit {server = 1;};
