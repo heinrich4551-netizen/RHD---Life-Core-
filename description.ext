@@ -42,8 +42,10 @@ class CfgFunctions
         class Industry
         {
             file = "core\\industry";
-            class gather {};
+            class serverGather {server = 1;};
+            class requestGather {};
             class refine {server = 1;};
+            class requestRefine {};
         };
         class UI
         {
@@ -69,13 +71,14 @@ class CfgRemoteExec
         class RHD_fnc_serverBuy {allowedTargets = 2;};
         class RHD_fnc_serverSell {allowedTargets = 2;};
         class RHD_fnc_setJob {allowedTargets = 2;};
+        class RHD_fnc_serverGather {allowedTargets = 2;};
         class RHD_fnc_refine {allowedTargets = 2;};
     };
 };
 
 class RHD_F6
 {
-    idd = 7600; movingEnable = 0; enableSimulation = 1;
+    idd=7600; movingEnable=0; enableSimulation=1;
     class controlsBackground { class Background: RscText {idc=7601;x=.28*safezoneW+safezoneX;y=.20*safezoneH+safezoneY;w=.44*safezoneW;h=.58*safezoneH;colorBackground[]={0,0,0,.82};}; };
     class controls
     {
@@ -84,7 +87,6 @@ class RHD_F6
         class Close: RscButton {idc=7604;x=.58*safezoneW+safezoneX;y=.70*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";};
     };
 };
-
 class RHD_F7
 {
     idd=7700; movingEnable=0; enableSimulation=1;
@@ -97,7 +99,6 @@ class RHD_F7
         class Close: RscButton {idc=7705;x=.58*safezoneW+safezoneX;y=.70*safezoneH+safezoneY;w=.12*safezoneW;h=.05*safezoneH;text="CLOSE";action="closeDialog 0";};
     };
 };
-
 class RHD_F8
 {
     idd=7805; movingEnable=0; enableSimulation=1;
