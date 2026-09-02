@@ -6,7 +6,7 @@ class CfgPatches
     {
         name = "RHD - LifeCore";
         author = "LT. Toad";
-        requiredVersion = 2.14;
+        requiredVersion = 2.20;
         requiredAddons[] = {"A3A_core", "cba_main", "ace_main", "ctab_core"};
         units[] = {
             "RHD_Module_AntistasiBase",
@@ -72,7 +72,7 @@ class CfgVehicles
             class RHD_A3A_CreateHQ
             {
                 displayName = "Create Safe HQ Anchors";
-                tooltip = "Creates the editor-independent HQ anchor objects required by Antistasi. They are repositioned by A3A when the campaign starts.";
+                tooltip = "Creates the editor-independent HQ anchor objects required by Antistasi. A3A repositions them during campaign startup.";
                 property = "RHD_A3A_CreateHQ";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_A3A_CreateHQ', _value, true]";
@@ -83,7 +83,7 @@ class CfgVehicles
             class RHD_A3A_TerrainFallback
             {
                 displayName = "Enable Generic Terrain Fallback";
-                tooltip = "Installs the RHD terrain adapter before campaign startup so unsupported terrain data can fall back to generic Arma detection.";
+                tooltip = "Installs the RHD terrain adapter before campaign startup when the active terrain has no A3A mapInfo entry.";
                 property = "RHD_A3A_TerrainFallback";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_A3A_TerrainFallback', _value, true]";
@@ -111,7 +111,7 @@ class CfgVehicles
             class RHD_EnableEconomy
             {
                 displayName = "Enable Economy / Shops";
-                tooltip = "Enables RHD virtual shops plus the dynamic base/mod vehicle and equipment catalogue.";
+                tooltip = "Enables RHD virtual shops plus the dynamic base-game and loaded-mod vehicle/equipment catalogue.";
                 property = "RHD_EnableEconomy";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnableEconomy', _value, true]";
@@ -122,7 +122,7 @@ class CfgVehicles
             class RHD_EnableJobs
             {
                 displayName = "Enable Jobs";
-                tooltip = "Enables the civilian, farmer, miner, refiner, police and EMS job systems.";
+                tooltip = "Enables the RHD civilian, farmer, miner, refiner, police and EMS job systems.";
                 property = "RHD_EnableJobs";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnableJobs', _value, true]";
@@ -133,7 +133,7 @@ class CfgVehicles
             class RHD_EnableIndustry
             {
                 displayName = "Enable Farming / Mining / Refining";
-                tooltip = "Enables RHD gathering and refining features configured by Eden markers.";
+                tooltip = "Enables RHD gathering/refining features configured through Eden locations.";
                 property = "RHD_EnableIndustry";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnableIndustry', _value, true]";
@@ -144,7 +144,7 @@ class CfgVehicles
             class RHD_EnableRP
             {
                 displayName = "Enable Police / EMS / RP";
-                tooltip = "Enables Life RP services, tickets, medical actions and dispatch systems.";
+                tooltip = "Enables Life RP services, tickets, medical interactions and dispatch.";
                 property = "RHD_EnableRP";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnableRP', _value, true]";
@@ -155,7 +155,7 @@ class CfgVehicles
             class RHD_EnablePersistence
             {
                 displayName = "Enable Life RP Persistence";
-                tooltip = "Saves and loads RHD cash, bank, job and inventory independently from the Antistasi campaign save.";
+                tooltip = "Saves RHD cash, bank, job and virtual inventory independently of the A3A campaign save.";
                 property = "RHD_EnablePersistence";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnablePersistence', _value, true]";
@@ -177,7 +177,7 @@ class CfgVehicles
             class RHD_EnableBranding
             {
                 displayName = "Enable RHD Billboard Branding";
-                tooltip = "Automatically applies the RHD - LifeCore artwork to normal Land_Billboard_F objects.";
+                tooltip = "Applies the RHD artwork to Land_Billboard_F objects when the server starts.";
                 property = "RHD_EnableBranding";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnableBranding', _value, true]";
@@ -188,7 +188,7 @@ class CfgVehicles
             class RHD_EnableTablet
             {
                 displayName = "Enable cTab Player Tablet";
-                tooltip = "Adds the RHD player tablet to ACE Self Actions.";
+                tooltip = "Adds the RHD LifeCore tablet to ACE Self Actions.";
                 property = "RHD_EnableTablet";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnableTablet', _value, true]";
@@ -199,7 +199,7 @@ class CfgVehicles
             class RHD_EnableConflict
             {
                 displayName = "Enable Life District Pressure";
-                tooltip = "Enables RHD-only civilian crime pressure around rhd_zone_* markers; strategic control remains A3A-owned.";
+                tooltip = "Enables the RHD-only civilian crime/heat layer around rhd_zone_* markers.";
                 property = "RHD_EnableConflict";
                 control = "Checkbox";
                 expression = "_this setVariable ['RHD_EnableConflict', _value, true]";
