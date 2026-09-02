@@ -1,4 +1,4 @@
-#define RHD_VERSION_TEXT "2.2.1"
+#define RHD_VERSION_TEXT "2.2.2"
 
 class CfgPatches
 {
@@ -33,6 +33,7 @@ class CfgFunctions
             file = "functions/modules";
             class moduleAntistasiBase {};
             class moduleLifeCore {};
+            class dynamicLocations {server = 1;};
             class terrainAudit {server = 1;};
             class terrainFallback {};
         };
