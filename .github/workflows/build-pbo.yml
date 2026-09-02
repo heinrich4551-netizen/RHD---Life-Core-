@@ -21,6 +21,53 @@ jobs:
       - name: Build PBOs
         run: hemtt build
 
+      - name: Validate generated PBOs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .hemttout/build/addons/rhd_rhd_lifecore.pbo
+          test -f .hemttout/build/addons/rhd_rhd_clothing.pbo
+
+          for pbo in .hemttout/build/addons/*.pbo; do
+            echo "Validating $pbo"
+            if strings "$pbo" | grep -E '(^|/)README\.md$|(^|/)version\.hpp$'; then
+              echo "ERROR: source-only documentation/header leaked into PBO: $pbo"
+              exit 1
+            fi
+          done
+
+          clothing=.hemttout/build/addons/rhd_rhd_clothing.pbo
+          for class in \
+            RHD_Outfit_TShirt_Tan_Casual \
+            RHD_Outfit_TShirt_Olive_Casual \
+            RHD_Outfit_TShirt_Black_Casual \
+            RHD_Outfit_Polo_White_Casual \
+            RHD_Outfit_Polo_Burgundy_Casual \
+            RHD_Outfit_Polo_Blue_Casual \
+            RHD_Outfit_Polo_Yellow_Casual \
+            RHD_Outfit_Polo_Striped_Casual \
+            RHD_Outfit_Field_Hunter_Green \
+            RHD_Outfit_Field_Hunter_Brown \
+            RHD_Outfit_Workwear_Poor_01 \
+            RHD_Outfit_Workwear_Poor_02 \
+            RHD_Outfit_Mechanic_Coveralls \
+            RHD_Outfit_Tactical_Black \
+            RHD_Outfit_Tactical_Olive \
+            RHD_Outfit_Tactical_Tan \
+            RHD_Outfit_Tactical_Grey \
+            RHD_Outfit_Tactical_Camo \
+            RHD_Outfit_Tactical_Patrol \
+            RHD_Outfit_Tactical_Contractor \
+            RHD_Outfit_Tactical_Field \
+            RHD_Outfit_Tactical_Worker; do
+            strings "$clothing" | grep -Fq "$class" || {
+              echo "ERROR: compiled clothing PBO is missing $class"
+              exit 1
+            }
+          done
+
+          echo "RHD strict PBO validation passed."
+
       - name: List generated PBOs
         run: find .hemttout/build -type f -name '*.pbo' -print
 
