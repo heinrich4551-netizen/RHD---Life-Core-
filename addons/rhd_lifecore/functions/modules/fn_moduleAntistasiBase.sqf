@@ -2,20 +2,12 @@
     RHD - LifeCore | 3DEN MODULE: ANTISTASI ULTIMATE BASE
     Author: LT. Toad
 
-    PURPOSE
-    -------
-    This module is the real startup switch for the Antistasi Ultimate campaign.
-    RHD does NOT start a second strategic simulation.
+    PLACE IN 3DEN
+    --------------
+    Systems -> RHD - LifeCore -> Antistasi Ultimate Base
 
-    PLACE THIS IN 3DEN
-    ------------------
-    Eden -> Systems -> RHD - LifeCore -> Antistasi Ultimate Base
-
-    Put it at the intended HQ / campaign start position.
-
-    The module creates only the small set of mission anchors that the A3A
-    campaign expects from the host mission, then starts A3A_fnc_initServer.
-    All strategic systems remain owned by Antistasi Ultimate.
+    This module is the mission's explicit A3A startup switch. It does not
+    replace or duplicate the Antistasi strategic engine.
 */
 
 params [
@@ -26,13 +18,12 @@ params [
 if (!_activated || {isNull _logic}) exitWith {};
 if (!isServer) exitWith {};
 
-// Prevent accidental double-starts if the module is triggered twice.
 if (missionNamespace getVariable ["RHD_A3A_MODULE_STARTED", false]) exitWith {
-    diag_log "[RHD-LIFECORE] Antistasi startup module was already activated.";
+    diag_log "[RHD-LIFECORE] Antistasi startup module already activated.";
 };
 
 if !(isClass (configFile >> "CfgPatches" >> "A3A_core")) exitWith {
-    diag_log "[RHD-LIFECORE] ERROR: Antistasi Ultimate is not loaded. Install the required A3A addon before starting the mission.";
+    diag_log "[RHD-LIFECORE] ERROR: Antistasi Ultimate is not loaded.";
 };
 
 if (isNil "A3A_fnc_initServer") exitWith {
@@ -47,49 +38,43 @@ private _createHQ = _logic getVariable ["RHD_A3A_CreateHQ", true];
 private _terrainFallback = _logic getVariable ["RHD_A3A_TerrainFallback", true];
 
 if (!_autoStart) exitWith {
-    diag_log "[RHD-LIFECORE] Antistasi module placed with campaign auto-start disabled.";
+    diag_log "[RHD-LIFECORE] Antistasi auto-start disabled on the 3DEN module.";
 };
 
-// ---------------------------------------------------------------------------
-// REQUIRED HOST-MISSION ANCHORS
-// ---------------------------------------------------------------------------
-// A3A's server initializer expects these mission objects to exist because it
-// positions/uses them during HQ setup. The campaign later replaces/repositions
-// Petros as part of its normal startup.
 private _basePos = getPosATL _logic;
 private _baseDir = getDir _logic;
 
-private _newAnchor = {
-    params ["_class", "_offset", ["_simulation", false]];
-    private _p = _basePos vectorAdd _offset;
-    private _obj = createVehicle [_class, _p, [], 0, "CAN_COLLIDE"];
-    _obj setDir _baseDir;
-    if (!_simulation) then {_obj enableSimulationGlobal false};
-    _obj
-};
-
+// Host-mission anchors expected by the A3A server initializer.
 if (_createHQ) then {
+    private _newAnchor = {
+        params ["_class", "_offset"];
+        private _obj = createVehicle [_class, _basePos vectorAdd _offset, [], 0, "CAN_COLLIDE"];
+        _obj setDir _baseDir;
+        _obj enableSimulationGlobal false;
+        _obj
+    };
+
     if (isNil "boxX" || {isNull boxX}) then {
-        boxX = ["B_supplyCrate_F", [3, 0, 0], false] call _newAnchor;
+        boxX = ["B_supplyCrate_F", [3, 0, 0]] call _newAnchor;
         publicVariable "boxX";
     };
 
     if (isNil "vehicleBox" || {isNull vehicleBox}) then {
-        vehicleBox = ["B_supplyCrate_F", [0, 3, 0], false] call _newAnchor;
+        vehicleBox = ["B_supplyCrate_F", [0, 3, 0]] call _newAnchor;
         publicVariable "vehicleBox";
     };
 
     if (isNil "mapX" || {isNull mapX}) then {
-        mapX = ["Land_MapBoard_F", [-3, 0, 0], false] call _newAnchor;
+        mapX = ["Land_MapBoard_F", [-3, 0, 0]] call _newAnchor;
         publicVariable "mapX";
     };
 
     if (isNil "flagX" || {isNull flagX}) then {
-        flagX = ["FlagCarrierWhite_F", [0, -3, 0], false] call _newAnchor;
+        flagX = ["FlagCarrierWhite_F", [0, -3, 0]] call _newAnchor;
         publicVariable "flagX";
     };
 
-    // Petros is re-created by A3A_fnc_createPetros after campaign save setup.
+    // A3A replaces/reinitializes Petros during campaign startup.
     if (isNil "petros" || {isNull petros}) then {
         private _group = createGroup [independent, true];
         petros = _group createUnit [
@@ -103,9 +88,7 @@ if (_createHQ) then {
     };
 };
 
-// ---------------------------------------------------------------------------
-// REQUIRED MARKERS
-// ---------------------------------------------------------------------------
+// Required A3A marker names if the host mission does not already contain them.
 if !("respawn_guerrila" in allMapMarkers) then {
     private _respawn = createMarker ["respawn_guerrila", _basePos];
     _respawn setMarkerType "Empty";
@@ -113,19 +96,17 @@ if !("respawn_guerrila" in allMapMarkers) then {
 };
 
 if !("Synd_HQ" in allMapMarkers) then {
-    private _hqMarker = createMarker ["Synd_HQ", _basePos];
-    _hqMarker setMarkerType "Empty";
-    _hqMarker setMarkerText "Antistasi HQ";
+    private _hq = createMarker ["Synd_HQ", _basePos];
+    _hq setMarkerType "Empty";
+    _hq setMarkerText "Antistasi HQ";
 };
 
-// ---------------------------------------------------------------------------
-// TERRAIN COMPATIBILITY
-// ---------------------------------------------------------------------------
+// This file lives inside the compiled RHD addon PBO, so use the PBO prefix.
 if (_terrainFallback) then {
-    ["GENERIC"] call compileFinal preprocessFileLineNumbers "addons\\rhd_lifecore\\functions\\modules\\fn_terrainFallback.sqf";
+    ["GENERIC"] call compileFinal preprocessFileLineNumbers "\\rhd_lifecore\\functions\\modules\\fn_terrainFallback.sqf";
 };
 
-// The A3A campaign owns the actual startup sequence.
+// Start the actual Antistasi Ultimate campaign. A3A owns all strategic logic.
 [] spawn A3A_fnc_initServer;
 
 diag_log format [
