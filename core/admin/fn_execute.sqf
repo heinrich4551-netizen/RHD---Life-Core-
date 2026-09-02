@@ -130,11 +130,10 @@ switch (_action) do {
             {_class != ""} &&
             {isClass (configFile >> "CfgVehicles" >> _class)}
         ) then {
-            private _veh = [_class, getPosATL _admin, 12, 8] call RHD_fnc_antistasiSpawnVehicle;
+            private _veh = [_class, getPosATL _admin, 12, 8] call RHD_fnc_spawnVehicle;
 
             if (isNull _veh) then {
-                // Fall back to a simple server spawn only if the A3A base is
-                // unavailable. This keeps the admin tool usable during setup.
+                // Fallback is only used when the Antistasi base is unavailable.
                 _veh = createVehicle [_class, getPosATL _admin, [], 6, "NONE"];
             };
 
