@@ -3,21 +3,11 @@ if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
 if !(_marker in allMapMarkers) exitWith {};
 if (_unit distance2D (getMarkerPos _marker) > 15) exitWith {};
 private _m = toLower _marker;
-private _item = "";
-if ((_m find "rhd_farm_") == 0) then {
-    private _suffix = _m select [9];
-    _item = switch (_suffix) do {
-        case "apples": {"apple"}; case "apple": {"apple"}; case "cannabis": {"cannabis_plant"};
-        case "coca": {"coca_leaf"}; case "corn": {"corn_cob"}; case "grapes": {"grapes"}; case "peaches": {"peaches"}; default {""}
-    };
-} else {
-    if ((_m find "rhd_mine_") == 0) then {
-        private _suffix = _m select [9];
-        _item = switch (_suffix) do {
-            case "iron": {"iron_ore"}; case "copper": {"copper_ore"}; case "gold": {"gold_ore"};
-            case "diamond": {"diamond"}; case "oil": {"oil_sand"}; default {""}
-        };
-    };
+private _item = switch (_m) do {
+    case "rhd_farm_apples": {"apple"}; case "rhd_farm_apple": {"apple"}; case "rhd_farm_cannabis": {"cannabis_plant"};
+    case "rhd_farm_coca": {"coca_leaf"}; case "rhd_farm_corn": {"corn_cob"}; case "rhd_farm_grapes": {"grapes"}; case "rhd_farm_peaches": {"peaches"};
+    case "rhd_mine_iron": {"iron_ore"}; case "rhd_mine_copper": {"copper_ore"}; case "rhd_mine_gold": {"gold_ore"};
+    case "rhd_mine_diamond": {"diamond"}; case "rhd_mine_oil": {"oil_sand"}; default {""}
 };
 if (_item isEqualTo "") exitWith {};
 private _job = _unit getVariable ["RHD_JOB", "civ"];
