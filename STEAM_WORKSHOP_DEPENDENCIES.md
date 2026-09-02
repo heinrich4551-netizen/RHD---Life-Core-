@@ -14,9 +14,16 @@ RHD - LifeCore is an Antistasi Ultimate-backed Life RP framework. The A3A campai
 | ACE3 | REQUIRED | Interaction, EMS and admin access | `463939057` |
 | cTab+ | REQUIRED | RHD player tablet | `2262006564` |
 
-## User-requested Workshop items
+## Police Equipment v1 dependencies supplied by project owner
 
-The project owner also supplied these Steam Workshop IDs:
+| Workshop ID | Purpose | Status |
+|---:|---|---|
+| `3352708204` | Customizable equipment / modular gear system | Pending exact Workshop title, addon class names, API and redistribution terms |
+| `2260572637` | Night vision dependency | Pending exact Workshop title, addon class names, API and redistribution terms |
+
+**Important:** Steam Workshop IDs are not valid Arma `requiredAddons[]` class names. The final config must use the dependency addon class names exposed by the actual PBOs. No class names are invented in this branch.
+
+## Previously supplied Workshop items
 
 ```text
 1123403138
@@ -26,23 +33,11 @@ The project owner also supplied these Steam Workshop IDs:
 2623373810
 ```
 
-Their exact Workshop titles, addon class names and transitive dependency chains are **not guessed** here. Live Steam metadata is unavailable in this development environment. Confirm each Steam page before publishing a locked server preset.
+Their exact Workshop titles, addon class names and transitive dependency chains remain pending official Steam verification.
 
-| Workshop ID | Title | RHD use | Dependency chain |
-|---:|---|---|---|
-| `1123403138` | Pending official Steam verification | Integrate after API/assets are confirmed | Pending |
-| `2618183963` | Pending official Steam verification | Integrate after API/assets are confirmed | Pending |
-| `2618122951` | Pending official Steam verification | Integrate after API/assets are confirmed | Pending |
-| `2623374243` | Pending official Steam verification | Integrate after API/assets are confirmed | Pending |
-| `2623373810` | Pending official Steam verification | Integrate after API/assets are confirmed | Pending |
+## Architecture rule
 
-## Important architecture rule
-
-**Antistasi Ultimate is now a runtime dependency, not just an inspiration.**
-
-RHD waits for the A3A campaign to finish its server initialization and then uses its exposed world state and function API. The RHD bridge uses A3A for campaign/world state and selected world operations rather than starting a second strategic AI engine.
-
-The upstream Antistasi server initialization creates/loads campaign state, initializes zones, garrisons and other systems, publishes `serverInitDone`, then starts the main background loops. fileciteturn426file0
+**Antistasi Ultimate is a runtime dependency, not just an inspiration.** RHD waits for the A3A campaign initialization and uses its exposed world state and function API rather than starting a second strategic AI engine.
 
 ## Recommended launch order
 
@@ -52,10 +47,12 @@ Arma 3
   -> Antistasi Ultimate
   -> ACE3
   -> cTab+
-  -> RHD - LifeCore mission
+  -> customization dependency (3352708204)
+  -> night vision dependency (2260572637)
+  -> RHD - LifeCore
 ```
 
-The exact mod load order can depend on your server launcher, but every client and the dedicated server must have compatible required mods enabled.
+The exact order may vary by server launcher, but clients and the dedicated server must have compatible required mods enabled.
 
 ## Development checkout
 
@@ -80,6 +77,6 @@ RHD - LifeCore remains mission-side code. Do not unpack ACE3, CBA_A3, cTab+ or A
 
 ## Licensing
 
-Antistasi Ultimate's main codebase is MIT-licensed, while the upstream repository explicitly identifies separate APL-ND components. RHD preserves that boundary and does not modify or redistribute those restricted components. fileciteturn427file0
+Antistasi Ultimate's main codebase is MIT-licensed, while the upstream repository explicitly identifies separate APL-ND components. RHD preserves that boundary and does not modify or redistribute those restricted components.
 
 See `THIRD_PARTY_NOTICES.md` and `LICENSES/ANTISTASI_ULTIMATE_LICENSE.txt`.
