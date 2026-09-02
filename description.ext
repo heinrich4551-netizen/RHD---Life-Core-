@@ -12,6 +12,7 @@ class CfgFunctions
         tag = "RHD";
         class Core { file="core"; class init {preInit=1;}; class initPlayer {postInit=1;}; class savePlayer {server=1;}; class loadPlayer {server=1;}; class getItemCount {}; class addItem {}; class removeItem {}; class addCash {server=1;}; class removeCash {server=1;}; class notify {}; };
         class Economy { file="core\\economy"; class serverBuy {server=1;}; class serverSell {server=1;}; class shopOpen {}; };
+        class Bank { file="core\\bank"; class deposit {server=1;}; class withdraw {server=1;}; class requestDeposit {}; class requestWithdraw {}; };
         class Jobs { file="core\\jobs"; class setJob {server=1;}; class startWork {}; class stopWork {}; };
         class Industry { file="core\\industry"; class serverGather {server=1;}; class requestGather {}; class refine {server=1;}; class requestRefine {}; };
         class RP { file="core\\rp"; class ticket {server=1;}; class requestTicket {}; class heal {server=1;}; class requestHeal {}; };
@@ -23,16 +24,10 @@ class CfgRemoteExec
     class Functions
     {
         mode=2; jip=1;
-        class RHD_fnc_notify {allowedTargets=0;};
-        class RHD_fnc_openMenu {allowedTargets=1;};
-        class RHD_fnc_shopOpen {allowedTargets=1;};
-        class RHD_fnc_serverBuy {allowedTargets=2;};
-        class RHD_fnc_serverSell {allowedTargets=2;};
-        class RHD_fnc_setJob {allowedTargets=2;};
-        class RHD_fnc_serverGather {allowedTargets=2;};
-        class RHD_fnc_refine {allowedTargets=2;};
-        class RHD_fnc_ticket {allowedTargets=2;};
-        class RHD_fnc_heal {allowedTargets=2;};
+        class RHD_fnc_notify {allowedTargets=0;}; class RHD_fnc_openMenu {allowedTargets=1;}; class RHD_fnc_shopOpen {allowedTargets=1;};
+        class RHD_fnc_serverBuy {allowedTargets=2;}; class RHD_fnc_serverSell {allowedTargets=2;}; class RHD_fnc_setJob {allowedTargets=2;};
+        class RHD_fnc_serverGather {allowedTargets=2;}; class RHD_fnc_refine {allowedTargets=2;}; class RHD_fnc_ticket {allowedTargets=2;}; class RHD_fnc_heal {allowedTargets=2;};
+        class RHD_fnc_deposit {allowedTargets=2;}; class RHD_fnc_withdraw {allowedTargets=2;};
     };
 };
 class RHD_F6
