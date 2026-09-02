@@ -1,5 +1,6 @@
 params ["_medic", "_target"];
 if (!isServer || {isNull _medic} || {isNull _target}) exitWith {};
+if (owner _medic != remoteExecutedOwner) exitWith {};
 if (!isPlayer _medic || {!isPlayer _target} || {!alive _target}) exitWith {};
 if !(_medic getVariable ["RHD_JOB", "civ"] isEqualTo "medic") exitWith {};
 if (_medic distance2D _target > 10) exitWith {};
