@@ -1,5 +1,3 @@
-#include "version.hpp"
-
 class CfgPatches
 {
     class rhd_clothing
