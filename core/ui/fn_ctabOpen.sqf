@@ -15,5 +15,6 @@ if (isNull _display) then {
 
 if (isNull _display) exitWith {false};
 
-[] call RHD_fnc_ctabBuild;
+private _ctrls = uiNamespace getVariable ["RHD_CTAB_CTRLS", []];
+if (_ctrls isEqualTo []) then {[] call RHD_fnc_ctabBuild;};
 true
