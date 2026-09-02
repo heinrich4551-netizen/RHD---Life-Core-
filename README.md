@@ -1,152 +1,137 @@
 # RHD - LifeCore
 
-![RHD - LifeCore](assets/branding/RHDLifeCore.jpg)
+**Arma 3 Life RP framework**  
+**Author: LT. Toad**
 
-**Author: LT. Toad**  
-An Arma 3 Life RP framework for persistent people, jobs, crime and opportunity. Built for **3DEN-first mission editing** and organized so a new server owner can change important gameplay values without understanding every SQF system.
+RHD - LifeCore is a terrain-agnostic, 3DEN-first Arma 3 Life framework built around readable configuration, modular systems, server-authoritative transactions and a lightweight persistent world.
 
-## Required dependencies
+## Project identity
 
-| Dependency | Required for | Steam Workshop ID |
-|---|---|---:|
-| **Arma 3** | Base game | — |
-| **CBA_A3** | cTab+ and shared mod support | `450814997` |
-| **cTab+** | RHD player tablet | `2262006564` |
-| **ACE3** | ACE interaction layer and RHD administration | `463939057` |
+- **Name:** RHD - LifeCore
+- **Author:** LT. Toad
+- **Primary editor workflow:** Arma 3 Eden / 3DEN
+- **Player interface:** cTab+ tablet
+- **Interaction layer:** ACE3 when installed
+- **Administration:** Separate UID-gated RHD admin panel through ACE Self Actions
+- **World systems:** RHD-owned conflict, economy, jobs, industry, RP and ambient systems
+- **Branding:** `assets/branding/RHDLifeCore.jpg`
 
-Workshop links and installation details are maintained in `STEAM_WORKSHOP_DEPENDENCIES.md`.
+The supplied Kavala artwork is used as the mission overview/loading artwork. The in-game mission name and author are `RHD - LifeCore` and `LT. Toad`.
 
-**Important:** Antistasi Ultimate is **not** a runtime dependency of RHD - LifeCore. RHD contains an RHD-owned district pressure system inspired by persistent-world concepts from Antistasi Ultimate.
+## External projects
 
-## Branding
+RHD - LifeCore integrates with external projects through their supported interfaces rather than bundling their entire addons into the mission.
 
-Mission identity is **RHD - LifeCore** and the mission author is **LT. Toad**. The supplied Kavala artwork is used as the mission loading screen and overview artwork and is stored at `assets/branding/RHDLifeCore.jpg`.
+### cTab+
+RHD uses cTab+'s tablet display as the player-facing UI host. The mission creates RHD-owned tablet controls on the cTab interface.
 
-## What is included
+### ACE3
+RHD uses ACE3 for contextual interaction menus and administrator/EMS access when ACE3 is installed.
 
-- Persistent player identity, cash/bank, inventory, licenses, job and jail state.
-- cTab-backed RHD player tablet for status, jobs, shop, banking, services and district pressure.
-- F6/F7/F8 shortcuts route into the same cTab-backed player surface.
-- ACE Self Actions can open the player tablet without requiring an RHD inventory item.
-- Separate UID-gated administrator panel based on the compact XEAT-style player/action layout.
+### Antistasi Ultimate
+RHD includes an **RHD-owned Conflict layer inspired by high-level Antistasi-style persistent-world concepts** such as district pressure, supply, local security presence and changing territorial status. RHD does **not** require Antistasi Ultimate at runtime and does not redistribute Antistasi Ultimate PBOs.
+
+This separation is intentional: Antistasi Ultimate is a complete persistent multiplayer scenario rather than a small mission library. RHD keeps the Life RP economy, identity, jobs and server rules under its own codebase while using compatible design concepts for the world-pressure layer.
+
+## Included gameplay
+
+- Persistent player identity, cash, bank, inventory, licenses, jobs and jail state.
+- cTab-backed RHD player tablet for Status, Jobs, Market, Banking, Services and Districts.
 - Farming: Apples, Cannabis Plant, Coca Leaf, Corn Cob, Grapes, Peaches.
 - Mining: Iron Ore, Copper Ore, Gold Ore, Diamond, Oil Sand.
 - Refining: Iron Ore -> Iron, Copper Ore -> Copper, Gold Ore -> Gold, Oil Sand -> Oil.
-- Generic buy/sell shop system using the centralized RHD economy configuration.
-- Police, EMS and civilian job templates with basic ticketing and treatment.
-- Terrain-independent bank, shop, fuel, farm, mine and refinery locations.
-- Performance-conscious ambient civilians, traffic and temporary roadside incidents.
-- Server-authoritative transactions with caller validation and anti-negative-money/inventory checks.
-- Persistent **district pressure** using `rhd_zone_*` markers with heat, supply, local police presence and control states.
+- Generic buy/sell shop system.
+- Police, EMS and civilian jobs.
+- Bank, fuel, farming, mining and refining location systems driven by Eden markers.
+- RHD Conflict districts using `rhd_zone_*` markers.
+- Crime pressure recording and police presence pressure reduction.
+- Lightweight ambient civilians and traffic with hard performance caps.
+- Rare roadside incidents and temporary Police/EMS dispatch events.
+- UID-gated unified administration with server-side privilege validation.
+- ACE-aware EMS treatment interactions.
 - No hard-coded terrain coordinates.
 
-## Antistasi Ultimate-inspired conflict layer
+## Beginner editor workflow
 
-Antistasi Ultimate is a persistent Arma 3 multiplayer scenario focused on guerrilla warfare and expanded persistent gameplay. RHD uses that *style of persistent world pressure* as design inspiration for its own **Conflict** layer.
+Most server owners only need two places:
 
-The RHD implementation provides:
+**1. Eden Editor**  
+Place the map objects, NPCs, vehicles and RHD markers.
 
-- `rhd_zone_*` markers that define districts in Eden.
-- District criminal/public-order **heat** from 0-100.
-- Nearby Police jobs that reduce heat over time.
-- `ORDERLY`, `CONTESTED` and `CRIMINAL PRESSURE` district states.
-- A district supply value for future jobs and events.
-- Server-side `RHD_fnc_recordCrime` support for adding pressure from gameplay systems.
-- A **DISTRICTS** page in the player cTab tablet.
+**2. `core/fn_init.sqf`**  
+Change the clearly marked server settings such as admin UIDs, jobs, pay rates, item prices, recipes and conflict tuning.
 
-The implementation is RHD-owned SQF. It does **not** load Antistasi Ultimate PBOs or require Antistasi Ultimate to run.
-
-## Licensing / third-party code
-
-The main Antistasi Ultimate project is MIT licensed, but its repository also identifies some integrated components as separately licensed APL-ND material. RHD does not copy or modify those restricted components. See `THIRD_PARTY_NOTICES.md` for the exact integration boundary and attribution.
-
-## Beginner editing
-
-### The one file most server owners should edit
-
-`core/fn_init.sqf`
-
-This file contains clearly labeled sections for:
-
-- Admin Steam64 IDs
-- Job names and pay rates
-- Item names and prices
-- Refining recipes
-- Gatherable resources
-- Conflict/district settings
-
-The comments directly above each section explain the format.
-
-### Map editing
-
-Do map work in **Arma 3 Eden (3DEN)**. Use `3DEN_SETUP.md` for marker names and the recommended town layout.
-
-### Advanced files
-
-Experienced developers can work directly in:
-
-- `core/admin/` — administrator actions
-- `core/ace/` — ACE3 integration
-- `core/ui/` — cTab player UI
-- `core/conflict/` — district pressure / world conflict
-- `core/economy/` — shop transactions
-- `core/bank/` — banking
-- `core/jobs/` — jobs
-- `core/industry/` — gathering/refining
-- `core/rp/` — police/EMS/RP
-- `core/services/` — vehicle services
-- `core/ambient/` — ambient population/events
-
-`description.ext` registers these systems and is commented for advanced editors, but most customization should be done through `core/fn_init.sqf` and Eden.
-
-## cTab+
-
-RHD uses [cTab+](https://github.com/jetelain/cTab) as the player-facing tablet surface. The mission opens cTab's `cTab_Tablet_dlg` through its mission-facing function and places RHD-owned controls on that display.
-
-cTab+ requires CBA_A3. Keep cTab+ installed as an external Workshop mod; do not copy its PBOs into this mission.
-
-## ACE3
-
-RHD detects ACE3 at runtime. ACE supplies the interaction layer for the RHD Life Tablet, RHD Administration and contextual EMS actions. RHD keeps LifeCore business rules and privileged validation on the server.
-
-## Administration
-
-All RHD administrator controls are consolidated into one `RHD - LIFECORE | ADMIN` screen. Administrators are identified by Steam64 UID, not player name.
-
-Edit the `RHD_ADMIN_UIDS` section in `core/fn_init.sqf` and add trusted Steam64 IDs.
-
-The administrator surface includes player inspection, heal/kill/freeze, teleport, spectate, cash/bank edits, item/job assignment, vehicle repair/refuel/spawn/delete, world time/weather and server announcements.
-
-Admin access is deliberately separate from the player tablet: no inventory item and no dedicated admin hotkey are required.
+Start with `EDITOR_QUICKSTART.md` before editing the deeper scripts.
 
 ## 3DEN marker conventions
 
-Use these marker prefixes in Eden:
+- `rhd_farm_*` - farming locations
+- `rhd_mine_*` - mining locations
+- `rhd_refine_*` - refining locations
+- `rhd_shop_*` - shops
+- `rhd_bank_*` - banks / ATMs
+- `rhd_fuel_*` - fuel stations
+- `rhd_zone_*` - persistent district/conflict zones
+- `rhd_jail_*` - jail area
+- `rhd_garage_*` - reserved for vehicle ownership expansion
+- `rhd_spawn_*` - reserved job/vehicle spawn locations
 
-- `rhd_farm_*` — farming areas
-- `rhd_mine_*` — mining areas
-- `rhd_refine_*` — refining areas
-- `rhd_shop_*` — shops
-- `rhd_bank_*` — banks/ATMs
-- `rhd_fuel_*` — fuel stations
-- `rhd_zone_*` — persistent district/conflict areas
-- `rhd_garage_*` — reserved for future garage expansion
-- `rhd_spawn_*` — reserved spawn locations
-- `rhd_jail_*` — jail area
+## Administration
 
-No terrain coordinates are hard-coded.
+All administrator functions remain in the separate `RHD_ADMIN` interface. The admin panel is not part of the player tablet.
 
-## Installation
+Access is through **ACE Self Actions -> RHD Administration**. There is no admin inventory item and no dedicated admin hotkey.
 
-1. Install Arma 3.
-2. Subscribe to **CBA_A3**, **ACE3**, and **cTab+** on Steam Workshop.
-3. Open `STEAM_WORKSHOP_DEPENDENCIES.md` for the current IDs and links.
-4. Create the mission in Eden on your chosen terrain.
-5. Copy the RHD mission files into the mission folder.
-6. Edit `core/fn_init.sqf` and add your trusted admin Steam64 IDs.
-7. Place the RHD markers described in `3DEN_SETUP.md`.
-8. Save the mission in Eden so `mission.sqm` is generated/updated.
-9. Test in local multiplayer.
-10. Test again on a dedicated server before publishing.
+Before hosting, edit the administrator list in `core/fn_init.sqf`:
 
-The released mission does not depend on `-filePatching`; use file patching only for development when needed.
+```sqf
+missionNamespace setVariable [
+    "RHD_ADMIN_UIDS",
+    ["76561198012345678"],
+    true
+];
+```
+
+Use Steam64 IDs only.
+
+## Dependencies
+
+For the requested full feature set, install these external mods on the client/server as appropriate:
+
+- Arma 3
+- CBA_A3
+- cTab+
+- ACE3
+
+**Antistasi Ultimate is not a dependency.** Its concepts are implemented in RHD's own `core/conflict` layer.
+
+See `STEAM_WORKSHOP_DEPENDENCIES.md` for Workshop IDs, links and load-order guidance.
+
+## Licensing and attribution
+
+See `THIRD_PARTY_NOTICES.md` for project-by-project licensing boundaries.
+
+Antistasi Ultimate's main project license is MIT, but its repository also identifies separately licensed APL-ND components. RHD does not copy or redistribute those restricted components. fileciteturn345file0
+
+The RHD admin interface keeps attribution for its XEAT_AdminTool structural reference. cTab+ and ACE3 remain external dependencies.
+
+## Development notes
+
+`mission.sqm` is intentionally generated by Eden rather than hand-authored by the framework.
+
+The repository is organized so that configuration is separated from system implementation:
+
+```text
+core/fn_init.sqf       -> easiest server configuration
+core/conflict/         -> district pressure / world conflict
+core/economy/          -> shop and market transactions
+core/bank/             -> banking
+core/jobs/             -> jobs and duty
+core/industry/         -> farming, mining, refining
+core/rp/               -> Police / EMS / RP
+core/services/         -> fuel and service actions
+core/ui/               -> cTab player interface
+core/ace/              -> ACE3 integration
+core/admin/            -> separate administration
+core/ambient/          -> civilians, traffic and incidents
+```
