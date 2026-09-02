@@ -1,1 +1,0 @@
-#define RHD_CLOTHING_VERSION_TEXT "2.1.0"
