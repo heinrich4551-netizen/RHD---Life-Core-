@@ -1,3 +1,8 @@
+/* RHD server bootstrap */
+
+[] spawn RHD_fnc_director;
+[] spawn RHD_fnc_events;
+
 addMissionEventHandler ["PlayerConnected", {
     params ["_id", "_uid", "_name", "_jip", "_owner"];
     if (_uid isEqualTo "") exitWith {};
