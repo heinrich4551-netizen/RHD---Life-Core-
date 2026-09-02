@@ -4,9 +4,13 @@
 
     EDIT THIS FILE FOR SERVER-SIDE RHD CONFIGURATION.
     ---------------------------------------------------------------------------
-    Map layout belongs in Eden / 3DEN. Do not put coordinates here.
-    Antistasi Ultimate and ACE3 are optional runtime enhancements.
-    Required external addons are CBA_A3 and cTab+ (declared in the addon PBO).
+    Map layout is resolved dynamically at server startup. Do not put terrain
+    coordinates in this file.
+    Antistasi Ultimate supplies the authoritative campaign state; RHD reads
+    A3A mapInfo / control locations when available and falls back to Arma
+    terrain discovery for generic service/resource placement.
+    Required external addons are CBA_A3, cTab+ and Antistasi Ultimate
+    (declared in the addon PBO).
     ---------------------------------------------------------------------------
 */
 
@@ -15,7 +19,7 @@ if (!isServer) exitWith {};
 // ============================================================================
 // IDENTITY / VERSION
 // ============================================================================
-missionNamespace setVariable ["RHD_VERSION", "2.1.1", true];
+missionNamespace setVariable ["RHD_VERSION", "2.2.2", true];
 missionNamespace setVariable ["RHD_DISPLAY_NAME", "RHD - LifeCore", true];
 missionNamespace setVariable ["RHD_AUTHOR", "LT. Toad", true];
 
@@ -47,6 +51,20 @@ missionNamespace setVariable ["RHD_DB", createHashMap];
 missionNamespace setVariable ["RHD_SHOPS", createHashMap];
 
 // ============================================================================
+// DYNAMIC LOCATION RESOLVER
+// true = automatically populate RHD shop/bank/fuel/service/farm/mine/refinery
+// locations from the active terrain and Antistasi Ultimate map state.
+// ============================================================================
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_ENABLE", true, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_WAIT_FOR_A3A", true, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_REPLACE_STATIC", true, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_WAIT_SECONDS", 180, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_READY", false, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_COUNT", 0, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_TERRAIN", worldName, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_A3A", false, true];
+
+// ============================================================================
 // DYNAMIC SHOPS
 // true = import base game + all currently loaded public addon content.
 // Prices are recalculated server-side before every purchase.
@@ -56,7 +74,6 @@ missionNamespace setVariable ["RHD_SHOP_VEHICLE_PRICE_MULTIPLIER", 1.0, true];
 missionNamespace setVariable ["RHD_SHOP_ITEM_PRICE_MULTIPLIER", 1.0, true];
 missionNamespace setVariable ["RHD_SHOP_MAX_VEHICLE_PRICE", 2500000, true];
 missionNamespace setVariable ["RHD_SHOP_MAX_ITEM_PRICE", 100000, true];
-// Exact class-price overrides win over the generated price.
 missionNamespace setVariable ["RHD_SHOP_PRICE_OVERRIDES", createHashMap, true];
 
 // ============================================================================
@@ -75,7 +92,6 @@ missionNamespace setVariable ["RHD_JOBS", createHashMapFromArray [
 // ============================================================================
 // RHD VIRTUAL LIFE-RP ITEMS
 // These are independent of Arma inventory classnames.
-// [Display Name, Unit Value, Gather/Recipe Cost Reference, Category]
 // ============================================================================
 missionNamespace setVariable ["RHD_ITEMS", createHashMapFromArray [
     ["apple",           ["Apple",           5,   2,   "food"]],
@@ -88,7 +104,7 @@ missionNamespace setVariable ["RHD_ITEMS", createHashMapFromArray [
     ["copper_ore",     ["Copper Ore",        22,   8,   "ore"]],
     ["gold_ore",       ["Gold Ore",          70,  25,   "ore"]],
     ["diamond",        ["Diamond",           350, 120,  "ore"]],
-    ["oil_sand",       ["Oil Sand",            30,  10,  "ore"]],
+    ["oil_sand",       ["Oil Sand",            30,  10,   "ore"]],
     ["iron",           ["Iron",                55,  20,   "refined"]],
     ["copper",         ["Copper",              65,  24,   "refined"]],
     ["gold",           ["Gold",               180,  70,   "refined"]],
@@ -99,7 +115,6 @@ missionNamespace setVariable ["RHD_ITEMS", createHashMapFromArray [
 
 // ============================================================================
 // REFINING RECIPES
-// [input_item, [output_item, output_quantity, input_quantity]]
 // ============================================================================
 missionNamespace setVariable ["RHD_RECIPES", createHashMapFromArray [
     ["iron_ore",   ["iron",   1, 2]],
@@ -110,7 +125,6 @@ missionNamespace setVariable ["RHD_RECIPES", createHashMapFromArray [
 
 // ============================================================================
 // GATHERABLES
-// [virtual_item, quantity_per_action]
 // ============================================================================
 missionNamespace setVariable ["RHD_GATHER", createHashMapFromArray [
     ["apple", 1], ["cannabis_plant", 1], ["coca_leaf", 1],
@@ -120,10 +134,11 @@ missionNamespace setVariable ["RHD_GATHER", createHashMapFromArray [
 ], true];
 
 // ============================================================================
-// OPTIONAL ANTISTASI ULTIMATE INTEGRATION
-// The bridge module decides whether an A3A campaign is actually connected.
+// ANTISTASI ULTIMATE INTEGRATION
+// A3A is required for the published RHD scenario. RHD never replaces the
+// A3A strategic engine; the dynamic resolver consumes its world state.
 // ============================================================================
-missionNamespace setVariable ["RHD_A3A_REQUIRED", false, true];
+missionNamespace setVariable ["RHD_A3A_REQUIRED", true, true];
 missionNamespace setVariable ["RHD_A3A_WORLD_BRIDGE_ENABLE", true, true];
 missionNamespace setVariable ["RHD_A3A_CRIME_AGGRESSION_MULTIPLIER", 0.5, true];
 missionNamespace setVariable ["RHD_A3A_CRIME_AGGRESSION_MINUTES", 10, true];
@@ -131,7 +146,7 @@ missionNamespace setVariable ["RHD_A3A_ALLOW_RESOURCE_EVENTS", true, true];
 missionNamespace setVariable ["RHD_A3A_ALLOW_BASE_VEHICLE_SPAWN", true, true];
 
 // ============================================================================
-// STANDALONE RHD CONFLICT / DISTRICT SETTINGS
+// RHD CONFLICT / DISTRICT SETTINGS
 // ============================================================================
 missionNamespace setVariable ["RHD_CONFLICT_ENABLE", true, true];
 missionNamespace setVariable ["RHD_CONFLICT_UPDATE_SECONDS", 60, true];
@@ -145,7 +160,7 @@ missionNamespace setVariable ["RHD_CONFLICT_START_SUPPLY", 100, true];
 // PERSISTENCE / STARTUP TUNING
 // ============================================================================
 missionNamespace setVariable ["RHD_PERSISTENCE_SAVE_INTERVAL_SECONDS", 180, true];
-missionNamespace setVariable ["RHD_A3A_BRIDGE_WAIT_SECONDS", 10, true];
+missionNamespace setVariable ["RHD_A3A_BRIDGE_WAIT_SECONDS", 180, true];
 missionNamespace setVariable ["RHD_STANDALONE_INIT_TIMEOUT_SECONDS", 15, true];
 
 // Publish shared configuration.
@@ -156,6 +171,11 @@ missionNamespace setVariable ["RHD_STANDALONE_INIT_TIMEOUT_SECONDS", 15, true];
     "RHD_DISPLAY_NAME",
     "RHD_AUTHOR",
     "RHD_ADMIN_UIDS",
+    "RHD_DYNAMIC_LOCATIONS_ENABLE",
+    "RHD_DYNAMIC_LOCATIONS_WAIT_FOR_A3A",
+    "RHD_DYNAMIC_LOCATIONS_REPLACE_STATIC",
+    "RHD_DYNAMIC_LOCATIONS_WAIT_SECONDS",
+    "RHD_SHOP_AUTO_IMPORT",
     "RHD_JOBS",
     "RHD_ITEMS",
     "RHD_RECIPES",
