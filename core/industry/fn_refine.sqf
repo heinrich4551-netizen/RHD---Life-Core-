@@ -1,0 +1,18 @@
+params ["_unit", "_input", ["_amount", 1], ["_marker", ""]];
+if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
+if (_marker isEqualTo "" || {!(_marker in allMapMarkers)} || {_unit distance2D (getMarkerPos _marker) > 15}) exitWith {};
+if !((toLower _marker find "rhd_refine_") == 0) exitWith {};
+if !(_unit getVariable ["RHD_JOB", "civ"] isEqualTo "refiner") exitWith {["You must be a refinery worker to refine materials.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
+private _recipes = missionNamespace getVariable ["RHD_RECIPES", createHashMap];
+private _recipe = _recipes getOrDefault [_input, []];
+if (_recipe isEqualTo []) exitWith {["That material cannot be refined.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
+private _output = _recipe select 0;
+private _yield = _recipe select 1;
+private _required = _recipe select 2;
+private _qty = floor _amount;
+private _need = _required * _qty;
+if ([_unit, _input] call RHD_fnc_getItemCount < _need) exitWith {[format ["You need %1 x %2.", _need, _input], "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
+if !([_unit, _input, _need] call RHD_fnc_removeItem) exitWith {};
+[_unit, _output, _yield * _qty] call RHD_fnc_addItem;
+private _name = ((missionNamespace getVariable ["RHD_ITEMS", createHashMap]) get _output) select 0;
+[format ["Refined %1 into %2 x%3.", _input, _name, _yield * _qty], "success"] remoteExecCall ["RHD_fnc_notify", owner _unit];
