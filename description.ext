@@ -16,7 +16,7 @@ class CfgFunctions
         class Bank { file="core\\bank"; class deposit {server=1;}; class withdraw {server=1;}; class requestDeposit {}; class requestWithdraw {}; };
         class Jobs { file="core\\jobs"; class setJob {server=1;}; class startWork {}; class stopWork {}; };
         class Industry { file="core\\industry"; class serverGather {server=1;}; class requestGather {}; class refine {server=1;}; class requestRefine {}; };
-        class RP { file="core\\rp"; class ticket {server=1;}; class requestTicket {}; class heal {server=1;}; class requestHeal {}; };
+        class RP { file="core\\rp"; class ticket {server=1;}; class requestTicket {}; class heal {server=1;}; class requestHeal {}; class dispatch {server=1;}; class receiveDispatch {}; };
         class UI { file="core\\ui"; class openMenu {}; class keyHandler {}; class refresh {}; class requestBuy {}; class requestSell {}; };
         class Ambient { file="core\\ambient"; class director {server=1;}; class events {server=1;}; };
     };
@@ -30,7 +30,7 @@ class CfgRemoteExec
         class RHD_fnc_notify {allowedTargets=0;}; class RHD_fnc_openMenu {allowedTargets=1;}; class RHD_fnc_shopOpen {allowedTargets=1;};
         class RHD_fnc_serverBuy {allowedTargets=2;}; class RHD_fnc_serverSell {allowedTargets=2;}; class RHD_fnc_setJob {allowedTargets=2;};
         class RHD_fnc_serverGather {allowedTargets=2;}; class RHD_fnc_refine {allowedTargets=2;}; class RHD_fnc_ticket {allowedTargets=2;}; class RHD_fnc_heal {allowedTargets=2;};
-        class RHD_fnc_deposit {allowedTargets=2;}; class RHD_fnc_withdraw {allowedTargets=2;};
+        class RHD_fnc_deposit {allowedTargets=2;}; class RHD_fnc_withdraw {allowedTargets=2;}; class RHD_fnc_receiveDispatch {allowedTargets=1;};
     };
 };
 
