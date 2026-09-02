@@ -1,5 +1,6 @@
 params ["_unit", "_item", ["_amount", 1]];
 if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
+if (owner _unit != remoteExecutedOwner) exitWith {};
 if (_amount < 1 || {_amount > 100}) exitWith {};
 private _items = missionNamespace getVariable ["RHD_ITEMS", createHashMap];
 private _def = _items getOrDefault [_item, []];
