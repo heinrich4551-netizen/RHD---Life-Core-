@@ -102,6 +102,7 @@ jobs:
                   b'functions/modules/fn_moduleLifeCore.sqf',
                   b'functions/modules/fn_terrainAudit.sqf',
                   b'functions/modules/fn_terrainFallback.sqf',
+                  b'file = "functions/modules"',
               ],
               'build-addon/rhd_rhd_clothing.pbo': [
                   b'config.cpp', b'$PBOPREFIX$', b'RHD_Outfit_Tactical_Black',
@@ -171,14 +172,16 @@ jobs:
           rm -rf package dist
           mkdir -p package/@RHD-Life-Core/addons
           mkdir -p package/@RHD-Life-Core/Missions
+          mkdir -p package/@RHD-Life-Core/mpmissions
           mkdir -p package/@RHD-Life-Core/assets/branding
           mkdir -p package/@RHD-Life-Core/docs
 
           cp build-addon/rhd_rhd_lifecore.pbo package/@RHD-Life-Core/addons/
           cp build-addon/rhd_rhd_clothing.pbo package/@RHD-Life-Core/addons/
           cp RHD_LifeCore.Altis.pbo package/@RHD-Life-Core/Missions/
+          cp RHD_LifeCore.Altis.pbo package/@RHD-Life-Core/mpmissions/
           cp mod.cpp package/@RHD-Life-Core/
-          cp meta.cpp package/@RHD-Life-Core/
+          cp meta.cpp package/@RHD-LifeCore/ 2>/dev/null || cp meta.cpp package/@RHD-Life-Core/
           cp assets/branding/RHDLifeCore.jpg package/@RHD-Life-Core/assets/branding/
 
           docs=(
@@ -188,9 +191,9 @@ jobs:
             STEAM_WORKSHOP_REQUIRED_ITEMS.txt THIRD_PARTY_NOTICES.md
             PERFORMANCE.md UI_REFERENCES.md
           )
-          for file in "${docs[@]}"; do cp "$file" package/@RHD-LifeCore/docs/; done
+          for file in "${docs[@]}"; do cp "$file" package/@RHD-Life-Core/docs/; done
 
-          cat > package/@RHD-LifeCore/INSTALL.txt <<'EOF'
+          cat > package/@RHD-Life-Core/INSTALL.txt <<'EOF'
 RHD - LifeCore | Plug-and-Play Arma 3 Launcher Package
 
 REQUIRED WORKSHOP MODS
@@ -202,32 +205,40 @@ OPTIONAL MOD
 ACE3
 
 LOCAL INSTALL
-1. Extract the package and keep the @RHD-LifeCore folder intact.
-2. Put @RHD-LifeCore beside your Arma 3 installation.
-3. In Arma 3 Launcher choose Local Mods and add the @RHD-LifeCore folder.
+1. Extract the package and keep the @RHD-Life-Core folder intact.
+2. Put @RHD-Life-Core beside your Arma 3 installation.
+3. In Arma 3 Launcher choose Local Mods and add the @RHD-Life-Core folder.
 4. Enable CBA_A3, cTab+, Antistasi Ultimate and RHD - LifeCore.
-5. Launch the bundled RHD_LifeCore.Altis scenario.
+5. The bundled mission is available as RHD_LifeCore.Altis in Multiplayer.
 
-The bundled Altis scenario is already configured with the RHD LifeCore and
-Antistasi Ultimate bridge modules and RHD economy/service markers.
+SERVER INSTALL
+The same mod folder includes mpmissions/RHD_LifeCore.Altis.pbo for a server
+that loads missions from the active mod path. If using a server profile with
+an explicit -cfg/-profiles mission directory, copy the PBO to that server's
+mpmissions directory as normal.
+
+The bundled Altis scenario already contains the RHD LifeCore and Antistasi
+Ultimate bridge modules and RHD economy/service markers.
 EOF
 
           mkdir -p dist
           cd package
-          zip -qr ../dist/RHD-Life-Core-Launcher-Package.zip @RHD-LifeCore
+          zip -qr ../dist/RHD-Life-Core-Launcher-Package.zip @RHD-Life-Core
           cd ..
 
       - name: Verify final Launcher package layout
         shell: bash
         run: |
           set -euo pipefail
-          test -s package/@RHD-LifeCore/addons/rhd_rhd_lifecore.pbo
-          test -s package/@RHD-LifeCore/addons/rhd_rhd_clothing.pbo
-          test -s package/@RHD-LifeCore/Missions/RHD_LifeCore.Altis.pbo
-          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/addons/rhd_rhd_lifecore.pbo'
-          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/addons/rhd_rhd_clothing.pbo'
-          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/Missions/RHD_LifeCore.Altis.pbo'
-          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/mod.cpp'
+          test -s package/@RHD-Life-Core/addons/rhd_rhd_lifecore.pbo
+          test -s package/@RHD-Life-Core/addons/rhd_rhd_clothing.pbo
+          test -s package/@RHD-Life-Core/Missions/RHD_LifeCore.Altis.pbo
+          test -s package/@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis.pbo
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_lifecore.pbo'
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_clothing.pbo'
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/Missions/RHD_LifeCore.Altis.pbo'
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis.pbo'
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/mod.cpp'
           echo 'Final Launcher package layout validated.'
 
       - name: Upload Launcher package ZIP
@@ -241,7 +252,7 @@ EOF
         uses: actions/upload-artifact@v4
         with:
           name: RHD-LifeCore-LauncherMod
-          path: package/@RHD-LifeCore
+          path: package/@RHD-Life-Core
           if-no-files-found: error
 
       - name: Upload addon PBOs
