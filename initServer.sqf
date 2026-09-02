@@ -9,3 +9,10 @@ addMissionEventHandler ["PlayerDisconnected", {
     if (_uid isEqualTo "") exitWith {};
     [_uid] call RHD_fnc_savePlayer;
 }];
+
+[] spawn {
+    while {isServer} do {
+        sleep 180;
+        {private _uid = getPlayerUID _x; if (_uid != "") then {[_uid] call RHD_fnc_savePlayer};} forEach allPlayers;
+    };
+};
