@@ -3,62 +3,48 @@
 **RHD - LifeCore**  
 **Author: LT. Toad**
 
-This file explains which external projects influenced or support RHD and what RHD actually redistributes.
+This file explains which external projects are required by, integrated with, or referenced by RHD and what RHD redistributes.
 
-## Antistasi Ultimate
+## Antistasi Ultimate — base framework
 
 Project:
 https://github.com/Antistasi-Ultimate-Community/A3-Antistasi-Ultimate
 
-The current Antistasi Ultimate repository describes the main Antistasi Ultimate, Antistasi Plus and Antistasi Community Edition code as MIT-licensed, while separately identifying integrated components with different licenses. fileciteturn345file0
+**Runtime status: REQUIRED.**
 
-RHD uses **Antistasi-style persistent-world design ideas** for its Conflict layer: district pressure, local public-order state, police presence, supply state and server-side crime pressure.
+RHD - LifeCore is designed as a Life RP layer on top of the Antistasi Ultimate campaign framework. RHD relies on the installed A3A campaign for strategic world state rather than running a parallel war engine.
 
-### What RHD does not redistribute
+RHD uses the A3A public function/state interface for selected operations including campaign initialization, aggression, enemy resources, strategic markers and collision-aware vehicle spawning. The RHD bridge waits for `serverInitDone` before enabling the A3A-dependent systems. fileciteturn426file0
 
-RHD does not copy Antistasi Ultimate PBOs into the mission and does not require Antistasi Ultimate at runtime.
+The upstream repository describes the main Antistasi Ultimate / Plus / Community Edition code as MIT-licensed while identifying separately licensed integrated components. The upstream license specifically identifies APL-ND material such as `Tools\\StreetArtist` and `A3-Antistasi\\Garage`. RHD does not modify or redistribute those restricted components. fileciteturn345file0
 
-The Antistasi Ultimate repository explicitly identifies separately licensed APL-ND material, including:
+The selected upstream development revision is tracked by the RHD Git submodule:
 
-- `Tools\\StreetArtist`
-- `A3-Antistasi\\Garage`
-
-RHD does not copy, modify or redistribute those restricted components. fileciteturn345file0
-
-### RHD implementation
-
-The RHD implementation is located in:
-
-`core/conflict/`
-
-Key files:
-
-- `fn_conflictInit.sqf` — initializes the RHD district state.
-- `fn_conflictDirector.sqf` — server-side district pressure loop.
-- `fn_getZoneStatus.sqf` — public district status helper.
-- `fn_recordCrime.sqf` — server-side crime/pressure recorder.
-
-Districts are placed by editors in Eden with marker names beginning with:
-
-`rhd_zone_`
-
-The current RHD Conflict layer is explicitly documented as RHD-owned code rather than a runtime Antistasi dependency. fileciteturn363file0
+`vendor/antistasi-ultimate`
 
 ## cTab+
 
 Project:
 https://github.com/jetelain/cTab
 
-cTab+ is an external Arma 3 mod used as the host surface for the RHD player tablet. RHD calls cTab's mission-facing interface and creates RHD-owned controls on the active cTab tablet display.
+**Runtime status: REQUIRED.**
 
-RHD does not redistribute cTab PBOs.
+cTab+ is the external host for the RHD player tablet. RHD creates RHD-owned controls on cTab's tablet display instead of copying the cTab addon into the mission.
+
+## CBA_A3
+
+**Runtime status: REQUIRED.**
+
+CBA_A3 is a prerequisite for cTab+ and is installed separately through the normal Arma 3 mod distribution channel.
 
 ## ACE3
 
 Project:
 https://github.com/acemod/ACE3
 
-ACE3 is an external Arma 3 mod used by RHD for interaction-menu integration, contextual EMS interaction and administrator access.
+**Runtime status: REQUIRED for the full RHD feature set.**
+
+ACE3 supplies the contextual interaction layer used by RHD for administrator access, EMS treatment and vehicle interaction.
 
 RHD does not redistribute ACE3 PBOs.
 
@@ -67,13 +53,13 @@ RHD does not redistribute ACE3 PBOs.
 Project:
 https://github.com/xedom/XEAT_AdminTool
 
-The RHD administrator panel uses a compact player-list / action-list / value / execute layout adapted from the XEAT_AdminTool interface concept.
+The separate RHD administrator panel uses a compact player-list / action-list / value / execute arrangement adapted from the XEAT_AdminTool interface concept.
 
-RHD keeps the required attribution and the adapted administrator UI is treated as APL-SA material according to the upstream XEAT license.
+RHD keeps the required attribution and treats the adapted administrator UI material according to the upstream XEAT APL-SA terms.
 
 ## RHD branding artwork
 
-The supplied Kavala artwork is included in:
+The supplied Kavala artwork is stored at:
 
 `assets/branding/RHDLifeCore.jpg`
 
@@ -82,27 +68,26 @@ Mission branding:
 - Name: `RHD - LifeCore`
 - Author: `LT. Toad`
 
-The image is used for the mission overview/loading art and as the automatic texture applied to `Land_Billboard_F` objects. A billboard can opt out by setting:
+`Land_Billboard_F` objects are automatically given the RHD artwork on server startup. An individual Eden object can opt out with:
 
 ```sqf
 rhd_billboard_skip = true;
 ```
 
-on the Eden object.
-
 ## Additional Steam Workshop integrations
 
-Four additional Workshop IDs were supplied by the RHD project owner:
+The project owner supplied these Workshop IDs:
 
+- `1123403138`
 - `2618183963`
 - `2618122951`
 - `2623374243`
 - `2623373810`
 
-Their exact titles, `CfgPatches` identifiers and transitive dependency chains are intentionally **not guessed** in this repository until their official Steam metadata is verified. See `STEAM_WORKSHOP_DEPENDENCIES.md`.
+Their titles, `CfgPatches` names and transitive dependencies are **not guessed**. The Steam pages could not be live-verified in this development environment. See `STEAM_WORKSHOP_DEPENDENCIES.md` for the exact verification boundary.
 
-## Distribution rule for server owners
+## Distribution rule
 
-Install external projects through their normal official distribution channels. Do not unpack or merge their PBOs into the RHD mission folder.
+External projects should be installed through their official Arma 3 / Steam distribution channels. Do not unpack their PBOs into the RHD mission folder.
 
-When publishing RHD, keep this notice file with the mission so the source projects and integration boundaries remain visible to users.
+Keep this notice with published RHD releases so the integration and licensing boundaries remain clear.
