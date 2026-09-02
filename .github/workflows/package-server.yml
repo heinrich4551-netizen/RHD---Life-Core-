@@ -1,4 +1,4 @@
-name: Build RHD Server Package
+name: Build RHD Workshop Package
 
 on:
   push:
@@ -15,29 +15,35 @@ jobs:
       - name: Setup HEMTT
         uses: arma-actions/hemtt@v1
 
-      - name: Validate repository layout
+      - name: Validate repository and hard dependencies
         shell: bash
         run: |
           set -euo pipefail
           test -f description.ext
           test -f initServer.sqf
           test -f initPlayerLocal.sqf
+          test -f onPlayerRespawn.sqf
           test -f core/fn_init.sqf
           test -f addons/rhd_lifecore/config.cpp
           test -f addons/rhd_clothing/config.cpp
+          test -f mod.cpp
+          test -f meta.cpp
+          test -f STEAM_WORKSHOP_REQUIRED_ITEMS.txt
 
-          grep -Fq 'requiredAddons[] = {"cba_main", "ctab_core"};' addons/rhd_lifecore/config.cpp
+          grep -Fq 'requiredAddons[] = {"cba_main", "ctab_core", "A3A_core"};' addons/rhd_lifecore/config.cpp
           ! grep -Fq '"ace_main"' addons/rhd_lifecore/config.cpp
-          ! grep -Fq '"A3A_core"' addons/rhd_lifecore/config.cpp
-          grep -Fq 'RHD_A3A_REQUIRED", false' core/fn_init.sqf
+          grep -Fq 'RHD_A3A_REQUIRED", true' core/fn_init.sqf
+          grep -Fq '3020755032' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
+          grep -Fq '450814997' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
+          grep -Fq '2262006564' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
 
       - name: Check project
         run: hemtt check
 
-      - name: Build PBOs
+      - name: Build addon PBOs
         run: hemtt build
 
-      - name: Validate generated PBOs
+      - name: Validate addon PBOs
         shell: bash
         run: |
           set -euo pipefail
@@ -52,79 +58,103 @@ jobs:
             fi
           done
 
-      - name: Assemble separated server package
+      - name: Assemble Workshop-ready mod folder
         shell: bash
         run: |
           set -euo pipefail
 
-          rm -rf package
-          mkdir -p package/@RHD-LifeCore/addons
-          mkdir -p package/mission-source/core
-          mkdir -p package/mission-source/assets
+          rm -rf workshop-package
+          mkdir -p workshop-package/@RHD-LifeCore/addons
+          mkdir -p workshop-package/@RHD-LifeCore/Missions
+          mkdir -p workshop-package/@RHD-LifeCore/docs
+          mkdir -p workshop-package/@RHD-LifeCore/assets/branding
 
-          cp .hemttout/build/addons/*.pbo package/@RHD-LifeCore/addons/
+          # Compiled addon payload.
+          cp .hemttout/build/addons/*.pbo workshop-package/@RHD-LifeCore/addons/
 
-          cp description.ext package/mission-source/
-          cp initServer.sqf package/mission-source/
-          cp initPlayerLocal.sqf package/mission-source/
-          cp -r core/. package/mission-source/core/
-          cp -r assets/. package/mission-source/assets/
+          # Launcher/Workshop metadata.
+          cp mod.cpp workshop-package/@RHD-LifeCore/
+          cp meta.cpp workshop-package/@RHD-LifeCore/
 
-          test -f package/mission-source/description.ext
-          test -f package/mission-source/initServer.sqf
-          test -f package/mission-source/initPlayerLocal.sqf
-          test -f package/mission-source/core/fn_init.sqf
+          # Public documentation shipped with the mod.
+          cp README.md workshop-package/@RHD-LifeCore/docs/
+          cp 3DEN_SETUP.md workshop-package/@RHD-LifeCore/docs/
+          cp 3DEN_MODULES.md workshop-package/@RHD-LifeCore/docs/
+          cp EDITOR_QUICKSTART.md workshop-package/@RHD-LifeCore/docs/
+          cp ADDON_BUILD.md workshop-package/@RHD-LifeCore/docs/
+          cp ADMIN_AND_ACE_SETUP.md workshop-package/@RHD-LifeCore/docs/
+          cp CTAB_INTEGRATION.md workshop-package/@RHD-LifeCore/docs/
+          cp ANTISTASI_BASE.md workshop-package/@RHD-LifeCore/docs/
+          cp STEAM_WORKSHOP_DEPENDENCIES.md workshop-package/@RHD-LifeCore/docs/
+          cp STEAM_WORKSHOP_REQUIRED_ITEMS.txt workshop-package/@RHD-LifeCore/docs/
+          cp THIRD_PARTY_NOTICES.md workshop-package/@RHD-LifeCore/docs/
+          cp PERFORMANCE.md workshop-package/@RHD-LifeCore/docs/
+          cp UI_REFERENCES.md workshop-package/@RHD-LifeCore/docs/
 
-          cat > package/README-INSTALL.txt <<'EOF'
-RHD - LifeCore | Server Package
-================================
+          # Mod artwork.
+          cp assets/branding/RHDLifeCore.jpg workshop-package/@RHD-LifeCore/assets/branding/
 
-MOD INSTALL
------------
-Copy @RHD-LifeCore/ into the Arma 3 installation and enable it in the
-Arma 3 Launcher together with CBA_A3 and cTab+.
+          # Keep a clearly named copy of the mission source for server owners.
+          mkdir -p workshop-package/RHD-LifeCore-MissionSource.Altis/core
+          mkdir -p workshop-package/RHD-LifeCore-MissionSource.Altis/assets
+          cp description.ext initServer.sqf initPlayerLocal.sqf onPlayerRespawn.sqf workshop-package/RHD-LifeCore-MissionSource.Altis/
+          cp -r core/. workshop-package/RHD-LifeCore-MissionSource.Altis/core/
+          cp -r assets/. workshop-package/RHD-LifeCore-MissionSource.Altis/assets/
 
-MISSION INSTALL
----------------
-1. Create/open the destination mission in Eden on the target terrain.
-2. Copy everything inside mission-source/ into that mission folder.
-3. Place one RHD Life RP Systems module in Eden.
-4. Optionally place one RHD Antistasi Ultimate Bridge when A3A is installed.
-5. Place your RHD shop/bank/fuel/farm/mine/refinery/zone/jail markers.
-6. Edit core/fn_init.sqf for server configuration.
-7. Save the mission from Eden so Eden creates/updates mission.sqm.
+          # Publish-time dependency manifest.
+          cp STEAM_WORKSHOP_REQUIRED_ITEMS.txt workshop-package/
 
-DEDICATED SERVER
-----------------
-Pack the saved Eden mission as RHD_LifeCore.<world>.pbo and place it in
-MPMissions/. Use the same required external addons on server and clients:
-CBA_A3 + cTab+.
+          cat > workshop-package/INSTALL.txt <<'EOF'
+RHD - LifeCore | Steam Workshop / Arma 3 Launcher Package
+==========================================================
 
-OPTIONAL INTEGRATIONS
----------------------
-Antistasi Ultimate/A3A and ACE3 are optional. Do not copy their PBOs into RHD.
+REQUIRED WORKSHOP ITEMS
+-----------------------
+CBA_A3              450814997
+cTab+               2262006564
+Antistasi Ultimate  3020755032
+
+ACE3 is optional.
+
+LOCAL INSTALL
+-------------
+Copy @RHD-LifeCore/ into your Arma 3 directory and select it in the
+Arma 3 Launcher. Also enable the three required Workshop items above.
+
+MISSION
+-------
+The package includes RHD-LifeCore-MissionSource.Altis as copy-ready mission
+source. Copy it into your Arma 3 user missions folder, rename it to
+RHD_LifeCore.Altis, open it in 3DEN and save it to generate mission.sqm.
+
+WORKSHOP PUBLISHING
+-------------------
+Upload the @RHD-LifeCore folder as the mod content. On Steam Workshop,
+mark CBA_A3, cTab+ and Antistasi Ultimate as REQUIRED dependencies for the
+published item. Steam's dependency graph is publisher metadata and cannot
+be established by a text file alone.
 EOF
 
-          cd package
-          zip -r ../RHD-LifeCore-ServerPackage.zip .
+          cd workshop-package
+          zip -r ../RHD-LifeCore-Workshop.zip .
 
-      - name: Upload separated server package
+      - name: Upload Workshop package
         uses: actions/upload-artifact@v4
         with:
-          name: RHD-LifeCore-ServerPackage
-          path: RHD-LifeCore-ServerPackage.zip
+          name: RHD-LifeCore-Workshop
+          path: RHD-LifeCore-Workshop.zip
           if-no-files-found: error
 
-      - name: Upload standalone mod package
+      - name: Upload Launcher mod folder
         uses: actions/upload-artifact@v4
         with:
-          name: RHD-LifeCore-Mod
-          path: package/@RHD-LifeCore
+          name: RHD-LifeCore-LauncherMod
+          path: workshop-package/@RHD-LifeCore
           if-no-files-found: error
 
-      - name: Upload mission source package
+      - name: Upload Altis mission source
         uses: actions/upload-artifact@v4
         with:
-          name: RHD-LifeCore-MissionSource
-          path: package/mission-source
+          name: RHD-LifeCore-Altis-MissionSource
+          path: workshop-package/RHD-LifeCore-MissionSource.Altis
           if-no-files-found: error
