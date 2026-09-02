@@ -129,7 +129,7 @@ switch (_page) do {
             _content ctrlSetStructuredText parseText "<t size='1.15'><b>EQUIPMENT SHOP DISABLED</b></t><br/>Enable Economy / Shops on the RHD Life RP Systems module in 3DEN.";
             _status ctrlSetText "EQUIPMENT: disabled by 3DEN configuration.";
         };
-        _content ctrlSetStructuredText parseText "<t size='1.15'><b>EQUIPMENT SHOP</b></t><br/>Weapons, magazines, gear, goggles and backpacks from the active modset.";
+        _content ctrlSetStructuredText parseText "<t size='1.15'><b>EQUIPMENT SHOP</b></t><br/>Weapons, uniforms, magazines, gear, goggles and backpacks from the active modset.";
         private _catalog = ["EQUIPMENT"] call RHD_fnc_getShopCatalog;
         {
             private _i = _list lbAdd format ["%1 | $%2", _x select 0, _x select 3];
