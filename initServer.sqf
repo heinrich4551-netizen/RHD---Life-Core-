@@ -9,9 +9,20 @@
 
     USE INSTEAD:
     - core/fn_init.sqf       -> jobs, items, prices, admins and tuning
-    - 3DEN_SETUP.md          -> map locations and district markers
+    - 3DEN_SETUP.md          -> map locations, district markers and billboards
     ---------------------------------------------------------------------------
 */
+
+// ============================================================================
+// RHD BRANDING
+// ============================================================================
+// Applies the supplied RHD - LifeCore artwork to Land_Billboard_F objects.
+// To skip a specific billboard, set rhd_billboard_skip = true on that object.
+[] spawn {
+    // Give Eden-created objects time to exist before applying textures.
+    sleep 1;
+    [] call compileFinal preprocessFileLineNumbers "core\\branding\\fn_applyBillboards.sqf";
+};
 
 // ============================================================================
 // AMBIENT WORLD SYSTEMS
