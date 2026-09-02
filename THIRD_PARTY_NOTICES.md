@@ -10,20 +10,20 @@ This file explains which external projects influenced or support RHD and what RH
 Project:
 https://github.com/Antistasi-Ultimate-Community/A3-Antistasi-Ultimate
 
-The main Antistasi Ultimate project is released under MIT licensing, with the repository also identifying separately licensed integrated components.
+The current Antistasi Ultimate repository describes the main Antistasi Ultimate, Antistasi Plus and Antistasi Community Edition code as MIT-licensed, while separately identifying integrated components with different licenses. fileciteturn345file0
 
-RHD uses **Antistasi-style persistent-world design ideas** for its Conflict layer: district pressure, changing public-order status, local law-enforcement presence and persistent district state.
+RHD uses **Antistasi-style persistent-world design ideas** for its Conflict layer: district pressure, local public-order state, police presence, supply state and server-side crime pressure.
 
 ### What RHD does not redistribute
 
-RHD does not copy Antistasi Ultimate PBOs into the mission and does not require the Antistasi Ultimate mod at runtime.
+RHD does not copy Antistasi Ultimate PBOs into the mission and does not require Antistasi Ultimate at runtime.
 
-The Antistasi Ultimate repository explicitly identifies some integrated folders as APL-ND material, including:
+The Antistasi Ultimate repository explicitly identifies separately licensed APL-ND material, including:
 
-- `Tools\StreetArtist`
-- `A3-Antistasi\Garage`
+- `Tools\\StreetArtist`
+- `A3-Antistasi\\Garage`
 
-Those components have separate licensing terms. RHD therefore does not copy, modify or redistribute those restricted components.
+RHD does not copy, modify or redistribute those restricted components. fileciteturn345file0
 
 ### RHD implementation
 
@@ -33,7 +33,7 @@ The RHD implementation is located in:
 
 Key files:
 
-- `fn_conflictInit.sqf` — beginner-facing conflict settings and initialization.
+- `fn_conflictInit.sqf` — initializes the RHD district state.
 - `fn_conflictDirector.sqf` — server-side district pressure loop.
 - `fn_getZoneStatus.sqf` — public district status helper.
 - `fn_recordCrime.sqf` — server-side crime/pressure recorder.
@@ -41,6 +41,8 @@ Key files:
 Districts are placed by editors in Eden with marker names beginning with:
 
 `rhd_zone_`
+
+The current RHD Conflict layer is explicitly documented as RHD-owned code rather than a runtime Antistasi dependency. fileciteturn363file0
 
 ## cTab+
 
@@ -80,7 +82,24 @@ Mission branding:
 - Name: `RHD - LifeCore`
 - Author: `LT. Toad`
 
-The image is used as the mission `loadScreen` and `overviewPicture`.
+The image is used for the mission overview/loading art and as the automatic texture applied to `Land_Billboard_F` objects. A billboard can opt out by setting:
+
+```sqf
+rhd_billboard_skip = true;
+```
+
+on the Eden object.
+
+## Additional Steam Workshop integrations
+
+Four additional Workshop IDs were supplied by the RHD project owner:
+
+- `2618183963`
+- `2618122951`
+- `2623374243`
+- `2623373810`
+
+Their exact titles, `CfgPatches` identifiers and transitive dependency chains are intentionally **not guessed** in this repository until their official Steam metadata is verified. See `STEAM_WORKSHOP_DEPENDENCIES.md`.
 
 ## Distribution rule for server owners
 
