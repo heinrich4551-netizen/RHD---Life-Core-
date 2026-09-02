@@ -1,0 +1,13 @@
+params ["_unit", "_item", ["_amount", 1]];
+if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
+if (_amount < 1 || {_amount > 100}) exitWith {};
+private _items = missionNamespace getVariable ["RHD_ITEMS", createHashMap];
+private _def = _items getOrDefault [_item, []];
+if (_def isEqualTo []) exitWith {};
+private _count = [_unit, _item] call RHD_fnc_getItemCount;
+private _qty = floor _amount;
+if (_count < _qty) exitWith {["You do not have enough of that item.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
+if (!([_unit, _item, _qty] call RHD_fnc_removeItem)) exitWith {};
+private _payout = (_def select 2) * _qty;
+_unit setVariable ["RHD_CASH", (_unit getVariable ["RHD_CASH", 0]) + _payout, true];
+[format ["Sold %1 x%2 for $%3.", _def select 0, _qty, _payout], "success"] remoteExecCall ["RHD_fnc_notify", owner _unit];
