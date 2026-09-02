@@ -3,8 +3,8 @@
     Author: LT. Toad
 
     Each case below is one page in the RHD player tablet.
-    Beginner editors can safely change the page wording here without changing
-    the underlying RHD economy / server-security code.
+    The CAMPAIGN page is the direct player-facing view of the Antistasi Ultimate
+    world that powers RHD - LifeCore.
 */
 
 disableSerialization;
@@ -13,9 +13,8 @@ private _page = param [0, "STATUS"];
 private _display = uiNamespace getVariable ["cTab_Tablet_dlg", displayNull];
 private _ctrls = uiNamespace getVariable ["RHD_CTAB_CTRLS", []];
 
-// Current RHD tablet uses 14 controls:
-// 6 navigation buttons + content/list/buttons/status/close controls.
-if (isNull _display || {count _ctrls < 14}) exitWith {false};
+// Current RHD tablet uses 15 controls.
+if (isNull _display || {count _ctrls < 15}) exitWith {false};
 
 // Control order is defined in fn_ctabBuild.sqf.
 private _content = _ctrls select 8;
@@ -34,13 +33,17 @@ switch (_page) do {
     // STATUS / INVENTORY
     // ------------------------------------------------------------------------
     case "STATUS": {
+        private _a3a = call RHD_fnc_getStatus;
+        private _baseState = if (_a3a param [0, false]) then {"ONLINE"} else {"WAITING"};
+
         _content ctrlSetStructuredText parseText format [
-            "<t size='1.25'><b>%1</b></t><br/><br/><t color='#BFD7EA'>JOB</t>  %2<br/><t color='#BFD7EA'>CASH</t>  $%3<br/><t color='#BFD7EA'>BANK</t>  $%4<br/><t color='#BFD7EA'>STATUS</t>  %5<br/><br/><t size='1.1'><b>INVENTORY</b></t><br/>%6",
+            "<t size='1.25'><b>%1</b></t><br/><br/><t color='#BFD7EA'>JOB</t>  %2<br/><t color='#BFD7EA'>CASH</t>  $%3<br/><t color='#BFD7EA'>BANK</t>  $%4<br/><t color='#BFD7EA'>STATUS</t>  %5<br/><t color='#BFD7EA'>A3A WORLD</t>  %6<br/><br/><t size='1.1'><b>INVENTORY</b></t><br/>%7",
             name player,
             player getVariable ["RHD_JOB", "civ"],
             player getVariable ["RHD_CASH", 0],
             player getVariable ["RHD_BANK", 0],
             if (player getVariable ["RHD_JAILED", false]) then {"JAILED"} else {"ACTIVE"},
+            _baseState,
             call {
                 private _inv = player getVariable ["RHD_INV", createHashMap];
                 private _items = missionNamespace getVariable ["RHD_ITEMS", createHashMap];
@@ -162,12 +165,16 @@ switch (_page) do {
     // DISTRICTS / WORLD PRESSURE
     // ------------------------------------------------------------------------
     case "DISTRICTS": {
-        _content ctrlSetStructuredText parseText "<t size='1.15'><b>DISTRICT PRESSURE</b></t><br/>Districts react to local criminal pressure and police presence.<br/>Use rhd_zone_* markers in Eden to define districts.";
+        _content ctrlSetStructuredText parseText "<t size='1.15'><b>DISTRICT PRESSURE</b></t><br/>Districts react to Life RP criminal pressure and the wider Antistasi campaign state.<br/>A3A strategic markers and optional rhd_zone_* markers are supported.";
 
-        private _zones = allMapMarkers select {(_x find "rhd_zone_") isEqualTo 0};
+        private _zones = missionNamespace getVariable ["RHD_A3A_ZONE_MARKERS", []];
 
         if (_zones isEqualTo []) then {
-            private _idx = _list lbAdd "No districts configured (rhd_zone_* markers).";
+            _zones = allMapMarkers select {(_x find "rhd_zone_") isEqualTo 0};
+        };
+
+        if (_zones isEqualTo []) then {
+            private _idx = _list lbAdd "No A3A/RHD districts are available yet.";
             _list lbSetColor [_idx, [0.70,0.70,0.70,1]];
         } else {
             {
@@ -175,7 +182,9 @@ switch (_page) do {
                 private _data = [_marker] call RHD_fnc_getZoneStatus;
 
                 if (_data isEqualTo []) then {
-                    private _idx = _list lbAdd format ["%1 | INITIALIZING", markerText _marker];
+                    private _label = markerText _marker;
+                    if (_label isEqualTo "") then {_label = _marker};
+                    private _idx = _list lbAdd format ["%1 | INITIALIZING", _label];
                     _list lbSetData [_idx, _marker];
                 } else {
                     private _name = _data select 0;
@@ -197,7 +206,42 @@ switch (_page) do {
             } forEach _zones;
         };
 
-        _status ctrlSetText "RHD - LIFECORE: district status updates server-side.";
+        _status ctrlSetText "RHD - LIFECORE: district status follows the A3A-backed world.";
+    };
+
+    // ------------------------------------------------------------------------
+    // ANTISTASI CAMPAIGN STATUS
+    // ------------------------------------------------------------------------
+    case "CAMPAIGN": {
+        private _a3a = call RHD_fnc_getStatus;
+        private _ready = _a3a param [0, false];
+        private _version = _a3a param [1, "unknown"];
+        private _startup = _a3a param [2, "unknown"];
+        private _aggression = _a3a param [3, 0];
+        private _hq = _a3a param [4, objNull];
+        private _zones = _a3a param [5, []];
+        private _attack = _a3a param [6, 0];
+        private _defence = _a3a param [7, 0];
+
+        private _hqText = if (isNull _hq) then {
+            "Not available"
+        } else {
+            format ["%1m away", round (player distance2D _hq)]
+        };
+
+        _content ctrlSetStructuredText parseText format [
+            "<t size='1.20'><b>ANTISTASI CAMPAIGN</b></t><br/><br/><t color='#BFD7EA'>BASE</t>  %1<br/><t color='#BFD7EA'>VERSION</t>  %2<br/><t color='#BFD7EA'>STARTUP</t>  %3<br/><t color='#BFD7EA'>AGGRESSION</t>  %4<br/><t color='#BFD7EA'>A3A ZONES</t>  %5<br/><t color='#BFD7EA'>ATTACK RESOURCES</t>  %6<br/><t color='#BFD7EA'>DEFENCE RESOURCES</t>  %7<br/><t color='#BFD7EA'>HQ / PETROS</t>  %8<br/><br/><t size='1.05'>RHD - LifeCore uses the Antistasi campaign for the strategic world, while LifeCore supplies the civilian economy, jobs and RP systems.</t>",
+            if (_ready) then {"ONLINE"} else {"WAITING"},
+            _version,
+            _startup,
+            _aggression,
+            count _zones,
+            _attack,
+            _defence,
+            _hqText
+        ];
+
+        _status ctrlSetText "ANTISTASI BASE: strategic campaign state supplied by A3A.";
     };
 };
 
