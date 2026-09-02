@@ -2,13 +2,8 @@
     RHD - LifeCore | 3DEN MODULE: ANTISTASI ULTIMATE BRIDGE
     Author: LT. Toad
 
-    PLACE IN 3DEN
-    --------------
-    Systems -> RHD - LifeCore -> Antistasi Ultimate Bridge
-
-    Antistasi Ultimate is optional. When A3A_core is present, this module
-    bridges RHD to the installed Antistasi campaign. When A3A is absent, the
-    module simply enables the standalone RHD LifeCore runtime.
+    This module is used by the bundled Altis mission and custom 3DEN missions.
+    Antistasi Ultimate is required by the published RHD profile.
 */
 
 params [
@@ -29,17 +24,16 @@ missionNamespace setVariable ["RHD_A3A_MODULE_LOGIC", _logic, true];
 private _hasA3A = isClass (configFile >> "CfgPatches" >> "A3A_core") && {!isNil "A3A_fnc_initServer"};
 missionNamespace setVariable ["RHD_A3A_INSTALLED", _hasA3A, true];
 
-private _autoStart = _logic getVariable ["RHD_A3A_AutoStart", true];
-private _createHQ = _logic getVariable ["RHD_A3A_CreateHQ", true];
-private _terrainFallback = _logic getVariable ["RHD_A3A_TerrainFallback", true];
-
-// Without Antistasi Ultimate, this module is a harmless standalone-mode gate.
 if (!_hasA3A) exitWith {
-    missionNamespace setVariable ["RHD_A3A_MODE", "STANDALONE", true];
-    diag_log "[RHD-LIFECORE] Antistasi Ultimate not installed; continuing in standalone RHD mode.";
+    diag_log "[RHD-LIFECORE] ERROR: Antistasi Ultimate (A3A_core) is not loaded.";
+    missionNamespace setVariable ["RHD_A3A_MODE", "MISSING_DEPENDENCY", true];
 };
 
 missionNamespace setVariable ["RHD_A3A_MODE", "ANTISTASI", true];
+
+private _autoStart = _logic getVariable ["RHD_A3A_AutoStart", true];
+private _createHQ = _logic getVariable ["RHD_A3A_CreateHQ", true];
+private _terrainFallback = _logic getVariable ["RHD_A3A_TerrainFallback", true];
 
 if (!_autoStart) exitWith {
     diag_log "[RHD-LIFECORE] Antistasi auto-start disabled on the 3DEN bridge module.";
@@ -89,7 +83,7 @@ if !("Synd_HQ" in allMapMarkers) then {
 };
 
 if (_terrainFallback) then {
-    ["GENERIC"] call compileFinal preprocessFileLineNumbers "\\rhd\\addons\\rhd_lifecore\\functions\\modules\\fn_terrainFallback.sqf";
+    ["GENERIC"] call RHD_fnc_terrainFallback;
 };
 
 [] spawn A3A_fnc_initServer;
