@@ -1,5 +1,6 @@
 params ["_unit", ["_amount", 100]];
 if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
+if (owner _unit != remoteExecutedOwner) exitWith {};
 if (_amount < 1 || {_amount > 10000}) exitWith {};
 private _cash = _unit getVariable ["RHD_CASH", 0];
 if (_cash < _amount) exitWith {["Insufficient cash.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
