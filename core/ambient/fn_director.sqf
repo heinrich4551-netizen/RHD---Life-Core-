@@ -7,8 +7,10 @@ if (!isServer) exitWith {};
 if (missionNamespace getVariable ["RHD_AMBIENT_RUNNING", false]) exitWith {};
 missionNamespace setVariable ["RHD_AMBIENT_RUNNING", true, false];
 
-private _maxCivilians = 10;
-private _maxTraffic = 4;
+private _maxCiviliansDay = 10;
+private _maxCiviliansNight = 5;
+private _maxTrafficDay = 4;
+private _maxTrafficNight = 2;
 private _spawnRadius = 450;
 private _avoidRadius = 180;
 private _despawnRadius = 1100;
@@ -18,6 +20,11 @@ private _civClasses = ["C_man_1","C_man_1_1_F","C_man_1_2_F","C_man_1_3_F"];
 private _vehicleClasses = ["C_Offroad_01_F","C_SUV_01_F","C_Hatchback_01_F","C_Hatchback_01_sport_F"];
 missionNamespace setVariable ["RHD_AMBIENT_CIVS", [], false];
 missionNamespace setVariable ["RHD_AMBIENT_VEHICLES", [], false];
+
+private _ambientGroup = createGroup civilian;
+_ambientGroup setBehaviourStrong "CARELESS";
+_ambientGroup setCombatMode "BLUE";
+missionNamespace setVariable ["RHD_AMBIENT_GROUP", _ambientGroup, false];
 
 private _fnNearestPlayerDistance = {
     params ["_pos"];
@@ -70,12 +77,14 @@ while {isServer} do {
     private _activePlayers = allPlayers select {alive _x};
     if (_activePlayers isEqualTo []) then {continue;};
     private _anchor = selectRandom _activePlayers;
+    private _night = (sunOrMoon < 0.35);
+    private _maxCivilians = if (_night) then {_maxCiviliansNight} else {_maxCiviliansDay};
+    private _maxTraffic = if (_night) then {_maxTrafficNight} else {_maxTrafficDay};
 
     if ((count _civs) < _maxCivilians && {random 1 > 0.35}) then {
         private _pos = [getPosATL _anchor] call _fnRoadPos;
         if !(_pos isEqualTo [0,0,0]) then {
-            private _group = createGroup civilian;
-            private _unit = _group createUnit [selectRandom _civClasses, _pos, [], 0, "NONE"];
+            private _unit = _ambientGroup createUnit [selectRandom _civClasses, _pos, [], 0, "NONE"];
             _unit setVariable ["RHD_AMBIENT", true, false];
             _unit setVariable ["RHD_AMBIENT_SPAWNED", diag_tickTime, false];
             _unit setBehaviour "CARELESS";
@@ -95,8 +104,7 @@ while {isServer} do {
             private _vehicle = createVehicle [selectRandom _vehicleClasses, _pos, [], 0, "NONE"];
             _vehicle setVariable ["RHD_AMBIENT", true, false];
             _vehicle setVariable ["RHD_AMBIENT_SPAWNED", diag_tickTime, false];
-            private _group = createGroup civilian;
-            private _driver = _group createUnit [selectRandom _civClasses, _pos, [], 0, "NONE"];
+            private _driver = _ambientGroup createUnit [selectRandom _civClasses, _pos, [], 0, "NONE"];
             _driver setVariable ["RHD_AMBIENT", true, false];
             _driver setVariable ["RHD_AMBIENT_SPAWNED", diag_tickTime, false];
             _driver moveInDriver _vehicle;
