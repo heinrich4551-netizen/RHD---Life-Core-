@@ -1,16 +1,83 @@
-# RHD Life — 3DEN Setup
+# RHD Life Core — 3DEN Setup Guide
 
-This framework is terrain agnostic. Build the actual map layout in Eden and keep the script package unchanged between terrains.
+This guide is for mission makers who are new to Arma 3 as well as experienced developers.
 
-## Required
+**Important:** RHD is terrain-agnostic. Build the map in Eden and keep the script package the same between terrains.
 
-Create a normal multiplayer mission in Eden, then copy the framework files into that mission folder. Save the mission in Eden. Do not hand-edit `mission.sqm` unless you know exactly why you need to.
+---
 
-## Marker conventions
+## 1. Before you start
 
-Use any marker shape/size. The scripts use marker position and name only.
+Install these Workshop dependencies:
+
+- Arma 3
+- CBA_A3
+- ACE3
+- cTab+
+
+See `STEAM_WORKSHOP_DEPENDENCIES.md` for the Workshop links and IDs.
+
+---
+
+## 2. Create the mission in Eden
+
+1. Open **Arma 3 → Eden Editor**.
+2. Choose your terrain.
+3. Create a multiplayer mission.
+4. Save it once.
+5. Copy the RHD mission files into that mission's folder.
+6. Return to Eden and save again.
+
+Let Eden generate `mission.sqm`. Do not hand-edit `mission.sqm` unless you understand exactly what you are changing.
+
+---
+
+## 3. Admin setup
+
+Open:
+
+`core/fn_init.sqf`
+
+Find:
+
+```sqf
+missionNamespace setVariable ["RHD_ADMIN_UIDS", [], true];
+```
+
+Put your Steam64 ID between the brackets:
+
+```sqf
+missionNamespace setVariable [
+    "RHD_ADMIN_UIDS",
+    ["76561198012345678"],
+    true
+];
+```
+
+Multiple admins:
+
+```sqf
+missionNamespace setVariable [
+    "RHD_ADMIN_UIDS",
+    [
+        "76561198012345678",
+        "76561198087654321"
+    ],
+    true
+];
+```
+
+RHD never uses player names for admin authentication.
+
+---
+
+## 4. Marker naming rules
+
+The scripts identify locations from marker **names**. Marker shape and color are up to you.
 
 ### Farming
+
+Use one or more of these:
 
 - `rhd_farm_apples`
 - `rhd_farm_cannabis`
@@ -18,8 +85,6 @@ Use any marker shape/size. The scripts use marker position and name only.
 - `rhd_farm_corn`
 - `rhd_farm_grapes`
 - `rhd_farm_peaches`
-
-Civilian and Farmer jobs can gather at farming markers. Farmer is the intended job for production RP.
 
 ### Mining
 
@@ -29,56 +94,67 @@ Civilian and Farmer jobs can gather at farming markers. Farmer is the intended j
 - `rhd_mine_diamond`
 - `rhd_mine_oil`
 
-Only the Miner job can gather at mining markers.
-
 ### Refining
 
-- `rhd_refine_iron` — 2 Iron Ore -> 1 Iron
-- `rhd_refine_copper` — 2 Copper Ore -> 1 Copper
-- `rhd_refine_gold` — 3 Gold Ore -> 1 Gold
-- `rhd_refine_oil` — 2 Oil Sand -> 1 Oil
+- `rhd_refine_iron`
+- `rhd_refine_copper`
+- `rhd_refine_gold`
+- `rhd_refine_oil`
 
-Only the Refiner job can refine.
+The recipes are configured in `core/fn_init.sqf`.
+
+Current recipes:
+
+| Input | Output |
+|---|---|
+| 1 Iron Ore | 2 Iron |
+| 1 Copper Ore | 2 Copper |
+| 1 Gold Ore | 3 Gold |
+| 1 Oil Sand | 2 Oil |
 
 ### Shops
 
-Use `rhd_shop_<name>` markers for your shop locations. The current shop inventory is centralized in `core/fn_init.sqf` and is available from F8.
+Name shop markers like:
+
+`rhd_shop_kavala`
+
+`rhd_shop_industrial`
+
+`rhd_shop_harbor`
+
+The shop uses the items and prices defined in `core/fn_init.sqf`.
 
 ### Banks
 
-Use `rhd_bank_<name>` markers for visual/organizational bank locations. The starter bank interaction currently deposits or withdraws $100 per action.
+Use names such as:
 
-### Fuel stations
+`rhd_bank_kavala`
 
-Use `rhd_fuel_<name>` markers, for example:
+`rhd_bank_industrial`
 
-- `rhd_fuel_kavala`
-- `rhd_fuel_industrial`
-- `rhd_fuel_harbor`
+### Fuel
 
-A driver at a fuel marker can refuel the current vehicle. The server calculates the price from the fuel missing and validates the distance before charging the player.
+Use names such as:
+
+`rhd_fuel_kavala`
+
+`rhd_fuel_industrial`
+
+`rhd_fuel_harbor`
 
 ### Jail
 
-Use `rhd_jail_<name>` markers for future jail/booking expansion. Keep at least one marker named `rhd_jail_main` if you add jail scripts.
+Use:
 
-## Ambient world system
+`rhd_jail_main`
 
-No ambient markers are required. The server creates a small amount of civilian life and traffic around active players, then removes it when it is too far away or too old.
+Additional jail markers can use the same `rhd_jail_` prefix.
 
-Current hard limits are deliberately conservative:
+---
 
-- 10 civilian actors during daylight.
-- 5 civilian actors at night.
-- 4 civilian traffic vehicles during daylight.
-- 2 civilian traffic vehicles at night.
-- 2 short-lived roadside incidents maximum.
+## 5. Optional Eden object variables
 
-The system does not attempt to simulate the whole island. It only simulates the small bubble players can actually experience.
-
-## Eden object variables
-
-You may give NPCs/objects these variable names for future expansion:
+On an NPC or object, you can assign these variable names for future expansion:
 
 - `rhd_shop`
 - `rhd_bank`
@@ -88,29 +164,101 @@ You may give NPCs/objects these variable names for future expansion:
 - `rhd_refine`
 - `rhd_fuel`
 
-The framework does not require those objects; marker-driven interactions are the portable baseline.
+The framework currently uses marker positions as the portable baseline, so these variables are optional.
 
-## Player controls
+---
 
-- **F6** — Player/account/inventory menu
-- **F7** — Job selection
-- **F8** — RHD Shop
-- Action menu — gathering, refining, banking, refueling, job duty, police ticketing, EMS treatment
+## 6. Player interface
 
-## Recommended Eden layout
+RHD uses **cTab+** as the player-facing tablet. The tablet contains:
+
+- Player status
+- Inventory
+- Jobs
+- Shop
+- Banking
+- Gathering
+- Refining
+
+The old F6/F7/F8 interfaces are now shortcuts into cTab pages rather than separate RHD windows.
+
+The normal player interface does not require an RHD inventory item.
+
+---
+
+## 7. Administrator interface
+
+Administrators have a completely separate interface.
+
+Open ACE Self Actions and choose:
+
+**RHD Administration**
+
+There is no administrator item and no dedicated administrator hotkey.
+
+All privileged commands are sent to the server and the admin Steam64 ID is checked again before execution.
+
+---
+
+## 8. Recommended town layout
 
 For each town, place:
 
-1. Spawn/player start.
-2. RHD shop marker and optional shop NPC.
-3. RHD bank marker and optional ATM/stand object.
-4. Fuel station marker and optional pump objects.
-5. Police station and police spawn.
-6. EMS station and EMS spawn.
-7. Civilian job center.
-8. One or more farms.
-9. One or more mines.
-10. One or more refineries.
-11. Jail/holding location.
+1. Player/spawn area.
+2. RHD shop.
+3. RHD bank/ATM.
+4. Fuel station.
+5. Police station.
+6. EMS station.
+7. Civilian/job center.
+8. Farms.
+9. Mines.
+10. Refinery.
+11. Jail/holding area.
 
-The framework never assumes a specific terrain, town name, coordinate, or asset pack.
+You can use any terrain and any building pack.
+
+---
+
+## 9. Editing prices, jobs and recipes
+
+For beginners, almost all economic balancing is done in one file:
+
+`core/fn_init.sqf`
+
+That file contains clear sections for:
+
+- Administrators
+- Jobs
+- Items
+- Refining recipes
+- Gatherable resources
+
+Examples are included directly in the file. The goal is that a new server owner can change a price or job salary without searching through the whole project.
+
+---
+
+## 10. Testing checklist
+
+Test these in a local multiplayer preview first:
+
+- Player joins and receives a RHD identity.
+- cTab tablet opens.
+- Status page shows cash/bank/job/inventory.
+- Job selection works.
+- Shop works at a `rhd_shop_*` marker.
+- Bank works at a `rhd_bank_*` marker.
+- Gathering only works in the correct location/job.
+- Refining consumes the input and gives the configured output.
+- ACE interactions appear when ACE3 is loaded.
+- Admin panel is visible only to allowlisted Steam64 IDs.
+- Admin actions are rejected for non-admin clients.
+- Dedicated-server test passes before public release.
+
+---
+
+## 11. Performance rule
+
+Do not add hundreds of always-running AI units just to make a town look busy. RHD's ambient system is intentionally capped and cleans up distant actors.
+
+See `PERFORMANCE.md` before increasing population limits.
