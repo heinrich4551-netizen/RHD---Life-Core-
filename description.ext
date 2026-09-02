@@ -2,29 +2,24 @@
     RHD - LifeCore | Mission Configuration
     Author: LT. Toad
     ---------------------------------------------------------------------------
-    BASE FRAMEWORK
-    --------------
-    RHD runs as a Life RP layer on top of the Antistasi Ultimate campaign core.
+    RHD is a Life RP layer running on the Antistasi Ultimate campaign.
 
-    BEGINNER EDITORS:
-    - Edit core/fn_init.sqf for gameplay settings.
-    - Edit the map in Eden / 3DEN.
-    - Read ANTISTASI_BASE.md before changing the campaign integration.
+    BEGINNER EDITORS
+    -----------------
+    1. Place ONE RHD Antistasi Ultimate Base module in 3DEN.
+    2. Place ONE RHD Life RP Systems module in 3DEN.
+    3. Place shops, banks, farms, mines, refineries, fuel stations, districts,
+       jail and other RHD locations in 3DEN.
+    4. Edit core/fn_init.sqf for prices, jobs, admins and tuning.
 
-    ADVANCED DEVELOPERS:
-    - CfgFunctions registers RHD bridge functions and Life systems.
-    - CfgRemoteExec controls networked functions.
-    - The A3A campaign engine is supplied by the required Antistasi Ultimate addon.
+    Do not hand-edit mission.sqm. Eden owns the mission layout.
     ---------------------------------------------------------------------------
 */
 
-// ============================================================================
-// BRANDING / MISSION IDENTITY
-// ============================================================================
 author = "LT. Toad";
 onLoadName = "RHD - LifeCore";
 onLoadMission = "RHD - LifeCore | Kavala Lives Different";
-overviewText = "RHD - LifeCore — People • Jobs • Crime • Opportunity";
+overviewText = "RHD - LifeCore | Antistasi Ultimate Life RP | People • Jobs • Crime • Opportunity";
 overviewPicture = "assets\\branding\\RHDLifeCore.jpg";
 loadScreen = "assets\\branding\\RHDLifeCore.jpg";
 
@@ -41,8 +36,35 @@ respawnDelay = 5;
 respawnTemplates[] = {"MenuPosition"};
 joinUnassigned = 1;
 
+// ---------------------------------------------------------------------------
+// GENERIC A3A MAPINFO FALLBACK
+// ---------------------------------------------------------------------------
+class A3A
+{
+    class mapInfo
+    {
+        class generic
+        {
+            climate = "temperate";
+            antennas[] = {};
+            antennasBlacklistIndex[] = {};
+            banks[] = {};
+            fuelStationTypes[] = {
+                "Land_FuelStation_Feed_F",
+                "Land_fs_feed_F",
+                "Land_FuelStation_01_pump_F",
+                "Land_FuelStation_02_pump_F",
+                "Land_FuelStation_03_pump_F",
+                "Land_A_FuelStation_Feed",
+                "Land_Ind_FuelStation_Feed_EP1",
+                "Land_Fuelstation"
+            };
+        };
+    };
+};
+
 // ============================================================================
-// FUNCTION REGISTRATION
+// RHD FUNCTION REGISTRATION
 // ============================================================================
 class CfgFunctions
 {
@@ -54,7 +76,7 @@ class CfgFunctions
         {
             file = "core";
             class init {preInit = 1;};
-            class initPlayer {postInit = 1;};
+            class initPlayer {};
             class initActions {};
             class savePlayer {server = 1;};
             class loadPlayer {server = 1;};
@@ -72,6 +94,13 @@ class CfgFunctions
             class serverBuy {server = 1;};
             class serverSell {server = 1;};
             class shopOpen {};
+            class getShopPrice {};
+            class getShopCatalog {};
+            class requestBuyVehicle {};
+            class requestBuyEquipment {};
+            class shopBuyVehicle {server = 1;};
+            class shopBuyItem {server = 1;};
+            class shopDeliverItem {};
         };
 
         class Bank
@@ -152,7 +181,6 @@ class CfgFunctions
             class aceInit {};
         };
 
-        // RHD / Antistasi Ultimate campaign bridge.
         class Antistasi
         {
             file = "core\\antistasi";
@@ -166,7 +194,7 @@ class CfgFunctions
         class Conflict
         {
             file = "core\\conflict";
-            class conflictInit {preInit = 1;};
+            class conflictInit {};
             class conflictDirector {server = 1;};
             class getZoneStatus {};
             class recordCrime {server = 1;};
@@ -206,16 +234,18 @@ class CfgRemoteExec
         class RHD_fnc_receiveDispatch {allowedTargets = 1;};
         class RHD_fnc_refuel {allowedTargets = 2;};
 
-        // Admin requests are UID-verified again on the server.
         class RHD_fnc_adminOpenMenu {allowedTargets = 1;};
         class RHD_fnc_execute {allowedTargets = 2;};
         class RHD_fnc_adminFreeze {allowedTargets = 1;};
         class RHD_fnc_adminSpectate {allowedTargets = 1;};
 
-        // Antistasi bridge wrappers are server-side only.
-        class RHD_fnc_addAggression {allowedTargets = 2;};
-        class RHD_fnc_addResources {allowedTargets = 2;};
-        class RHD_fnc_spawnVehicle {allowedTargets = 2;};
+        class RHD_fnc_antistasiAddAggression {allowedTargets = 2;};
+        class RHD_fnc_antistasiAddResources {allowedTargets = 2;};
+        class RHD_fnc_antistasiSpawnVehicle {allowedTargets = 2;};
+
+        class RHD_fnc_shopBuyVehicle {allowedTargets = 2;};
+        class RHD_fnc_shopBuyItem {allowedTargets = 2;};
+        class RHD_fnc_shopDeliverItem {allowedTargets = 1;};
     };
 };
 
@@ -259,8 +289,6 @@ class RscTitles
 // ============================================================================
 // SEPARATE ADMIN PANEL
 // ============================================================================
-// The administrator surface is separate from cTab and is opened through ACE
-// Self Actions. No admin item and no dedicated admin keyboard shortcut exist.
 class RHD_ADMIN
 {
     idd = 8500;
