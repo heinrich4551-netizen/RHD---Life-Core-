@@ -2,27 +2,39 @@
     RHD - LifeCore | Mission Configuration
     Author: LT. Toad
     ---------------------------------------------------------------------------
-    Mission source is separate from the RHD addon source:
-      - Mission files: this file, initServer.sqf, initPlayerLocal.sqf, core/, assets/
-      - Mod files: addons/rhd_lifecore/ and addons/rhd_clothing/
+    PUBLISHED ALTIS BUILD
+    ---------------------
+    The bundled RHD_LifeCore.Altis mission is preconfigured for plug-and-play
+    use. It already contains the RHD LifeCore and Antistasi Ultimate bridge
+    modules plus the RHD service/economy markers used by the packaged scenario.
 
-    SETUP
-    -----
-    1. Build/install the @RHD-LifeCore addon.
-    2. Ensure CBA_A3 and cTab+ are loaded.
-    3. In 3DEN place ONE RHD Life RP Systems module.
-    4. Optionally place ONE RHD Antistasi Ultimate Bridge module when A3A is installed.
-    5. Place RHD map locations/markers in Eden.
-    6. Edit core/fn_init.sqf for server configuration.
+    REQUIRED WORKSHOP DEPENDENCIES
+    ------------------------------
+    - CBA_A3
+    - cTab+
+    - Antistasi Ultimate
 
-    Do not hand-edit mission.sqm. Eden owns the mission layout.
+    ACE3 remains optional.
+
+    SOURCE TEMPLATE USE
+    -------------------
+    When creating a custom terrain mission from this template:
+      1. Build/install the @RHD-LifeCore mod.
+      2. Ensure all required Workshop dependencies are loaded.
+      3. In 3DEN place ONE RHD Life RP Systems module.
+      4. Place ONE RHD Antistasi Ultimate Bridge module.
+      5. Place the RHD service/economy markers appropriate for your terrain.
+      6. Configure core/fn_init.sqf for your server.
+
+    Do not hand-edit mission.sqm for a 3DEN-authored custom mission. Eden owns
+    the custom mission layout. The bundled Altis mission is already packed.
     ---------------------------------------------------------------------------
 */
 
 author = "LT. Toad";
 onLoadName = "RHD - LifeCore";
-onLoadMission = "RHD - LifeCore | Life RP";
-overviewText = "RHD - LifeCore | Life RP | Jobs • Economy • Crime • Opportunity";
+onLoadMission = "RHD - LifeCore | Altis Life RP";
+overviewText = "RHD - LifeCore | Altis Life RP | Jobs • Economy • Crime • Opportunity";
 overviewPicture = "assets\\branding\\RHDLifeCore.jpg";
 loadScreen = "assets\\branding\\RHDLifeCore.jpg";
 
@@ -40,11 +52,8 @@ respawnTemplates[] = {"MenuPosition"};
 joinUnassigned = 1;
 
 // ============================================================================
-// OPTIONAL ANTISTASI COMPATIBILITY
+// ANTISTASI ULTIMATE COMPATIBILITY
 // ============================================================================
-// A3A owns its campaign state when the optional RHD bridge is enabled.
-// Keeping the class here is harmless in standalone missions and preserves
-// compatibility with Antistasi Ultimate's mission-side version/mapInfo checks.
 class A3A
 {
     version[] = {11,9,12};
@@ -280,7 +289,6 @@ class RscTitles
     };
 };
 
-// Separate administrator panel. Access is UID-gated in SQF.
 class RHD_ADMIN
 {
     idd = 8500;
