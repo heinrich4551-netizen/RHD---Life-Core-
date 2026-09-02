@@ -21,7 +21,7 @@ if ((_m find "rhd_farm_") == 0) then {
 };
 if (_item isEqualTo "") exitWith {};
 private _job = _unit getVariable ["RHD_JOB", "civ"];
-private _allowed = if ((_m find "rhd_farm_") == 0) then {[_job] find "farmer" >= 0 || _job isEqualTo "civ"} else {_job isEqualTo "miner"};
+private _allowed = if ((_m find "rhd_farm_") == 0) then {_job isEqualTo "farmer" || _job isEqualTo "civ"} else {_job isEqualTo "miner"};
 if (!_allowed) exitWith {["You do not have the correct job for this location.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
 private _last = _unit getVariable ["RHD_LAST_GATHER", 0];
 if (serverTime - _last < 3) exitWith {["Slow down. Gathering is on cooldown.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
