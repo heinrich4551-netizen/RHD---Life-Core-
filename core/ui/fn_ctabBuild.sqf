@@ -35,10 +35,55 @@ private _close = _display ctrlCreate ["RHD_CTAB_Button", 9812];
 
 // Keep every RHD control in one array so cleanup is reliable.
 private _ctrls = [
-    _bg,_title,_dash,_jobs,_shop,_bank,_svc,_content,_list,
-    _primary,_secondary,_status,_close,_districts
+    _bg,_title,_dash,_jobs,_shop,_bank,_svc,_districts,
+    _content,_list,_primary,_secondary,_status,_close
 ];
 uiNamespace setVariable ["RHD_CTAB_CTRLS", _ctrls];
+
+// ---------------------------------------------------------------------------
+// RHD PLAYER THEME
+// ---------------------------------------------------------------------------
+private _theme = profileNamespace getVariable ["RHD_UI_THEME", 0];
+private _palette = switch (_theme) do {
+    case 1: {
+        [
+            [0.09,0.09,0.11,0.97],
+            [0.18,0.18,0.22,1],
+            [0.35,0.65,0.95,1],
+            [0.80,0.84,0.90,1]
+        ]
+    };
+    case 2: {
+        [
+            [0.02,0.05,0.03,0.96],
+            [0.05,0.16,0.08,1],
+            [0.38,0.85,0.48,1],
+            [0.72,0.95,0.76,1]
+        ]
+    };
+    default {
+        [
+            [0,0,0,0.86],
+            [0.10,0.46,0.62,1],
+            [0.18,0.72,0.92,1],
+            [0.93,0.95,0.97,1]
+        ]
+    };
+};
+
+_bg ctrlSetBackgroundColor (_palette select 0);
+_title ctrlSetBackgroundColor (_palette select 1);
+_title ctrlSetTextColor (_palette select 3);
+_content ctrlSetBackgroundColor (_palette select 0);
+_content ctrlSetTextColor (_palette select 3);
+_list ctrlSetBackgroundColor (_palette select 0);
+_list ctrlSetTextColor (_palette select 3);
+_status ctrlSetTextColor (_palette select 2);
+
+{
+    _x ctrlSetBackgroundColor (_palette select 1);
+    _x ctrlSetTextColor (_palette select 3);
+} forEach [_dash,_jobs,_shop,_bank,_svc,_districts,_primary,_secondary,_close];
 
 // ---------------------------------------------------------------------------
 // LAYOUT
