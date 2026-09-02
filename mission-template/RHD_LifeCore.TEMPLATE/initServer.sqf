@@ -2,22 +2,18 @@
     RHD - LifeCore | SERVER BOOTSTRAP
     Author: LT. Toad
     ---------------------------------------------------------------------------
-    This mission can run in two modes:
-      1. STANDALONE: RHD Life RP only. No Antistasi Ultimate required.
-      2. ANTISTASI: the optional 3DEN bridge connects RHD to installed A3A.
-
-    The 3DEN Life RP Systems module is required for RHD gameplay features.
-    The Antistasi bridge module is optional.
+    Published scenario: Antistasi Ultimate + RHD LifeCore.
+    Antistasi Ultimate supplies the campaign state; RHD dynamically resolves
+    service/economy/industry locations after A3A world initialization.
     ---------------------------------------------------------------------------
 */
 
 if (!isServer) exitWith {};
 
 // ============================================================================
-// OPTIONAL ANTISTASI BRIDGE
-// Do not block standalone missions waiting for A3A.
+// ANTISTASI ULTIMATE BRIDGE
 // ============================================================================
-private _bridgeWait = missionNamespace getVariable ["RHD_A3A_BRIDGE_WAIT_SECONDS", 10];
+private _bridgeWait = missionNamespace getVariable ["RHD_A3A_BRIDGE_WAIT_SECONDS", 180];
 private _bridgeDeadline = time + _bridgeWait;
 
 waitUntil {
@@ -25,21 +21,17 @@ waitUntil {
     missionNamespace getVariable ["RHD_A3A_MODULE_STARTED", false] || {time > _bridgeDeadline}
 };
 
-if (missionNamespace getVariable ["RHD_A3A_MODULE_STARTED", false]) then {
-    private _baseReady = [] call RHD_fnc_initBase;
+if !(missionNamespace getVariable ["RHD_A3A_MODULE_STARTED", false]) exitWith {
+    diag_log "[RHD-LIFECORE] ERROR: Antistasi Ultimate bridge module did not initialize.";
+};
 
-    if (!_baseReady) then {
-        diag_log "[RHD-LIFECORE] WARNING: Antistasi bridge did not complete cleanly; RHD continues with its own Life RP systems.";
-    };
-} else {
-    missionNamespace setVariable ["RHD_A3A_BASE_READY", true, true];
-    missionNamespace setVariable ["RHD_A3A_INSTALLED", false, true];
-    missionNamespace setVariable ["RHD_A3A_MODE", "STANDALONE", true];
-    missionNamespace setVariable ["RHD_A3A_BASE_VERSION", "not connected", true];
-    missionNamespace setVariable ["RHD_A3A_BASE_STARTED", false, true];
-    missionNamespace setVariable ["RHD_A3A_ZONE_MARKERS", [], true];
-    missionNamespace setVariable ["RHD_A3A_HQ", objNull, true];
-    diag_log "[RHD-LIFECORE] No RHD Antistasi bridge module detected; starting RHD in standalone mode.";
+private _baseReady = [] call RHD_fnc_initBase;
+if (!_baseReady) then {
+    diag_log "[RHD-LIFECORE] ERROR: Antistasi Ultimate did not become ready.";
+};
+
+if !(missionNamespace getVariable ["RHD_A3A_BASE_READY", false]) exitWith {
+    diag_log "[RHD-LIFECORE] ERROR: RHD startup halted because Antistasi Ultimate was not ready.";
 };
 
 // ============================================================================
@@ -56,6 +48,21 @@ if !(missionNamespace getVariable ["RHD_LIFE_MODULE_READY", false]) exitWith {
 };
 
 // ============================================================================
+// WAIT FOR TERRAIN/LOCATION RESOLUTION BEFORE STARTING SYSTEMS THAT CONSUME
+// RHD MARKERS. This prevents race conditions with shops, gathering, refining
+// and conflict districts.
+// ============================================================================
+private _locationDeadline = time + (missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_WAIT_SECONDS", 180]);
+waitUntil {
+    sleep 0.25;
+    missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_READY", false] || {time > _locationDeadline}
+};
+
+if !(missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_READY", false]) then {
+    diag_log "[RHD-LIFECORE] WARNING: Dynamic locations did not complete before timeout.";
+};
+
+// ============================================================================
 // RHD-ONLY SYSTEMS
 // ============================================================================
 if (missionNamespace getVariable ["RHD_LIFE_ENABLE_BRANDING", true]) then {
@@ -66,7 +73,6 @@ if (missionNamespace getVariable ["RHD_LIFE_ENABLE_BRANDING", true]) then {
 };
 
 if (missionNamespace getVariable ["RHD_LIFE_ENABLE_ECONOMY", true]) then {
-    // The actual catalogue is generated locally from the active Arma modset.
     missionNamespace setVariable ["RHD_SHOP_SERVER_READY", true, true];
 };
 
@@ -102,10 +108,8 @@ if (missionNamespace getVariable ["RHD_LIFE_ENABLE_PERSISTENCE", true]) then {
 
     [] spawn {
         private _saveInterval = missionNamespace getVariable ["RHD_PERSISTENCE_SAVE_INTERVAL_SECONDS", 180];
-
         while {isServer} do {
             sleep _saveInterval;
-
             {
                 private _uid = getPlayerUID _x;
                 if (_uid != "") then {
