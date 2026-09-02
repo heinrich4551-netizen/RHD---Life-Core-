@@ -1,0 +1,156 @@
+name: RHD LifeCore Package
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup HEMTT
+        uses: arma-actions/hemtt@v1
+
+      - name: Validate package inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f addons/rhd_lifecore/config.cpp
+          test -f addons/rhd_clothing/config.cpp
+          test -f mission-template/RHD_LifeCore.TEMPLATE/description.ext
+          test -f mission-template/RHD_LifeCore.TEMPLATE/mission.sqm
+          test -f tools/pbo_pack.py
+          test -f mod.cpp
+          test -f meta.cpp
+          test -f assets/branding/RHDLifeCore.jpg
+          grep -Fq 'requiredAddons[] = {"cba_main", "ctab_core", "A3A_core"};' addons/rhd_lifecore/config.cpp
+          grep -Fq '450814997' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
+          grep -Fq '2262006564' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
+          grep -Fq '3020755032' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
+
+      - name: Check addon project
+        run: hemtt check
+
+      - name: Build addon PBOs
+        run: hemtt build
+
+      - name: Validate addon PBOs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s .hemttout/build/addons/rhd_rhd_lifecore.pbo
+          test -s .hemttout/build/addons/rhd_rhd_clothing.pbo
+
+      - name: Build Altis mission PBO
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf build-mission
+          mkdir -p build-mission/RHD_LifeCore.Altis
+          cp -r mission-template/RHD_LifeCore.TEMPLATE/. build-mission/RHD_LifeCore.Altis/
+          python3 tools/pbo_pack.py build-mission/RHD_LifeCore.Altis RHD_LifeCore.Altis.pbo
+          test -s RHD_LifeCore.Altis.pbo
+
+      - name: Validate Altis mission PBO
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          data = Path('RHD_LifeCore.Altis.pbo').read_bytes()
+          required = [
+              b'description.ext', b'mission.sqm', b'initServer.sqf',
+              b'initPlayerLocal.sqf', b'onPlayerRespawn.sqf', b'core/fn_init.sqf',
+              b'RHD_Module_AntistasiBase', b'RHD_Module_LifeCore', b'rhd_shop_kavala'
+          ]
+          missing = [x.decode() for x in required if x not in data]
+          if missing:
+              raise SystemExit('Mission PBO missing: ' + ', '.join(missing))
+          print('Altis mission validation passed.')
+          PY
+
+      - name: Assemble @RHD-LifeCore
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf package dist
+          mkdir -p package/@RHD-LifeCore/addons
+          mkdir -p package/@RHD-LifeCore/Missions
+          mkdir -p package/@RHD-LifeCore/assets/branding
+          mkdir -p package/@RHD-LifeCore/docs
+
+          cp .hemttout/build/addons/rhd_rhd_lifecore.pbo package/@RHD-LifeCore/addons/
+          cp .hemttout/build/addons/rhd_rhd_clothing.pbo package/@RHD-LifeCore/addons/
+          cp RHD_LifeCore.Altis.pbo package/@RHD-LifeCore/Missions/
+          cp mod.cpp package/@RHD-LifeCore/
+          cp meta.cpp package/@RHD-LifeCore/
+          cp assets/branding/RHDLifeCore.jpg package/@RHD-LifeCore/assets/branding/
+
+          for f in README.md 3DEN_SETUP.md 3DEN_MODULES.md EDITOR_QUICKSTART.md \
+                   ADDON_BUILD.md ADMIN_AND_ACE_SETUP.md CTAB_INTEGRATION.md \
+                   ANTISTASI_BASE.md STEAM_WORKSHOP_DEPENDENCIES.md \
+                   STEAM_WORKSHOP_REQUIRED_ITEMS.txt THIRD_PARTY_NOTICES.md \
+                   PERFORMANCE.md UI_REFERENCES.md; do
+            cp "$f" package/@RHD-LifeCore/docs/
+          done
+
+          cat > package/@RHD-LifeCore/INSTALL.txt <<'EOF'
+RHD - LifeCore | Plug-and-Play Arma 3 Launcher Package
+
+REQUIRED WORKSHOP MODS
+CBA_A3             450814997
+cTab+               2262006564
+Antistasi Ultimate  3020755032
+
+OPTIONAL MOD
+ACE3
+
+INSTALL
+1. Extract the archive.
+2. Keep the @RHD-LifeCore folder intact.
+3. In Arma 3 Launcher choose Local Mods and select @RHD-LifeCore.
+4. Enable CBA_A3, cTab+, Antistasi Ultimate and RHD - LifeCore.
+5. Launch RHD_LifeCore.Altis.
+
+The bundled Altis mission already contains the RHD LifeCore and Antistasi
+Ultimate bridge modules and its RHD economy/service markers. No 3DEN setup
+is required for the bundled scenario.
+EOF
+
+          mkdir -p dist
+          cd package
+          zip -qr ../dist/RHD-LifeCore-Launcher-Package.zip @RHD-LifeCore
+          cd ..
+
+          unzip -l dist/RHD-LifeCore-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/addons/rhd_rhd_lifecore.pbo'
+          unzip -l dist/RHD-LifeCore-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/addons/rhd_rhd_clothing.pbo'
+          unzip -l dist/RHD-LifeCore-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/Missions/RHD_LifeCore.Altis.pbo'
+          unzip -l dist/RHD-LifeCore-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/mod.cpp'
+          unzip -l dist/RHD-LifeCore-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/meta.cpp'
+          unzip -l dist/RHD-LifeCore-Launcher-Package.zip | grep -Fq '@RHD-LifeCore/INSTALL.txt'
+
+      - name: Upload Launcher package ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: RHD-LifeCore-Launcher-Package
+          path: dist/RHD-LifeCore-Launcher-Package.zip
+          if-no-files-found: error
+
+      - name: Upload raw @RHD-LifeCore
+        uses: actions/upload-artifact@v4
+        with:
+          name: RHD-LifeCore-LauncherMod
+          path: package/@RHD-LifeCore
+          if-no-files-found: error
+
+      - name: Upload Altis mission PBO
+        uses: actions/upload-artifact@v4
+        with:
+          name: RHD-LifeCore-Altis-Mission
+          path: RHD_LifeCore.Altis.pbo
+          if-no-files-found: error
