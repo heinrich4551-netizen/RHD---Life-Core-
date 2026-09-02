@@ -4,9 +4,9 @@ disableSerialization;
 
 private _display = uiNamespace getVariable ["cTab_Tablet_dlg", displayNull];
 private _ctrls = uiNamespace getVariable ["RHD_CTAB_CTRLS", []];
-if (isNull _display || {count _ctrls < 10}) exitWith {};
+if (isNull _display || {count _ctrls < 17}) exitWith {};
 
-private _list = _ctrls select 9;
+private _list = _ctrls select 12;
 if (_index < 0 || {_index >= lbSize _list}) exitWith {
     ["Select a vehicle first.", "error"] call RHD_fnc_notify;
 };
