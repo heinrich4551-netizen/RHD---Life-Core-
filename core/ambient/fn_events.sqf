@@ -1,6 +1,7 @@
 /*
     RHD Ambient Events
     Rare, short-lived micro-events to make populated areas feel active.
+    Events are cosmetic and job-dispatch driven; no persistent combat AI.
 */
 if (!isServer) exitWith {};
 if (missionNamespace getVariable ["RHD_AMBIENT_EVENTS_RUNNING", false]) exitWith {};
@@ -22,12 +23,7 @@ private _fnCleanup = {
         private _origin = [0,0,0];
         if !(_alive isEqualTo []) then {_origin = getPosATL (_alive select 0);};
         private _near = 99999;
-        {
-            if (alive _x) then {
-                private _d = _x distance2D _origin;
-                if (_d < _near) then {_near = _d;};
-            };
-        } forEach allPlayers;
+        {if (alive _x) then {private _d = _x distance2D _origin; if (_d < _near) then {_near = _d;};};} forEach allPlayers;
         if (_alive isEqualTo [] || {_near > 1100} || {diag_tickTime - _time > _lifetime}) then {
             {if (!isNull _x) then {deleteVehicle _x;};} forEach _objects;
         } else {
@@ -49,7 +45,6 @@ private _fnRoadPos = {
 while {isServer} do {
     sleep 90;
     call _fnCleanup;
-
     private _events = missionNamespace getVariable ["RHD_AMBIENT_EVENTS", []];
     if ((count _events) >= _maxEvents) then {continue;};
     private _players = allPlayers select {alive _x};
@@ -60,10 +55,11 @@ while {isServer} do {
     private _pos = [getPosATL _anchor] call _fnRoadPos;
     if (_pos isEqualTo [0,0,0]) then {continue;};
 
+    private _isMedical = random 1 < 0.35;
     private _vehicle = createVehicle [selectRandom ["C_Offroad_01_F","C_SUV_01_F","C_Hatchback_01_F"], _pos, [], 0, "NONE"];
     _vehicle setVariable ["RHD_AMBIENT_EVENT", true, false];
     _vehicle setFuel 0;
-    _vehicle setDamage 0.25;
+    _vehicle setDamage (if (_isMedical) then {0.05} else {0.25});
 
     private _group = createGroup civilian;
     private _person = _group createUnit [selectRandom ["C_man_1","C_man_1_1_F","C_man_1_2_F"], _pos, [], 0, "NONE"];
@@ -74,6 +70,7 @@ while {isServer} do {
     _person disableAI "AUTOTARGET";
     _person disableAI "AUTOCOMBAT";
     _person setDir (random 360);
+    if (_isMedical) then {_person setDamage 0.35;};
 
     private _objects = [_vehicle,_person];
     if (random 1 > 0.55) then {
@@ -89,4 +86,10 @@ while {isServer} do {
 
     _events pushBack [_objects, diag_tickTime];
     missionNamespace setVariable ["RHD_AMBIENT_EVENTS", _events, false];
+
+    if (_isMedical) then {
+        [_pos, "Possible injured civilian - assistance requested", "ems"] call RHD_fnc_dispatch;
+    } else {
+        [_pos, "Roadside vehicle incident - check welfare", "police"] call RHD_fnc_dispatch;
+    };
 };
