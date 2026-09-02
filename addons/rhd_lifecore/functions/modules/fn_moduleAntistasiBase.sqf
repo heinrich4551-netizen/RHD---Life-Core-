@@ -74,36 +74,25 @@ if (_createHQ) then {
         publicVariable "flagX";
     };
 
-    // A3A replaces/reinitializes Petros during campaign startup.
-    if (isNil "petros" || {isNull petros}) then {
-        private _group = createGroup [independent, true];
-        petros = _group createUnit [
-            "a3a_unit_reb_petros",
-            _basePos vectorAdd [0, 6, 0],
-            [],
-            0,
-            "NONE"
-        ];
-        publicVariable "petros";
-    };
+    // Do not create a fake Petros class. A3A owns Petros and initializes the
+    // correct campaign object from its loaded templates during startup.
 };
 
 // Required A3A marker names if the host mission does not already contain them.
 if !("respawn_guerrila" in allMapMarkers) then {
     private _respawn = createMarker ["respawn_guerrila", _basePos];
-    _respawn setMarkerType "Empty";
     _respawn setMarkerText "RHD Campaign Start";
 };
 
 if !("Synd_HQ" in allMapMarkers) then {
     private _hq = createMarker ["Synd_HQ", _basePos];
-    _hq setMarkerType "Empty";
     _hq setMarkerText "Antistasi HQ";
 };
 
-// This file lives inside the compiled RHD addon PBO, so use the PBO prefix.
+// This file lives inside the compiled RHD addon PBO, so use the canonical
+// addon prefix emitted in $PBOPREFIX$.
 if (_terrainFallback) then {
-    ["GENERIC"] call compileFinal preprocessFileLineNumbers "\\rhd_lifecore\\functions\\modules\\fn_terrainFallback.sqf";
+    ["GENERIC"] call compileFinal preprocessFileLineNumbers "\\rhd\\addons\\rhd_lifecore\\functions\\modules\\fn_terrainFallback.sqf";
 };
 
 // Start the actual Antistasi Ultimate campaign. A3A owns all strategic logic.
