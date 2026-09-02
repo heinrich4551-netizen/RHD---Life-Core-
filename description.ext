@@ -1,26 +1,30 @@
 /*
-    RHD LIFE CORE - MISSION CONFIGURATION
+    RHD - LifeCore | Mission Configuration
+    Author: LT. Toad
     ---------------------------------------------------------------------------
-    This file tells Arma 3 which scripts, remote functions and UI classes
-    belong to the RHD mission.
-
     BEGINNER EDITORS:
     - You normally do NOT need to edit this file.
-    - Edit server gameplay values in: core/fn_init.sqf
-    - Edit map locations in: Eden Editor (3DEN)
-    - Edit dependency information in: STEAM_WORKSHOP_DEPENDENCIES.md
+    - Change gameplay values in: core/fn_init.sqf
+    - Change map locations in: Eden Editor (3DEN)
+    - Read setup/dependencies in: EDITOR_QUICKSTART.md and STEAM_WORKSHOP_DEPENDENCIES.md
 
     ADVANCED DEVELOPERS:
     - CfgFunctions registers SQF functions.
-    - CfgRemoteExec controls which networked functions may be called.
+    - CfgRemoteExec controls networked functions.
     - cTab UI definitions are included from core/ui/ctab.hpp.
     ---------------------------------------------------------------------------
 */
 
 // ============================================================================
-// BASIC MISSION INFORMATION
+// BRANDING / MISSION IDENTITY
 // ============================================================================
-author = "RHD Development";
+author = "LT. Toad";
+onLoadName = "RHD - LifeCore";
+onLoadMission = "RHD - LifeCore | Kavala Lives Different";
+overviewText = "RHD - LifeCore — People • Jobs • Crime • Opportunity";
+overviewPicture = "assets\\branding\\RHDLifeCore.jpg";
+loadScreen = "assets\\branding\\RHDLifeCore.jpg";
+
 class Header
 {
     gameType = Coop;
@@ -35,7 +39,7 @@ respawnTemplates[] = {"MenuPosition"};
 joinUnassigned = 1;
 
 // ============================================================================
-// RHD FUNCTION REGISTRATION
+// FUNCTION REGISTRATION
 // ============================================================================
 class CfgFunctions
 {
@@ -43,7 +47,6 @@ class CfgFunctions
     {
         tag = "RHD";
 
-        // Core player/server systems.
         class Core
         {
             file = "core";
@@ -60,7 +63,6 @@ class CfgFunctions
             class notify {};
         };
 
-        // Economy and shop.
         class Economy
         {
             file = "core\\economy";
@@ -69,7 +71,6 @@ class CfgFunctions
             class shopOpen {};
         };
 
-        // Bank and ATM functions.
         class Bank
         {
             file = "core\\bank";
@@ -79,7 +80,6 @@ class CfgFunctions
             class requestWithdraw {};
         };
 
-        // Jobs and work.
         class Jobs
         {
             file = "core\\jobs";
@@ -88,7 +88,6 @@ class CfgFunctions
             class stopWork {};
         };
 
-        // Farming, mining and refining.
         class Industry
         {
             file = "core\\industry";
@@ -98,7 +97,6 @@ class CfgFunctions
             class requestRefine {};
         };
 
-        // Police, EMS and civilian role-play systems.
         class RP
         {
             file = "core\\rp";
@@ -110,7 +108,6 @@ class CfgFunctions
             class receiveDispatch {};
         };
 
-        // Fuel/services.
         class Services
         {
             file = "core\\services";
@@ -118,7 +115,6 @@ class CfgFunctions
             class refuel {server = 1;};
         };
 
-        // Player UI and cTab integration.
         class UI
         {
             file = "core\\ui";
@@ -136,7 +132,6 @@ class CfgFunctions
             class ctabClose {};
         };
 
-        // Administrator functions.
         class Admin
         {
             file = "core\\admin";
@@ -148,14 +143,22 @@ class CfgFunctions
             class adminSpectate {};
         };
 
-        // Optional ACE3 integration.
         class ACE
         {
             file = "core\\ace";
             class aceInit {};
         };
 
-        // Ambient civilians, traffic and events.
+        // Antistasi-inspired persistent district pressure layer.
+        class Conflict
+        {
+            file = "core\\conflict";
+            class conflictInit {preInit = 1;};
+            class conflictDirector {server = 1;};
+            class getZoneStatus {};
+            class recordCrime {server = 1;};
+        };
+
         class Ambient
         {
             file = "core\\ambient";
@@ -168,9 +171,6 @@ class CfgFunctions
 // ============================================================================
 // NETWORK SECURITY
 // ============================================================================
-// mode = 2 means only functions listed here are permitted through remoteExec.
-// Server-side functions use allowedTargets = 2.
-// Client-side UI functions use allowedTargets = 1.
 class CfgRemoteExec
 {
     class Functions
@@ -178,31 +178,22 @@ class CfgRemoteExec
         mode = 2;
         jip = 1;
 
-        // Notifications / player UI.
         class RHD_fnc_notify {allowedTargets = 0;};
         class RHD_fnc_openMenu {allowedTargets = 1;};
         class RHD_fnc_shopOpen {allowedTargets = 1;};
-
-        // Economy.
         class RHD_fnc_serverBuy {allowedTargets = 2;};
         class RHD_fnc_serverSell {allowedTargets = 2;};
         class RHD_fnc_setJob {allowedTargets = 2;};
-
-        // Industry.
         class RHD_fnc_serverGather {allowedTargets = 2;};
         class RHD_fnc_refine {allowedTargets = 2;};
-
-        // Role-play.
         class RHD_fnc_ticket {allowedTargets = 2;};
         class RHD_fnc_heal {allowedTargets = 2;};
-
-        // Bank/services.
         class RHD_fnc_deposit {allowedTargets = 2;};
         class RHD_fnc_withdraw {allowedTargets = 2;};
         class RHD_fnc_receiveDispatch {allowedTargets = 1;};
         class RHD_fnc_refuel {allowedTargets = 2;};
 
-        // Admin. These are still validated by Steam64 UID on the server.
+        // Admin requests are still UID-verified on the server.
         class RHD_fnc_adminOpenMenu {allowedTargets = 1;};
         class RHD_fnc_execute {allowedTargets = 2;};
         class RHD_fnc_adminFreeze {allowedTargets = 1;};
@@ -211,14 +202,12 @@ class CfgRemoteExec
 };
 
 // ============================================================================
-// cTab TABLET UI
+// cTab PLAYER TABLET
 // ============================================================================
-// The actual RHD page definitions live in core/ui/ctab.hpp so UI work is kept
-// separate from this mission configuration file.
 #include "core\\ui\\ctab.hpp"
 
 // ============================================================================
-// RHD STATUS HUD
+// ALWAYS-ON STATUS HUD
 // ============================================================================
 class RscTitles
 {
@@ -240,7 +229,7 @@ class RscTitles
                 y = .955 * safezoneH + safezoneY;
                 w = .97 * safezoneW;
                 h = .025 * safezoneH;
-                text = "RHD LIFE";
+                text = "RHD - LIFECORE";
                 sizeEx = .018;
                 shadow = 1;
                 colorBackground[] = {0,0,0,.25};
@@ -250,11 +239,10 @@ class RscTitles
 };
 
 // ============================================================================
-// ADMIN PANEL
+// SEPARATE ADMIN PANEL
 // ============================================================================
-// This interface intentionally remains separate from the player cTab tablet.
-// Admin access is provided by ACE Self Actions and is UID-gated.
-// The compact player/action layout is adapted from XEAT_AdminTool.
+// The administrator surface is separate from cTab and is opened through ACE
+// Self Actions. No admin item and no dedicated admin keyboard shortcut exist.
 class RHD_ADMIN
 {
     idd = 8500;
@@ -280,9 +268,9 @@ class RHD_ADMIN
             y = .269 * safezoneH + safezoneY;
             w = .221719 * safezoneW;
             h = .022 * safezoneH;
-            text = "RHD | ADMIN CONTROL";
+            text = "RHD - LIFECORE | ADMIN";
             sizeEx = .020;
-            tooltip = "Adapted from the XEAT_AdminTool interface layout.";
+            tooltip = "Compact admin layout adapted from the XEAT_AdminTool interface.";
             colorBackground[] = {.02,.08,.12,.96};
         };
 
@@ -407,7 +395,7 @@ class RHD_ADMIN
             y = .611 * safezoneH + safezoneY;
             w = .211406 * safezoneW;
             h = .022 * safezoneH;
-            text = "RHD ADMIN";
+            text = "RHD - LIFECORE | ADMIN";
             sizeEx = .016;
         };
     };
