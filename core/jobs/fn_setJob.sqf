@@ -1,5 +1,6 @@
 params ["_unit", "_job"];
 if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
+if (owner _unit != remoteExecutedOwner) exitWith {};
 private _jobs = missionNamespace getVariable ["RHD_JOBS", createHashMap];
 private _def = _jobs getOrDefault [_job, []];
 if (_def isEqualTo []) exitWith {["Invalid job.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
