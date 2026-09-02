@@ -3,7 +3,14 @@
     Author: LT. Toad
 
     Creates the RHD player interface on cTab's tablet display.
-    The page controls are RHD-owned; cTab remains an external dependency.
+    cTab remains the external tablet host; all RHD controls are mission-owned.
+
+    PLAYER PAGES
+    ------------
+    STATUS | JOBS | SHOP | BANK | SERVICES | DISTRICTS | CAMPAIGN
+
+    The CAMPAIGN page reads Antistasi Ultimate state so players can see the
+    strategic world that their Life RP exists inside.
 */
 
 disableSerialization;
@@ -32,11 +39,13 @@ private _primary = _display ctrlCreate ["RHD_CTAB_Button", 9809];
 private _secondary = _display ctrlCreate ["RHD_CTAB_Button", 9810];
 private _status = _display ctrlCreate ["RHD_CTAB_Status", 9811];
 private _close = _display ctrlCreate ["RHD_CTAB_Button", 9812];
+private _campaign = _display ctrlCreate ["RHD_CTAB_Nav", 9814];
 
 // Keep every RHD control in one array so cleanup is reliable.
+// NOTE: content/list/buttons retain their original indexes for compatibility.
 private _ctrls = [
     _bg,_title,_dash,_jobs,_shop,_bank,_svc,_districts,
-    _content,_list,_primary,_secondary,_status,_close
+    _content,_list,_primary,_secondary,_status,_close,_campaign
 ];
 uiNamespace setVariable ["RHD_CTAB_CTRLS", _ctrls];
 
@@ -46,28 +55,13 @@ uiNamespace setVariable ["RHD_CTAB_CTRLS", _ctrls];
 private _theme = profileNamespace getVariable ["RHD_UI_THEME", 0];
 private _palette = switch (_theme) do {
     case 1: {
-        [
-            [0.09,0.09,0.11,0.97],
-            [0.18,0.18,0.22,1],
-            [0.35,0.65,0.95,1],
-            [0.80,0.84,0.90,1]
-        ]
+        [[0.09,0.09,0.11,0.97],[0.18,0.18,0.22,1],[0.35,0.65,0.95,1],[0.80,0.84,0.90,1]]
     };
     case 2: {
-        [
-            [0.02,0.05,0.03,0.96],
-            [0.05,0.16,0.08,1],
-            [0.38,0.85,0.48,1],
-            [0.72,0.95,0.76,1]
-        ]
+        [[0.02,0.05,0.03,0.96],[0.05,0.16,0.08,1],[0.38,0.85,0.48,1],[0.72,0.95,0.76,1]]
     };
     default {
-        [
-            [0,0,0,0.86],
-            [0.10,0.46,0.62,1],
-            [0.18,0.72,0.92,1],
-            [0.93,0.95,0.97,1]
-        ]
+        [[0,0,0,0.86],[0.10,0.46,0.62,1],[0.18,0.72,0.92,1],[0.93,0.95,0.97,1]]
     };
 };
 
@@ -83,7 +77,7 @@ _status ctrlSetTextColor (_palette select 2);
 {
     _x ctrlSetBackgroundColor (_palette select 1);
     _x ctrlSetTextColor (_palette select 3);
-} forEach [_dash,_jobs,_shop,_bank,_svc,_districts,_primary,_secondary,_close];
+} forEach [_dash,_jobs,_shop,_bank,_svc,_districts,_primary,_secondary,_close,_campaign];
 
 // ---------------------------------------------------------------------------
 // LAYOUT
@@ -95,19 +89,29 @@ _title ctrlSetPosition [0.28 * safezoneW + safezoneX, 0.215 * safezoneH + safezo
 _title ctrlSetText "RHD - LIFECORE | COMMAND TABLET";
 _title ctrlCommit 0;
 
-// Six compact pages keep the player experience in one tablet.
+// Seven compact pages keep the player experience in one tablet.
 private _nav = [
-    [0.28,  "STATUS"],
-    [0.352, "JOBS"],
-    [0.424, "SHOP"],
-    [0.496, "BANK"],
-    [0.568, "SERVICES"],
-    [0.640, "DISTRICTS"]
+    [0.280, "STATUS"],
+    [0.341, "JOBS"],
+    [0.402, "SHOP"],
+    [0.463, "BANK"],
+    [0.524, "SERVICES"],
+    [0.585, "DISTRICTS"],
+    [0.652, "CAMPAIGN"]
 ];
 
 {
-    private _c = _ctrls select (2 + _forEachIndex);
-    _c ctrlSetPosition [(_x select 0) * safezoneW + safezoneX, 0.27 * safezoneH + safezoneY, 0.066 * safezoneW, 0.04 * safezoneH];
+    private _c = switch (_forEachIndex) do {
+        case 0: {_dash};
+        case 1: {_jobs};
+        case 2: {_shop};
+        case 3: {_bank};
+        case 4: {_svc};
+        case 5: {_districts};
+        default {_campaign};
+    };
+
+    _c ctrlSetPosition [(_x select 0) * safezoneW + safezoneX, 0.27 * safezoneH + safezoneY, 0.056 * safezoneW, 0.04 * safezoneH];
     _c ctrlSetText (_x select 1);
     _c ctrlCommit 0;
 } forEach _nav;
@@ -141,6 +145,7 @@ _shop ctrlSetEventHandler ["ButtonClick", "[\"SHOP\"] call RHD_fnc_ctabPage"];
 _bank ctrlSetEventHandler ["ButtonClick", "[\"BANK\"] call RHD_fnc_ctabPage"];
 _svc ctrlSetEventHandler ["ButtonClick", "[\"SERVICES\"] call RHD_fnc_ctabPage"];
 _districts ctrlSetEventHandler ["ButtonClick", "[\"DISTRICTS\"] call RHD_fnc_ctabPage"];
+_campaign ctrlSetEventHandler ["ButtonClick", "[\"CAMPAIGN\"] call RHD_fnc_ctabPage"];
 
 // Clean up RHD controls when cTab closes.
 [_display] displayAddEventHandler ["Unload", {[] call RHD_fnc_ctabClear}];
