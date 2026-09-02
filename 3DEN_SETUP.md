@@ -1,198 +1,209 @@
-# RHD - LifeCore — 3DEN Setup
+# RHD - LifeCore | 3DEN Setup
 
-**Author: LT. Toad**
+**Author: LT. Toad | Version 2.1.1**
 
-RHD - LifeCore is assembled in Eden. Antistasi Ultimate supplies the strategic campaign; the RHD Life module supplies the RP systems that sit around it.
+RHD is a mission-side Life RP framework backed by the `@RHD-LifeCore` addon. Keep the two parts separate:
 
-## STEP 1 — Load the RHD addon
+```text
+MOD:     @RHD-LifeCore/addons/*.pbo
+MISSION: description.ext + initServer.sqf + initPlayerLocal.sqf + core/ + assets/ + Eden-generated mission.sqm
+```
 
-Build/install `@RHD-LifeCore` so the `rhd_lifecore.pbo` addon is loaded with:
+## 1. Load the mod
 
-- Arma 3
-- Antistasi Ultimate
-- CBA_A3
-- ACE3
-- cTab+
+Enable these on server and clients:
 
-The RHD addon is a dependency of the mission and provides the custom Eden modules.
+```text
+CBA_A3
+cTab+
+@RHD-LifeCore
+```
 
-## STEP 2 — Place the Antistasi Base module
+Antistasi Ultimate and ACE3 are optional.
 
-In 3DEN:
-
-`Systems -> RHD - LifeCore -> RHD - LifeCore | Antistasi Ultimate Base`
-
-Place exactly one at your desired campaign start / HQ location.
-
-Recommended attributes:
-
-- Start Antistasi Campaign = **ON**
-- Create Safe HQ Anchors = **ON**
-- Generic Terrain Fallback = **ON**
-
-This module starts `A3A_fnc_initServer` after creating the small host-mission anchors required by the A3A campaign. The Antistasi engine then handles campaign saves, strategic zones, faction control, garrisons, patrols, QRFs, attacks, aggression, enemy resources, HQ/Petros, arsenal and campaign background loops.
-
-## STEP 3 — Place the Life RP Systems module
+## 2. Place the required RHD module
 
 In 3DEN:
 
 `Systems -> RHD - LifeCore -> RHD - LifeCore | Life RP Systems`
 
-Place exactly one module anywhere on the map.
+Place exactly one.
 
 Recommended attributes:
 
-- Economy / Shops = **ON**
-- Jobs = **ON**
-- Farming / Mining / Refining = **ON**
-- Police / EMS / RP = **ON**
-- Life RP Persistence = **ON**
-- Ambient Life = **ON**
-- RHD Billboard Branding = **ON**
-- cTab Player Tablet = **ON**
-- Life District Pressure = **ON**
+```text
+Economy / Shops                 ON
+Jobs                            ON
+Farming / Mining / Refining     ON
+Police / EMS / RP               ON
+Life RP Persistence             ON
+Ambient Life                    ON
+RHD Billboard Branding          ON
+cTab Player Tablet              ON
+Life District Pressure          ON
+```
 
-This module is the editor switch for RHD systems that do not belong to Antistasi.
+This module controls all RHD Life RP systems. The mission does not silently start those systems when the module is missing.
 
-## STEP 4 — Place map locations in Eden
+## 3. Optional Antistasi integration
 
-RHD uses markers for locations so the same scripts work across terrains. Use these names:
+Only when Antistasi Ultimate is installed and you want RHD connected to the A3A campaign, place:
 
-### Shops
+`Systems -> RHD - LifeCore -> RHD - LifeCore | Antistasi Ultimate Bridge (Optional)`
+
+Place one bridge at your desired campaign/HQ anchor point.
+
+Recommended attributes:
+
+```text
+Use Antistasi Ultimate when installed   ON
+Create Antistasi HQ Anchors              ON
+Enable Antistasi Terrain Adapter        ON
+```
+
+The bridge is optional. Do not place it in a standalone RHD mission unless you also intend to use A3A.
+
+When the bridge is absent, RHD deliberately starts in `STANDALONE` mode. This prevents an installed-but-unused A3A addon from blocking RHD startup.
+
+## 4. Map locations
+
+Use Eden markers rather than SQF coordinates.
 
 ```text
 rhd_shop_<name>
-```
-
-Example:
-
-```text
-rhd_shop_kavala
-rhd_shop_harbor
-rhd_shop_industrial
-```
-
-### Banks
-
-```text
 rhd_bank_<name>
-```
-
-### Fuel stations
-
-```text
 rhd_fuel_<name>
-```
-
-### Farming
-
-```text
-rhd_farm_apples_<name>
-rhd_farm_cannabis_<name>
-rhd_farm_coca_<name>
-rhd_farm_corn_<name>
-rhd_farm_grapes_<name>
-rhd_farm_peaches_<name>
-```
-
-### Mining
-
-```text
-rhd_mine_iron_<name>
-rhd_mine_copper_<name>
-rhd_mine_gold_<name>
-rhd_mine_diamond_<name>
-rhd_mine_oil_<name>
-```
-
-### Refineries
-
-```text
-rhd_refine_iron_<name>
-rhd_refine_copper_<name>
-rhd_refine_gold_<name>
-rhd_refine_oil_<name>
-```
-
-### Districts
-
-```text
+rhd_farm_<resource>_<name>
+rhd_mine_<resource>_<name>
+rhd_refine_<resource>_<name>
 rhd_zone_<name>
-```
-
-These are RHD civilian pressure areas. A3A still owns strategic campaign control.
-
-### Jail
-
-```text
 rhd_jail_<name>
 ```
 
-## Shops — base game and dependency-mod content
+Examples:
 
-The RHD tablet generates two separate physical-content stores:
-
-- **VEHICLES** — every public land/air/ship vehicle class found in the active Arma 3 config.
-- **EQUIPMENT** — public weapons, magazines, gear, goggles and backpacks in the active Arma 3 config.
-
-Because the catalogue scans the loaded config at runtime, you do not need to edit a class list every time another supported Workshop addon is enabled. The same shop code sees base-game classes, Antistasi classes and public classes from other loaded mods.
-
-Vehicle purchases are validated server-side and spawned through the RHD/A3A safe-spawn bridge.
-
-## Branding / billboards
-
-Place normal `Land_Billboard_F` objects in Eden. When RHD Billboard Branding is enabled, the server automatically applies the supplied RHD - LifeCore artwork.
-
-To intentionally leave one billboard unchanged, put this object variable on that billboard:
-
-```sqf
-rhd_billboard_skip = true
+```text
+rhd_shop_city
+rhd_bank_city
+rhd_fuel_city
+rhd_farm_apples_north
+rhd_farm_cannabis_south
+rhd_farm_coca_hills
+rhd_farm_corn_fields
+rhd_farm_grapes_vineyard
+rhd_farm_peaches_orchard
+rhd_mine_iron_quarry
+rhd_mine_copper_quarry
+rhd_mine_gold_quarry
+rhd_mine_diamond_quarry
+rhd_mine_oil_oilsands
+rhd_refine_iron_factory
+rhd_refine_copper_factory
+rhd_refine_gold_factory
+rhd_refine_oil_refinery
+rhd_zone_city
+rhd_jail_city
 ```
 
-## Terrain support
+The default virtual resources are defined in `core/fn_init.sqf` and can be renamed/extended there.
 
-The preferred source of terrain data is Antistasi Ultimate's own `A3A/mapInfo/<world>` configuration.
+## 5. Shops
 
-When a terrain has no A3A mapInfo entry, the RHD Base module can install a generic adapter before campaign startup. The generic adapter provides broad Arma object detection for common world services and a generic climate entry so the mission has a graceful fallback.
+RHD scans the active Arma configuration at runtime.
 
-This is designed to make the framework terrain-agnostic, but a community terrain can still have unique airports, building layouts, factions or infrastructure that require a proper A3A mapInfo definition. Validate those terrain-specific features in-game.
+**Vehicles:** public `LandVehicle`, `Air` and `Ship` classes.
 
-## What not to edit
+**Equipment:** public weapons, magazines, uniforms/gear, goggles and backpacks.
 
-Do not edit `mission.sqm` by hand.
+The generated catalog can therefore include base Arma content plus content from any loaded public addon. The server revalidates the class, price and player distance before a purchase.
 
-Do not put terrain coordinates into `core/fn_init.sqf`.
+Vehicle spawning works in both modes:
 
-Do not modify the Antistasi source submodule for normal mission setup.
+```text
+ANTISTASI  -> A3A safe vehicle spawning when available
+STANDALONE -> base-game safe-position fallback
+```
 
-Do not copy Antistasi/ACE3/CBA/cTab PBOs into the RHD mission folder.
+## 6. Farming / mining / refining
 
-## Beginner configuration
+Place the corresponding resource markers in Eden. RHD virtual inventory is defined in `core/fn_init.sqf`.
 
-Use `core/fn_init.sqf` for:
+Default refining:
 
-- Admin Steam64 IDs
-- Job salaries
-- RHD virtual market prices
-- Refining recipes
-- Gatherables
-- Dynamic shop price multipliers
-- Exact shop price overrides
-- Antistasi/RHD crime tuning
-- RHD district pressure tuning
+```text
+iron_ore   -> iron    | 2 ore -> 1 iron
+copper_ore -> copper  | 2 ore -> 1 copper
+gold_ore   -> gold    | 3 ore -> 1 gold
+oil_sand   -> oil     | 2 sand -> 1 oil
+```
 
-## Final Eden checklist
+## 7. District pressure
 
-You should have:
+Place `rhd_zone_<name>` markers wherever civilian crime/heat should be simulated.
 
-1. One Antistasi Ultimate Base module.
-2. One RHD Life RP Systems module.
-3. A player start/respawn location suitable for the campaign.
-4. One or more `rhd_shop_*` markers.
-5. Optional `rhd_bank_*`, `rhd_fuel_*`, farm, mine and refinery markers.
-6. One or more `rhd_zone_*` districts.
-7. Optional jail markers.
-8. Optional `Land_Billboard_F` branding objects.
-9. The intended Antistasi world/faction setup required by the selected campaign template.
+RHD settings control radius, heat growth/decay and update rate. Antistasi strategic zones remain A3A-owned when A3A is active.
 
-Save in Eden. The saved mission becomes the mission that runs on the dedicated server.
+## 8. Billboards
+
+Place normal `Land_Billboard_F` objects.
+
+With RHD Billboard Branding enabled, RHD applies:
+
+```text
+assets/branding/RHDLifeCore.jpg
+```
+
+Skip one object with:
+
+```sqf
+this setVariable ["rhd_billboard_skip", true, true];
+```
+
+## 9. Configuration file
+
+Edit only:
+
+```text
+core/fn_init.sqf
+```
+
+Use it for:
+
+```text
+admin Steam64 IDs
+job display names and pay rates
+virtual item values/categories
+gather quantities
+refining recipes
+vehicle/equipment price multipliers
+maximum generated prices
+exact class price overrides
+optional A3A integration tuning
+RHD district pressure tuning
+persistence save interval
+optional bridge startup timing
+```
+
+Do not put map coordinates in this file.
+
+## 10. Eden save workflow
+
+1. Place the RHD Life module.
+2. Optionally place the Antistasi bridge.
+3. Place all RHD markers and billboard objects.
+4. Confirm the marker names exactly match the prefixes above.
+5. Save the mission in Eden.
+6. Eden creates/updates `mission.sqm`.
+7. Package the saved mission as `RHD_LifeCore.<world>.pbo` for the dedicated server.
+
+## 11. Rules
+
+Do not hand-edit `mission.sqm`.
+
+Do not put RHD PBOs into the mission folder.
+
+Do not copy A3A, ACE3, CBA_A3 or cTab+ PBOs into RHD.
+
+Do not hard-code terrain coordinates into RHD SQF.
+
+Use the repository `README.md` for the complete one-page deployment and configuration reference.
