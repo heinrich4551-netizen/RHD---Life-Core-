@@ -1,48 +1,54 @@
 # RHD - LifeCore | 3DEN Module Guide
 
-**Author: LT. Toad**
+**Author: LT. Toad | Version 2.1.1**
 
-RHD is intentionally built so a mission editor can assemble the framework in Eden without editing coordinates into SQF.
+RHD uses Eden modules as the editor-facing switches. Map placement remains in Eden; server-side prices/jobs/items/tuning remain in `core/fn_init.sqf`.
 
-## Module 1: Antistasi Ultimate Base
-
-Place:
-
-`Systems -> RHD - LifeCore -> RHD - LifeCore | Antistasi Ultimate Base`
-
-Place one module at the desired campaign start / HQ area.
-
-Recommended settings:
-
-- **Start Antistasi Campaign:** ON
-- **Create Safe HQ Anchors:** ON
-- **Enable Generic Terrain Fallback:** ON
-
-This module starts the installed Antistasi Ultimate campaign engine and creates the small host-mission anchors required by the A3A server initializer. A3A then owns campaign save/load, strategic control, garrisons, aggression, resources, attacks, HQ/Petros and the rest of the strategic simulation.
-
-## Module 2: RHD Life RP Systems
+## Module 1 — RHD Life RP Systems (required)
 
 Place:
 
 `Systems -> RHD - LifeCore -> RHD - LifeCore | Life RP Systems`
 
-Recommended settings:
+Place exactly one.
 
-- **Economy / Shops:** ON
-- **Jobs:** ON
-- **Farming / Mining / Refining:** ON
-- **Police / EMS / RP:** ON
-- **Life RP Persistence:** ON
-- **Ambient Life:** ON
-- **RHD Billboard Branding:** ON
-- **cTab Player Tablet:** ON
-- **Life District Pressure:** ON
+Attributes:
 
-This is the single editor switch for RHD systems that do not belong to Antistasi.
+```text
+Economy / Shops
+Jobs
+Farming / Mining / Refining
+Police / EMS / RP
+Life RP Persistence
+Ambient Life
+RHD Billboard Branding
+cTab Player Tablet
+Life District Pressure
+```
 
-## Map setup stays in Eden
+All default to ON. This module publishes the final RHD feature switches to the server/clients.
 
-Use the existing RHD marker conventions or your own Eden placement workflow:
+## Module 2 — Antistasi Ultimate Bridge (optional)
+
+Place:
+
+`Systems -> RHD - LifeCore -> RHD - LifeCore | Antistasi Ultimate Bridge (Optional)`
+
+Use this only when Antistasi Ultimate/A3A is installed and you want RHD integrated with that campaign.
+
+Attributes:
+
+```text
+Use Antistasi Ultimate when installed
+Create Antistasi HQ Anchors
+Enable Antistasi Terrain Adapter
+```
+
+The bridge detects A3A at runtime. With no A3A installed it becomes a harmless standalone gate. With A3A installed but the bridge omitted, RHD deliberately remains standalone instead of blocking mission startup.
+
+## Map conventions
+
+Use these marker prefixes:
 
 ```text
 rhd_shop_<name>
@@ -55,31 +61,38 @@ rhd_zone_<name>
 rhd_jail_<name>
 ```
 
-No terrain coordinates are hard-coded into the gameplay configuration.
+Do not put map coordinates into SQF configuration.
 
-## Vehicle and equipment shops
+## Vehicle/equipment shops
 
-The RHD tablet scans the Arma 3 configuration at runtime. Public vehicles and equipment from the active modset are included automatically.
+Dynamic shops read the active Arma configuration. Public vehicles and public equipment classes from loaded addons can be included automatically.
 
-That includes:
+Vehicle purchases have two spawn paths:
 
-- Arma 3 base-game vehicles and equipment.
-- Antistasi Ultimate vehicles/equipment that are loaded and public.
-- ACE3/CBA/cTab-supported public content, where those addons expose usable public classes.
-- The four additional Workshop integration items, once they are actually loaded in the server/client modset.
+```text
+A3A active -> A3A safeVehicleSpawn
+A3A absent -> base-game safe-position fallback
+```
 
-The RHD server recalculates the price before every purchase. Vehicle purchases are spawned through the A3A-safe spawn bridge.
+This keeps vehicle shops functional in both supported RHD modes.
 
-## Terrain compatibility
+## Strategic ownership
 
-Antistasi Ultimate remains the strategic foundation. A3A's own mapInfo data is preferred whenever the terrain provides it. The RHD base module can install a generic fallback for terrains without an A3A mapInfo entry.
+In Antistasi mode:
 
-A generic fallback is not a guarantee that every map-specific Antistasi behavior can be perfect on every community terrain. Terrain-specific A3A content such as unusual airports, custom factions, special building layouts and map-specific markers should still be validated in-game.
+```text
+A3A owns campaign strategic state.
+RHD owns Life RP state.
+```
 
-## Editor rule
+RHD does not replace A3A save/load, garrisons, strategic control or other campaign systems.
+
+## Editor rules
 
 Do not edit `mission.sqm` by hand.
 
-Do not put map coordinates in `core/fn_init.sqf`.
+Do not copy addon PBOs into the mission.
 
-Use Eden for map placement and the RHD configuration file for values such as prices, pay rates, admins and tuning.
+Do not copy third-party PBOs into the repository.
+
+Use `core/fn_init.sqf` for gameplay configuration and Eden for all map placement.
