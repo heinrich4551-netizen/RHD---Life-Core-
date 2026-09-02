@@ -15,6 +15,22 @@ jobs:
       - name: Setup HEMTT
         uses: arma-actions/hemtt@v1
 
+      - name: Validate repository layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f description.ext
+          test -f initServer.sqf
+          test -f initPlayerLocal.sqf
+          test -f core/fn_init.sqf
+          test -f addons/rhd_lifecore/config.cpp
+          test -f addons/rhd_clothing/config.cpp
+
+          grep -Fq 'requiredAddons[] = {"cba_main", "ctab_core"};' addons/rhd_lifecore/config.cpp
+          ! grep -Fq '"ace_main"' addons/rhd_lifecore/config.cpp
+          ! grep -Fq '"A3A_core"' addons/rhd_lifecore/config.cpp
+          grep -Fq 'RHD_A3A_REQUIRED", false' core/fn_init.sqf
+
       - name: Check project
         run: hemtt check
 
@@ -54,32 +70,39 @@ jobs:
           cp -r core/. package/mission-source/core/
           cp -r assets/. package/mission-source/assets/
 
+          test -f package/mission-source/description.ext
+          test -f package/mission-source/initServer.sqf
+          test -f package/mission-source/initPlayerLocal.sqf
+          test -f package/mission-source/core/fn_init.sqf
+
           cat > package/README-INSTALL.txt <<'EOF'
 RHD - LifeCore | Server Package
 ================================
 
-1) MOD INSTALL
-   Copy @RHD-LifeCore/ into the Arma 3 installation.
-   Enable it in the Arma 3 Launcher together with CBA_A3 and cTab+.
+MOD INSTALL
+-----------
+Copy @RHD-LifeCore/ into the Arma 3 installation and enable it in the
+Arma 3 Launcher together with CBA_A3 and cTab+.
 
-2) MISSION INSTALL
-   Create/open the destination mission in Eden on the target terrain.
-   Copy everything inside mission-source/ into that mission folder.
-   In Eden place one RHD Life RP Systems module.
-   Optionally place one RHD Antistasi Ultimate Bridge when A3A is installed.
-   Place your RHD shop/bank/fuel/farm/mine/refinery/zone/jail markers.
-   Save the mission from Eden so Eden creates/updates mission.sqm.
+MISSION INSTALL
+---------------
+1. Create/open the destination mission in Eden on the target terrain.
+2. Copy everything inside mission-source/ into that mission folder.
+3. Place one RHD Life RP Systems module in Eden.
+4. Optionally place one RHD Antistasi Ultimate Bridge when A3A is installed.
+5. Place your RHD shop/bank/fuel/farm/mine/refinery/zone/jail markers.
+6. Edit core/fn_init.sqf for server configuration.
+7. Save the mission from Eden so Eden creates/updates mission.sqm.
 
-3) DEDICATED SERVER
-   Pack the saved Eden mission as RHD_LifeCore.<world>.pbo and place it in MPMissions/.
-   Use the same required external addons on server and clients: CBA_A3 + cTab+.
+DEDICATED SERVER
+----------------
+Pack the saved Eden mission as RHD_LifeCore.<world>.pbo and place it in
+MPMissions/. Use the same required external addons on server and clients:
+CBA_A3 + cTab+.
 
-4) CONFIGURATION
-   Edit mission-source/core/fn_init.sqf before saving the mission for admin IDs,
-   prices, jobs, virtual items, recipes, gathering and RHD tuning.
-
-5) OPTIONAL INTEGRATIONS
-   Antistasi Ultimate and ACE3 remain optional. Do not copy their PBOs into RHD.
+OPTIONAL INTEGRATIONS
+---------------------
+Antistasi Ultimate/A3A and ACE3 are optional. Do not copy their PBOs into RHD.
 EOF
 
           cd package
