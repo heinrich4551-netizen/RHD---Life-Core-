@@ -212,10 +212,10 @@ class CfgRemoteExec
         class RHD_fnc_adminFreeze {allowedTargets = 1;};
         class RHD_fnc_adminSpectate {allowedTargets = 1;};
 
-        // Antistasi bridge calls are server-only.
-        class RHD_fnc_antistasiAddAggression {allowedTargets = 2;};
-        class RHD_fnc_antistasiAddResources {allowedTargets = 2;};
-        class RHD_fnc_antistasiSpawnVehicle {allowedTargets = 2;};
+        // Antistasi bridge wrappers are server-side only.
+        class RHD_fnc_addAggression {allowedTargets = 2;};
+        class RHD_fnc_addResources {allowedTargets = 2;};
+        class RHD_fnc_spawnVehicle {allowedTargets = 2;};
     };
 };
 
