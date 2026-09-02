@@ -1,5 +1,6 @@
 params ["_unit", "_marker"];
 if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
+if (owner _unit != remoteExecutedOwner) exitWith {};
 if !(_marker in allMapMarkers) exitWith {};
 if (_unit distance2D (getMarkerPos _marker) > 15) exitWith {};
 private _m = toLower _marker;
