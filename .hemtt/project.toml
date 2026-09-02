@@ -13,3 +13,9 @@ archive_name = "RHD-LifeCore-{version}"
 
 [properties]
 author = "LT. Toad"
+
+[files]
+exclude = [
+    "addons/*/README.md",
+    "addons/*/version.hpp",
+]
