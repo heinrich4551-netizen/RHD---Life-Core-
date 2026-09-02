@@ -2,7 +2,10 @@
     RHD - LifeCore | SERVER BOOTSTRAP
     Author: LT. Toad
     ---------------------------------------------------------------------------
-    This file starts the server-side RHD systems and persistence routines.
+    BASE
+    ----
+    RHD waits for the Antistasi Ultimate campaign core and then starts the
+    Life RP layer around that world state.
 
     NORMAL SERVER OWNERS:
     You normally do not need to edit this file.
@@ -10,38 +13,48 @@
     USE INSTEAD:
     - core/fn_init.sqf       -> jobs, items, prices, admins and tuning
     - 3DEN_SETUP.md          -> map locations, district markers and billboards
+    - ANTISTASI_BASE.md      -> how the A3A foundation is used
     ---------------------------------------------------------------------------
 */
 
 // ============================================================================
-// RHD BRANDING
+// ANTISTASI ULTIMATE BASE
 // ============================================================================
-// Applies the supplied RHD - LifeCore artwork to Land_Billboard_F objects.
-// To skip a specific billboard, set rhd_billboard_skip = true on that object.
 [] spawn {
-    // Give Eden-created objects time to exist before applying textures.
-    sleep 1;
-    [] call compileFinal preprocessFileLineNumbers "core\\branding\\fn_applyBillboards.sqf";
-};
+    private _baseReady = [] call RHD_fnc_initBase;
 
-// ============================================================================
-// AMBIENT WORLD SYSTEMS
-// ============================================================================
-[] spawn RHD_fnc_director; // Ambient civilians / traffic.
-[] spawn RHD_fnc_events;   // Rare roadside micro-events.
+    if (!_baseReady) exitWith {
+        diag_log "[RHD-LIFECORE] Server startup stopped because the Antistasi Ultimate base was not ready.";
+    };
+
+    // ========================================================================
+    // RHD BRANDING
+    // ========================================================================
+    [] spawn {
+        sleep 1;
+        [] call compileFinal preprocessFileLineNumbers "core\\branding\\fn_applyBillboards.sqf";
+    };
+
+    // ========================================================================
+    // AMBIENT WORLD SYSTEMS
+    // ========================================================================
+    [] spawn RHD_fnc_director; // Ambient civilians / traffic.
+    [] spawn RHD_fnc_events;   // Rare roadside micro-events.
+};
 
 // ============================================================================
 // PLAYER PERSISTENCE
 // ============================================================================
+// Life RP data is kept separate from the Antistasi campaign save so each layer
+// can evolve without corrupting the other. The world/war state remains A3A.
 addMissionEventHandler ["PlayerConnected", {
     params ["_id", "_uid", "_name", "_jip", "_owner"];
 
     if (_uid isEqualTo "") exitWith {};
 
-    // Give the player object a moment to initialize before loading saved data.
     [_uid] spawn {
         params ["_uid"];
-        sleep 2;
+        sleep 5;
         [_uid] call RHD_fnc_loadPlayer;
     };
 }];
@@ -50,12 +63,10 @@ addMissionEventHandler ["PlayerDisconnected", {
     params ["_id", "_uid", "_name", "_jip", "_owner"];
 
     if (_uid isEqualTo "") exitWith {};
-
-    // Save immediately when a player leaves.
     [_uid] call RHD_fnc_savePlayer;
 }];
 
-// Periodic autosave protects player data during long server sessions.
+// Periodic autosave protects Life RP data during long server sessions.
 [] spawn {
     while {isServer} do {
         sleep 180;
