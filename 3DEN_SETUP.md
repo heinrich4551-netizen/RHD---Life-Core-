@@ -2,147 +2,197 @@
 
 **Author: LT. Toad**
 
-This framework is terrain agnostic. Build the actual map layout in Eden and keep the script package unchanged between terrains.
+RHD - LifeCore is assembled in Eden. Antistasi Ultimate supplies the strategic campaign; the RHD Life module supplies the RP systems that sit around it.
 
-## Required
+## STEP 1 — Load the RHD addon
 
-Create a normal multiplayer mission in Eden, then copy the framework files into that mission folder. Save the mission in Eden. Do not hand-edit `mission.sqm` unless you know exactly why you need to.
+Build/install `@RHD-LifeCore` so the `rhd_lifecore.pbo` addon is loaded with:
+
+- Arma 3
+- Antistasi Ultimate
+- CBA_A3
+- ACE3
+- cTab+
+
+The RHD addon is a dependency of the mission and provides the custom Eden modules.
+
+## STEP 2 — Place the Antistasi Base module
+
+In 3DEN:
+
+`Systems -> RHD - LifeCore -> RHD - LifeCore | Antistasi Ultimate Base`
+
+Place exactly one at your desired campaign start / HQ location.
+
+Recommended attributes:
+
+- Start Antistasi Campaign = **ON**
+- Create Safe HQ Anchors = **ON**
+- Generic Terrain Fallback = **ON**
+
+This module starts `A3A_fnc_initServer` after creating the small host-mission anchors required by the A3A campaign. The Antistasi engine then handles campaign saves, strategic zones, faction control, garrisons, patrols, QRFs, attacks, aggression, enemy resources, HQ/Petros, arsenal and campaign background loops.
+
+## STEP 3 — Place the Life RP Systems module
+
+In 3DEN:
+
+`Systems -> RHD - LifeCore -> RHD - LifeCore | Life RP Systems`
+
+Place exactly one module anywhere on the map.
+
+Recommended attributes:
+
+- Economy / Shops = **ON**
+- Jobs = **ON**
+- Farming / Mining / Refining = **ON**
+- Police / EMS / RP = **ON**
+- Life RP Persistence = **ON**
+- Ambient Life = **ON**
+- RHD Billboard Branding = **ON**
+- cTab Player Tablet = **ON**
+- Life District Pressure = **ON**
+
+This module is the editor switch for RHD systems that do not belong to Antistasi.
+
+## STEP 4 — Place map locations in Eden
+
+RHD uses markers for locations so the same scripts work across terrains. Use these names:
+
+### Shops
+
+```text
+rhd_shop_<name>
+```
+
+Example:
+
+```text
+rhd_shop_kavala
+rhd_shop_harbor
+rhd_shop_industrial
+```
+
+### Banks
+
+```text
+rhd_bank_<name>
+```
+
+### Fuel stations
+
+```text
+rhd_fuel_<name>
+```
+
+### Farming
+
+```text
+rhd_farm_apples_<name>
+rhd_farm_cannabis_<name>
+rhd_farm_coca_<name>
+rhd_farm_corn_<name>
+rhd_farm_grapes_<name>
+rhd_farm_peaches_<name>
+```
+
+### Mining
+
+```text
+rhd_mine_iron_<name>
+rhd_mine_copper_<name>
+rhd_mine_gold_<name>
+rhd_mine_diamond_<name>
+rhd_mine_oil_<name>
+```
+
+### Refineries
+
+```text
+rhd_refine_iron_<name>
+rhd_refine_copper_<name>
+rhd_refine_gold_<name>
+rhd_refine_oil_<name>
+```
+
+### Districts
+
+```text
+rhd_zone_<name>
+```
+
+These are RHD civilian pressure areas. A3A still owns strategic campaign control.
+
+### Jail
+
+```text
+rhd_jail_<name>
+```
+
+## Shops — base game and dependency-mod content
+
+The RHD tablet generates two separate physical-content stores:
+
+- **VEHICLES** — every public land/air/ship vehicle class found in the active Arma 3 config.
+- **EQUIPMENT** — public weapons, magazines, gear, goggles and backpacks in the active Arma 3 config.
+
+Because the catalogue scans the loaded config at runtime, you do not need to edit a class list every time another supported Workshop addon is enabled. The same shop code sees base-game classes, Antistasi classes and public classes from other loaded mods.
+
+Vehicle purchases are validated server-side and spawned through the RHD/A3A safe-spawn bridge.
 
 ## Branding / billboards
 
-RHD - LifeCore can automatically brand every `Land_Billboard_F` placed in the mission with the supplied Kavala artwork.
+Place normal `Land_Billboard_F` objects in Eden. When RHD Billboard Branding is enabled, the server automatically applies the supplied RHD - LifeCore artwork.
 
-1. Place `Land_Billboard_F` objects in Eden wherever you want RHD advertising.
-2. Leave the billboard at its normal/default texture.
-3. Start the mission. The server applies the RHD - LifeCore artwork automatically.
-4. To leave one specific billboard unchanged, set its object variable to:
+To intentionally leave one billboard unchanged, put this object variable on that billboard:
 
 ```sqf
 rhd_billboard_skip = true
 ```
 
-The branding source image is stored at `assets/branding/RHDLifeCore.jpg` and the lightweight billboard texture is stored alongside it.
+## Terrain support
 
-## Marker conventions
+The preferred source of terrain data is Antistasi Ultimate's own `A3A/mapInfo/<world>` configuration.
 
-Use any marker shape/size. The scripts use marker position and name only.
+When a terrain has no A3A mapInfo entry, the RHD Base module can install a generic adapter before campaign startup. The generic adapter provides broad Arma object detection for common world services and a generic climate entry so the mission has a graceful fallback.
 
-### Farming
+This is designed to make the framework terrain-agnostic, but a community terrain can still have unique airports, building layouts, factions or infrastructure that require a proper A3A mapInfo definition. Validate those terrain-specific features in-game.
 
-- `rhd_farm_apples`
-- `rhd_farm_cannabis`
-- `rhd_farm_coca`
-- `rhd_farm_corn`
-- `rhd_farm_grapes`
-- `rhd_farm_peaches`
+## What not to edit
 
-Civilian and Farmer jobs can gather at farming markers. Farmer is the intended job for production RP.
+Do not edit `mission.sqm` by hand.
 
-### Mining
+Do not put terrain coordinates into `core/fn_init.sqf`.
 
-- `rhd_mine_iron`
-- `rhd_mine_copper`
-- `rhd_mine_gold`
-- `rhd_mine_diamond`
-- `rhd_mine_oil`
+Do not modify the Antistasi source submodule for normal mission setup.
 
-Only the Miner job can gather at mining markers.
+Do not copy Antistasi/ACE3/CBA/cTab PBOs into the RHD mission folder.
 
-### Refining
+## Beginner configuration
 
-- `rhd_refine_iron` — 2 Iron Ore -> 1 Iron
-- `rhd_refine_copper` — 2 Copper Ore -> 1 Copper
-- `rhd_refine_gold` — 3 Gold Ore -> 1 Gold
-- `rhd_refine_oil` — 2 Oil Sand -> 1 Oil
+Use `core/fn_init.sqf` for:
 
-Only the Refiner job can refine.
+- Admin Steam64 IDs
+- Job salaries
+- RHD virtual market prices
+- Refining recipes
+- Gatherables
+- Dynamic shop price multipliers
+- Exact shop price overrides
+- Antistasi/RHD crime tuning
+- RHD district pressure tuning
 
-### Shops
+## Final Eden checklist
 
-Use `rhd_shop_<name>` markers for your shop locations. The current shop inventory is centralized in `core/fn_init.sqf` and is available from the RHD player tablet.
+You should have:
 
-### Banks
+1. One Antistasi Ultimate Base module.
+2. One RHD Life RP Systems module.
+3. A player start/respawn location suitable for the campaign.
+4. One or more `rhd_shop_*` markers.
+5. Optional `rhd_bank_*`, `rhd_fuel_*`, farm, mine and refinery markers.
+6. One or more `rhd_zone_*` districts.
+7. Optional jail markers.
+8. Optional `Land_Billboard_F` branding objects.
+9. The intended Antistasi world/faction setup required by the selected campaign template.
 
-Use `rhd_bank_<name>` markers for visual/organizational bank locations. The starter bank interaction currently deposits or withdraws $100 per action.
-
-### Fuel stations
-
-Use `rhd_fuel_<name>` markers, for example:
-
-- `rhd_fuel_kavala`
-- `rhd_fuel_industrial`
-- `rhd_fuel_harbor`
-
-A driver at a fuel marker can refuel the current vehicle. The server calculates the price from the fuel missing and validates the distance before charging the player.
-
-### Districts / Conflict layer
-
-Use `rhd_zone_<name>` markers for persistent LifeCore districts.
-
-Examples:
-
-- `rhd_zone_kavala`
-- `rhd_zone_harbor`
-- `rhd_zone_industrial`
-
-Each district tracks local pressure, supply, nearby players and police presence. Criminal pressure can be increased by server-side crime events and reduced by police presence.
-
-### Jail
-
-Use `rhd_jail_<name>` markers for future jail/booking expansion. Keep at least one marker named `rhd_jail_main` if you add jail scripts.
-
-## Ambient world system
-
-No ambient markers are required. The server creates a small amount of civilian life and traffic around active players, then removes it when it is too far away or too old.
-
-Current hard limits are deliberately conservative:
-
-- 10 civilian actors during daylight.
-- 5 civilian actors at night.
-- 4 civilian traffic vehicles during daylight.
-- 2 civilian traffic vehicles at night.
-- 2 short-lived roadside incidents maximum.
-
-The system does not attempt to simulate the whole island. It only simulates the small bubble players can actually experience.
-
-## Eden object variables
-
-You may give NPCs/objects these variable names for future expansion:
-
-- `rhd_shop`
-- `rhd_bank`
-- `rhd_garage`
-- `rhd_farm`
-- `rhd_mine`
-- `rhd_refine`
-- `rhd_fuel`
-
-For billboards, `rhd_billboard_skip = true` prevents RHD branding on that individual object.
-
-## Player controls
-
-The player experience is centered on the cTab tablet. RHD's older F6/F7/F8 shortcuts route into tablet pages rather than opening separate RHD dialog windows.
-
-Contextual medical and vehicle actions are provided through ACE interactions.
-
-Administration is separate: allowlisted administrators use ACE Self Actions -> `RHD Administration`. No admin item and no dedicated admin hotkey are required.
-
-## Recommended Eden layout
-
-For each town, place:
-
-1. Spawn/player start.
-2. RHD shop marker and optional shop NPC.
-3. RHD bank marker and optional ATM/stand object.
-4. Fuel station marker and optional pump objects.
-5. Police station and police spawn.
-6. EMS station and EMS spawn.
-7. Civilian job center.
-8. One or more farms.
-9. One or more mines.
-10. One or more refineries.
-11. One or more `rhd_zone_*` district markers.
-12. Jail/holding location.
-13. Optional `Land_Billboard_F` objects for automatic RHD branding.
-
-The framework never assumes a specific terrain, town name, coordinate, or asset pack.
+Save in Eden. The saved mission becomes the mission that runs on the dedicated server.
