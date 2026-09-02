@@ -12,6 +12,9 @@
 
     Place one module in every mission. The module is global and publishes its
     choices so server and clients use the same configuration.
+
+    Dynamic locations are resolved by RHD after Antistasi Ultimate finishes
+    its world initialization. This removes the need for Altis-only coordinates.
 */
 
 params [
@@ -42,6 +45,16 @@ missionNamespace setVariable ["RHD_LIFE_SETTINGS", _settings, true];
     private _enabled = _x select 1;
     missionNamespace setVariable [format ["RHD_LIFE_ENABLE_%1", toUpper _name], _enabled, true];
 } forEach _settings;
+
+// Dynamic terrain/economy/service location population is server-authoritative.
+// It waits for Antistasi Ultimate (when present), then uses A3A mapInfo,
+// controlsX, real fuel/industrial objects and terrain scoring fallbacks.
+if (isServer && {missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_ENABLE", true]}) then {
+    [] spawn {
+        sleep 1;
+        [] call RHD_fnc_dynamicLocations;
+    };
+};
 
 diag_log format [
     "[RHD-LIFECORE] Life RP 3DEN module initialized. Settings: %1",
