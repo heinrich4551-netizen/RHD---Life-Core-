@@ -3,8 +3,6 @@
     Author: LT. Toad
 
     RHD-only client features are enabled by the 3DEN Life RP Systems module.
-    This keeps player UI, ACE interactions and HUD setup in the editor instead
-    of hidden mission startup code.
 */
 
 waitUntil {
@@ -12,20 +10,15 @@ waitUntil {
     missionNamespace getVariable ["RHD_LIFE_MODULE_READY", false]
 };
 
-// Core player identity / inventory state is part of the RHD Life layer.
+// RHD player identity/inventory only starts when the Life module exists.
 [] call RHD_fnc_initPlayer;
 
 waitUntil {!isNull findDisplay 46};
 (findDisplay 46) displayAddEventHandler ["KeyDown", "_this call RHD_fnc_keyHandler"];
 
-if (missionNamespace getVariable ["RHD_LIFE_ENABLE_TABLET", true]) then {
-    [] call RHD_fnc_aceInit;
-};
-
-if (missionNamespace getVariable ["RHD_LIFE_ENABLE_ECONOMY", true]) then {
-    // The cTab shop catalogue is generated from the active Arma modset on use.
-    true
-};
+// ACE setup is always called so the separate admin surface still works even
+// when the server owner disables the player tablet in 3DEN.
+[] call RHD_fnc_aceInit;
 
 [] spawn {
     waitUntil {!isNull player};
