@@ -1,0 +1,10 @@
+disableSerialization;
+private _display = uiNamespace getVariable ["cTab_Tablet_dlg", displayNull];
+private _ctrls = uiNamespace getVariable ["RHD_CTAB_CTRLS", []];
+if (isNull _display || {count _ctrls < 9}) exitWith {};
+private _lb = _ctrls select 8;
+private _index = lbCurSel _lb;
+if (_index < 0) exitWith {["Select a job first.", "error"] call RHD_fnc_notify};
+private _job = _lb lbData _index;
+[player, _job] remoteExecCall ["RHD_fnc_setJob", 2];
+["STATUS"] call RHD_fnc_ctabPage;

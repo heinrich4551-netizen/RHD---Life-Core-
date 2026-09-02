@@ -1,0 +1,4 @@
+/*
+    RHD UI entry points are now handled by cTab.
+    Contextual interactions remain available through ACE where configured.
+*/

@@ -1,0 +1,11 @@
+params ["_officer", "_target", ["_amount", 250]];
+if (!isServer || {isNull _officer} || {isNull _target} || {!isPlayer _officer} || {!isPlayer _target}) exitWith {};
+if (owner _officer != remoteExecutedOwner) exitWith {};
+if (!alive _target || {_officer distance2D _target > 10}) exitWith {};
+if !(_officer getVariable ["RHD_JOB", "civ"] isEqualTo "police") exitWith {};
+private _cash = _target getVariable ["RHD_CASH", 0];
+private _paid = floor (_cash min _amount);
+_target setVariable ["RHD_CASH", _cash - _paid, true];
+_officer setVariable ["RHD_CASH", (_officer getVariable ["RHD_CASH", 0]) + _paid, true];
+[format ["You were fined $%1.", _paid], "error"] remoteExecCall ["RHD_fnc_notify", owner _target];
+[format ["Ticket issued: $%1.", _paid], "success"] remoteExecCall ["RHD_fnc_notify", owner _officer];
