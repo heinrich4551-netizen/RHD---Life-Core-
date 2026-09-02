@@ -1,5 +1,3 @@
-#include "version.hpp"
-
 class CfgPatches
 {
     class rhd_clothing
@@ -35,10 +33,10 @@ class CfgWeapons
     // ---------------------------------------------------------------------
     // RHD TOPS
     // ---------------------------------------------------------------------
-    // NOTE: Arma 3's vanilla uniform slot is a complete outfit. These first
-    // RHD clothing entries therefore use stock uniform models/textures as
-    // top-style presets. True independently swappable top/bottom garments
-    // require a custom clothing model in a later asset pass.
+    // Arma 3's vanilla uniform slot is a complete outfit. These first RHD
+    // entries therefore act as top-style outfit presets using stock models.
+    // True independently swappable tops and pants require a custom uniform
+    // model with separate upper/lower geometry.
 
     class U_C_Poloshirt_white;
     class U_C_Poloshirt_blue;
@@ -46,8 +44,6 @@ class CfgWeapons
     class U_C_Poloshirt_yellow;
     class U_C_Poloshirt_stripped;
     class U_C_Poloshirt_tricolour;
-    class U_C_Poloshirt_redwhite;
-    class U_C_Poloshirt_salmon;
 
     class RHD_Top_TShirt_Tan: U_C_Poloshirt_white
     {
