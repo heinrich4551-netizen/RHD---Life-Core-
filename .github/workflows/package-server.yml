@@ -1,0 +1,107 @@
+name: Build RHD Server Package
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup HEMTT
+        uses: arma-actions/hemtt@v1
+
+      - name: Check project
+        run: hemtt check
+
+      - name: Build PBOs
+        run: hemtt build
+
+      - name: Validate generated PBOs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .hemttout/build/addons/rhd_rhd_lifecore.pbo
+          test -f .hemttout/build/addons/rhd_rhd_clothing.pbo
+
+          for pbo in .hemttout/build/addons/*.pbo; do
+            echo "Validating $pbo"
+            if strings "$pbo" | grep -E '(^|/)README\\.md$|(^|/)version\\.hpp$'; then
+              echo "ERROR: source-only documentation/header leaked into PBO: $pbo"
+              exit 1
+            fi
+          done
+
+      - name: Assemble separated server package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          rm -rf package
+          mkdir -p package/@RHD-LifeCore/addons
+          mkdir -p package/mission-source/core
+          mkdir -p package/mission-source/assets
+
+          cp .hemttout/build/addons/*.pbo package/@RHD-LifeCore/addons/
+
+          cp description.ext package/mission-source/
+          cp initServer.sqf package/mission-source/
+          cp initPlayerLocal.sqf package/mission-source/
+          cp -r core/. package/mission-source/core/
+          cp -r assets/. package/mission-source/assets/
+
+          cat > package/README-INSTALL.txt <<'EOF'
+RHD - LifeCore | Server Package
+================================
+
+1) MOD INSTALL
+   Copy @RHD-LifeCore/ into the Arma 3 installation.
+   Enable it in the Arma 3 Launcher together with CBA_A3 and cTab+.
+
+2) MISSION INSTALL
+   Create/open the destination mission in Eden on the target terrain.
+   Copy everything inside mission-source/ into that mission folder.
+   In Eden place one RHD Life RP Systems module.
+   Optionally place one RHD Antistasi Ultimate Bridge when A3A is installed.
+   Place your RHD shop/bank/fuel/farm/mine/refinery/zone/jail markers.
+   Save the mission from Eden so Eden creates/updates mission.sqm.
+
+3) DEDICATED SERVER
+   Pack the saved Eden mission as RHD_LifeCore.<world>.pbo and place it in MPMissions/.
+   Use the same required external addons on server and clients: CBA_A3 + cTab+.
+
+4) CONFIGURATION
+   Edit mission-source/core/fn_init.sqf before saving the mission for admin IDs,
+   prices, jobs, virtual items, recipes, gathering and RHD tuning.
+
+5) OPTIONAL INTEGRATIONS
+   Antistasi Ultimate and ACE3 remain optional. Do not copy their PBOs into RHD.
+EOF
+
+          cd package
+          zip -r ../RHD-LifeCore-ServerPackage.zip .
+
+      - name: Upload separated server package
+        uses: actions/upload-artifact@v4
+        with:
+          name: RHD-LifeCore-ServerPackage
+          path: RHD-LifeCore-ServerPackage.zip
+          if-no-files-found: error
+
+      - name: Upload standalone mod package
+        uses: actions/upload-artifact@v4
+        with:
+          name: RHD-LifeCore-Mod
+          path: package/@RHD-LifeCore
+          if-no-files-found: error
+
+      - name: Upload mission source package
+        uses: actions/upload-artifact@v4
+        with:
+          name: RHD-LifeCore-MissionSource
+          path: package/mission-source
+          if-no-files-found: error
