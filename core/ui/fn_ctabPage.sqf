@@ -13,14 +13,16 @@ private _page = param [0, "STATUS"];
 private _display = uiNamespace getVariable ["cTab_Tablet_dlg", displayNull];
 private _ctrls = uiNamespace getVariable ["RHD_CTAB_CTRLS", []];
 
-// Current RHD tablet uses 14 controls: 6 navigation buttons + 8 content/action controls.
+// Current RHD tablet uses 14 controls:
+// 6 navigation buttons + content/list/buttons/status/close controls.
 if (isNull _display || {count _ctrls < 14}) exitWith {false};
 
-private _content = _ctrls select 7;
-private _list = _ctrls select 8;
-private _primary = _ctrls select 9;
-private _secondary = _ctrls select 10;
-private _status = _ctrls select 11;
+// Control order is defined in fn_ctabBuild.sqf.
+private _content = _ctrls select 8;
+private _list = _ctrls select 9;
+private _primary = _ctrls select 10;
+private _secondary = _ctrls select 11;
+private _status = _ctrls select 12;
 
 lbClear _list;
 _primary ctrlShow false;
@@ -163,6 +165,7 @@ switch (_page) do {
         _content ctrlSetStructuredText parseText "<t size='1.15'><b>DISTRICT PRESSURE</b></t><br/>Districts react to local criminal pressure and police presence.<br/>Use rhd_zone_* markers in Eden to define districts.";
 
         private _zones = allMapMarkers select {(_x find "rhd_zone_") isEqualTo 0};
+
         if (_zones isEqualTo []) then {
             private _idx = _list lbAdd "No districts configured (rhd_zone_* markers).";
             _list lbSetColor [_idx, [0.70,0.70,0.70,1]];
