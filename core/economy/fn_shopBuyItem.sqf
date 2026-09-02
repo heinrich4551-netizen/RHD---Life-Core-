@@ -1,6 +1,10 @@
 /*
     RHD - LifeCore | EQUIPMENT SHOP PURCHASE
+    Author: LT. Toad
+
     Server-side validation for base-game and loaded-mod equipment.
+    Purchased content is placed in a server-created ground holder so the
+    transaction does not depend on a client-callable "give item" function.
 */
 
 params [
@@ -33,7 +37,6 @@ if !(isClass _cfg) exitWith {
 if (getNumber (_cfg >> "scope") < 2) exitWith {
     ["That item is not public.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit];
 };
-
 if (_typeUpper isEqualTo "BACKPACK" && {!(_class isKindOf "Bag_Base")}) exitWith {};
 
 private _price = [_class, _typeUpper] call RHD_fnc_getShopPrice;
@@ -44,9 +47,23 @@ if (_cash < _price) exitWith {
     [format ["You need $%1. Your cash is $%2.", _price, _cash], "error"] remoteExecCall ["RHD_fnc_notify", owner _unit];
 };
 
-// Charge only after the class and shop position are fully validated.
+// Prepare the delivery before charging the player.
+private _holderPos = _unit modelToWorld [0, 1.2, 0.1];
+private _holder = createVehicle ["GroundWeaponHolder_Simple", _holderPos, [], 0, "CAN_COLLIDE"];
+if (isNull _holder) exitWith {
+    ["The shop could not prepare the purchase. No money was taken.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit];
+};
+
+switch (_typeUpper) do {
+    case "WEAPON": {_holder addWeaponCargoGlobal [_class, 1];};
+    case "MAGAZINE": {_holder addMagazineCargoGlobal [_class, 1];};
+    case "BACKPACK": {_holder addBackpackCargoGlobal [_class, 1];};
+    default {_holder addItemCargoGlobal [_class, 1];};
+};
+
 _unit setVariable ["RHD_CASH", _cash - _price, true];
+_holder setVariable ["RHD_SHOP_OWNER_UID", getPlayerUID _unit, true];
+_holder setVariable ["RHD_SHOP_PRICE", _price, true];
+_holder setVariable ["RHD_SHOP_PURCHASE", true, true];
 
-[_class, _typeUpper] remoteExecCall ["RHD_fnc_shopDeliverItem", owner _unit];
-
-[format ["Purchased %1 for $%2.", getText (_cfg >> "displayName"), _price], "success"] remoteExecCall ["RHD_fnc_notify", owner _unit];
+[format ["Purchased %1 for $%2. Your purchase is at your feet.", getText (_cfg >> "displayName"), _price], "success"] remoteExecCall ["RHD_fnc_notify", owner _unit];
