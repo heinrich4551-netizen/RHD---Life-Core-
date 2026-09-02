@@ -1,0 +1,16 @@
+RHD - LifeCore | STEAM WORKSHOP PAYLOAD
+
+Upload the contents of the generated @RHD-LifeCore directory.
+
+Hard dependencies:
+CBA_A3 450814997
+cTab+ 2262006564
+Antistasi Ultimate 3020755032
+
+Included mission:
+Missions/RHD_LifeCore.Altis.pbo
+
+Optional:
+ACE3
+
+Do not upload the repository source tree. Publish only the generated Workshop package.
