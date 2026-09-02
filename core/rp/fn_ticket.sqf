@@ -3,7 +3,7 @@ if (!isServer || {isNull _officer} || {isNull _target} || {!isPlayer _officer} |
 if (!alive _target || {_officer distance2D _target > 10}) exitWith {};
 if !(_officer getVariable ["RHD_JOB", "civ"] isEqualTo "police") exitWith {};
 private _cash = _target getVariable ["RHD_CASH", 0];
-private _paid = floor ([_cash, _amount] min _cash);
+private _paid = floor (_cash min _amount);
 _target setVariable ["RHD_CASH", _cash - _paid, true];
 _officer setVariable ["RHD_CASH", (_officer getVariable ["RHD_CASH", 0]) + _paid, true];
 [format ["You were fined $%1.", _paid], "error"] remoteExecCall ["RHD_fnc_notify", owner _target];
