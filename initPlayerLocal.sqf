@@ -7,6 +7,8 @@ player addAction ["Open RHD Player Menu", {[] call RHD_fnc_openMenu}, nil, 1.5, 
 
 [] spawn {
     waitUntil {!isNull player};
-    sleep 2;
+    sleep 1;
+    [] call RHD_fnc_initHud;
+    sleep 1;
     ["Welcome to RHD Life. F6 Player | F7 Jobs | F8 Shop", "info"] call RHD_fnc_notify;
 };
