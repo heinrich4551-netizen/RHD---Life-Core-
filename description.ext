@@ -2,15 +2,18 @@
     RHD - LifeCore | Mission Configuration
     Author: LT. Toad
     ---------------------------------------------------------------------------
-    RHD is a Life RP layer running on the Antistasi Ultimate campaign.
+    Mission source is separate from the RHD addon source:
+      - Mission files: this file, initServer.sqf, initPlayerLocal.sqf, core/, assets/
+      - Mod files: addons/rhd_lifecore/ and addons/rhd_clothing/
 
-    BEGINNER EDITORS
-    -----------------
-    1. Place ONE RHD Antistasi Ultimate Base module in 3DEN.
-    2. Place ONE RHD Life RP Systems module in 3DEN.
-    3. Place shops, banks, farms, mines, refineries, fuel stations, districts,
-       jail and other RHD locations in 3DEN.
-    4. Edit core/fn_init.sqf for prices, jobs, admins and tuning.
+    SETUP
+    -----
+    1. Build/install the @RHD-LifeCore addon.
+    2. Ensure CBA_A3 and cTab+ are loaded.
+    3. In 3DEN place ONE RHD Life RP Systems module.
+    4. Optionally place ONE RHD Antistasi Ultimate Bridge module when A3A is installed.
+    5. Place RHD map locations/markers in Eden.
+    6. Edit core/fn_init.sqf for server configuration.
 
     Do not hand-edit mission.sqm. Eden owns the mission layout.
     ---------------------------------------------------------------------------
@@ -18,8 +21,8 @@
 
 author = "LT. Toad";
 onLoadName = "RHD - LifeCore";
-onLoadMission = "RHD - LifeCore | Kavala Lives Different";
-overviewText = "RHD - LifeCore | Antistasi Ultimate Life RP | People • Jobs • Crime • Opportunity";
+onLoadMission = "RHD - LifeCore | Life RP";
+overviewText = "RHD - LifeCore | Life RP | Jobs • Economy • Crime • Opportunity";
 overviewPicture = "assets\\branding\\RHDLifeCore.jpg";
 loadScreen = "assets\\branding\\RHDLifeCore.jpg";
 
@@ -36,12 +39,12 @@ respawnDelay = 5;
 respawnTemplates[] = {"MenuPosition"};
 joinUnassigned = 1;
 
-// ---------------------------------------------------------------------------
-// ANTISTASI MISSION COMPATIBILITY
-// ---------------------------------------------------------------------------
-// Antistasi Ultimate's pre-JIP check requires a mission-side A3A class.
-// The current A3A branch requires mission version 10.0.0 or newer; this
-// mission advertises the current verified development revision here.
+// ============================================================================
+// OPTIONAL ANTISTASI COMPATIBILITY
+// ============================================================================
+// A3A owns its campaign state when the optional RHD bridge is enabled.
+// Keeping the class here is harmless in standalone missions and preserves
+// compatibility with Antistasi Ultimate's mission-side version/mapInfo checks.
 class A3A
 {
     version[] = {11,9,12};
@@ -277,7 +280,7 @@ class RscTitles
     };
 };
 
-// Separate administrator panel. No item or admin hotkey is required.
+// Separate administrator panel. Access is UID-gated in SQF.
 class RHD_ADMIN
 {
     idd = 8500;
@@ -305,7 +308,7 @@ class RHD_ADMIN
             h = .022 * safezoneH;
             text = "RHD - LIFECORE | ADMIN";
             sizeEx = .020;
-            tooltip = "Compact admin layout adapted from the XEAT_AdminTool interface.";
+            tooltip = "Compact RHD administration panel.";
             colorBackground[] = {.02,.08,.12,.96};
         };
 
