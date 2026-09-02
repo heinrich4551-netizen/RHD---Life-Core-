@@ -1,17 +1,31 @@
+/* RHD - LifeCore | Virtual Market Purchase | Server */
 params ["_unit", "_item", ["_amount", 1]];
+
 if (!isServer || {isNull _unit} || {!isPlayer _unit}) exitWith {};
 if (owner _unit != remoteExecutedOwner) exitWith {};
+if !(missionNamespace getVariable ["RHD_LIFE_ENABLE_ECONOMY", false]) exitWith {};
 if (_amount < 1 || {_amount > 100}) exitWith {};
-private _shopNear = false;
-{if (_unit distance2D (getMarkerPos _x) <= 18) exitWith {_shopNear = true;};} forEach (allMapMarkers select {(_x find "rhd_shop_") isEqualTo 0});
-if (!_shopNear) exitWith {["You are not at an RHD shop.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
+
+private _shopNear = allMapMarkers findIf {
+    (_x find "rhd_shop_") isEqualTo 0 && {_unit distance2D (getMarkerPos _x) <= 18}
+};
+if (_shopNear < 0) exitWith {
+    ["You are not at an RHD shop.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit];
+};
+
 private _items = missionNamespace getVariable ["RHD_ITEMS", createHashMap];
 private _def = _items getOrDefault [_item, []];
 if (_def isEqualTo []) exitWith {};
+
 private _qty = floor _amount;
 private _price = (_def select 1) * _qty;
 private _cash = _unit getVariable ["RHD_CASH", 0];
-if (_cash < _price) exitWith {["Not enough cash.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit]};
+
+if (_cash < _price) exitWith {
+    ["Not enough cash.", "error"] remoteExecCall ["RHD_fnc_notify", owner _unit];
+};
+
 if (!([_unit, _item, _qty] call RHD_fnc_addItem)) exitWith {};
 _unit setVariable ["RHD_CASH", _cash - _price, true];
+
 [format ["Bought %1 x%2 for $%3.", _def select 0, _qty, _price], "success"] remoteExecCall ["RHD_fnc_notify", owner _unit];
