@@ -1,6 +1,19 @@
 if (!hasInterface) exitWith {};
 if !(isClass (configFile >> "CfgPatches" >> "ace_main")) exitWith {};
 
+private _playerTabletAction = [
+    "RHD_PlayerTablet",
+    "RHD Life Tablet",
+    "\a3\ui_f\data\IGUI\Cfg\Actions\showmap_ca.paa",
+    {[] call RHD_fnc_openMenu},
+    {alive _player},
+    {},
+    [],
+    [0,0,0],
+    2
+] call ace_interact_menu_fnc_createAction;
+[player, 1, ["ACE_SelfActions"], _playerTabletAction] call ace_interact_menu_fnc_addActionToObject;
+
 private _adminAction = [
     "RHD_Admin",
     "RHD Administration",
@@ -26,19 +39,6 @@ private _emsAction = [
     3
 ] call ace_interact_menu_fnc_createAction;
 ["CAManBase", 0, ["ACE_TapShoulderRight"], _emsAction, true] call ace_interact_menu_fnc_addActionToClass;
-
-private _adminVehicleAction = [
-    "RHD_AdminVehicle",
-    "RHD Vehicle Controls",
-    "\a3\ui_f\data\IGUI\Cfg\Actions\repair_ca.paa",
-    {[] call RHD_fnc_adminOpenMenu},
-    {[_player] call RHD_fnc_isAdmin && {vehicle _player != _player}},
-    {},
-    [],
-    [0,0,0],
-    2
-] call ace_interact_menu_fnc_createAction;
-[player, 1, ["ACE_SelfActions"], _adminVehicleAction] call ace_interact_menu_fnc_addActionToObject;
 
 missionNamespace setVariable ["RHD_ACE_READY", true, false];
 true
