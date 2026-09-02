@@ -20,7 +20,7 @@ class CfgFunctions
         class Services { file="core\\services"; class requestRefuel {}; class refuel {server=1;}; };
         class UI { file="core\\ui"; class openMenu {}; class keyHandler {}; class refresh {}; class requestBuy {}; class requestSell {}; class setTheme {}; class initHud {}; };
         class Admin { file="core\\admin"; class isAdmin {}; class adminOpenMenu {}; class adminExecuteFromMenu {}; class execute {server=1;}; class adminFreeze {}; class adminSpectate {}; };
-        class ACE { file="core\\ace"; class init {}; };
+        class ACE { file="core\\ace"; class aceInit {}; };
         class Ambient { file="core\\ambient"; class director {server=1;}; class events {server=1;}; };
     };
 };
