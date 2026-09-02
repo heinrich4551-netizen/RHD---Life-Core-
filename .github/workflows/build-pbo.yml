@@ -1,0 +1,32 @@
+name: Build RHD PBOs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup HEMTT
+        uses: arma-actions/hemtt@v1
+
+      - name: Check project
+        run: hemtt check
+
+      - name: Build PBOs
+        run: hemtt build
+
+      - name: List generated PBOs
+        run: find .hemttout/build -type f -name '*.pbo' -print
+
+      - name: Upload PBO build
+        uses: actions/upload-artifact@v4
+        with:
+          name: RHD-LifeCore-PBOs
+          path: .hemttout/build/**/*.pbo
+          if-no-files-found: error
