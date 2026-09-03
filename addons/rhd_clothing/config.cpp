@@ -31,7 +31,25 @@ class CfgPatches
             "RHD_Outfit_Tactical_Patrol",
             "RHD_Outfit_Tactical_Contractor",
             "RHD_Outfit_Tactical_Field",
-            "RHD_Outfit_Tactical_Worker"
+            "RHD_Outfit_Tactical_Worker",
+
+            // RHD tactical vests — 250-load utility line
+            "RHD_Vest_Plate_Ranger",
+            "RHD_Vest_Plate_Multicam",
+            "RHD_Vest_Plate_Black",
+            "RHD_Vest_Plate_Tan",
+            "RHD_Vest_Plate_Grey",
+            "RHD_Vest_Plate_Woodland",
+            "RHD_Vest_Medic",
+            "RHD_Vest_Police",
+            "RHD_Vest_Security",
+            "RHD_Vest_SOF",
+            "RHD_Vest_Utility",
+            "RHD_Vest_Comms",
+            "RHD_Vest_LMG",
+            "RHD_Vest_Marksman",
+            "RHD_Vest_Contractor",
+            "RHD_Vest_Executive"
         };
         units[] = {};
     };
@@ -240,5 +258,222 @@ class CfgWeapons
         scopeArsenal = 2;
         displayName = "RHD Tactical | Utility Worker";
         descriptionShort = "Rugged utility outfit for industrial, mining and maintenance roles.";
+    };
+
+    // =====================================================================
+    // RHD 16-VEST LINE
+    // Inspired by the supplied modular plate-carrier / chest-rig reference.
+    // Each vest exposes 250 cargo-load units. RHD_PouchSlots is metadata for
+    // the RHD virtual-pouch system: each pouch is one-item, zero-extra-weight.
+    // Vanilla Arma still applies item mass when items are physically placed in
+    // the carrier; the RHD pouch metadata is intentionally separate from that.
+    // =====================================================================
+    class V_PlateCarrier1_rgr;
+    class V_PlateCarrier2_rgr;
+    class V_PlateCarrierSpec_rgr;
+    class V_PlateCarrierGL_rgr;
+    class V_PlateCarrierIA1_dgtl;
+    class V_PlateCarrierIA2_dgtl;
+    class V_TacVest_oli;
+    class V_TacVest_khk;
+    class V_TacVest_blk;
+    class V_TacVest_camo;
+    class V_HarnessO_brn;
+    class V_HarnessOGL_brn;
+    class V_HarnessO_gry;
+    class V_HarnessOGL_gry;
+    class V_PlateCarrier3_rgr;
+    class V_PlateCarrierL_CTRG;
+
+    class RHD_Vest_Plate_Ranger: V_PlateCarrier1_rgr
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Plate Carrier Ranger";
+        descriptionShort = "RHD modular ranger plate carrier with front rifle pouches, side sustainment pouches and admin pouch.";
+        maximumLoad = 250;
+        mass = 40;
+        RHD_PouchSlots[] = {"magazine","magazine","magazine","radio","utility","medical","grenade","tool"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Plate_Multicam: V_PlateCarrier2_rgr
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Plate Carrier Multi-Terrain";
+        descriptionShort = "Full-coverage multi-terrain carrier with extended side pouches and front admin pack.";
+        maximumLoad = 250;
+        mass = 42;
+        RHD_PouchSlots[] = {"magazine","magazine","magazine","magazine","radio","medical","utility","grenade","tool"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Plate_Black: V_PlateCarrierSpec_rgr
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Plate Carrier Black";
+        descriptionShort = "Low-visibility heavy carrier for security, tactical response and urban operations.";
+        maximumLoad = 250;
+        mass = 44;
+        RHD_PouchSlots[] = {"magazine","magazine","magazine","radio","radio","medical","utility","tool"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Plate_Tan: V_PlateCarrier2_rgr
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Plate Carrier Tan";
+        descriptionShort = "Tan plate carrier tuned for contractors and arid-zone operations.";
+        maximumLoad = 250;
+        mass = 42;
+        RHD_PouchSlots[] = {"magazine","magazine","magazine","radio","utility","medical","grenade","tool"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Plate_Grey: V_TacVest_blk
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Plate Carrier Grey";
+        descriptionShort = "Compact urban carrier with modular front chest rig and side pouches.";
+        maximumLoad = 250;
+        mass = 38;
+        RHD_PouchSlots[] = {"magazine","magazine","radio","radio","medical","utility","tool"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Plate_Woodland: V_PlateCarrierIA1_dgtl
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Plate Carrier Woodland";
+        descriptionShort = "Woodland-pattern carrier with broad MOLLE-compatible utility coverage.";
+        maximumLoad = 250;
+        mass = 42;
+        RHD_PouchSlots[] = {"magazine","magazine","magazine","radio","medical","utility","grenade","tool"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Medic: V_PlateCarrierGL_rgr
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Combat Medic";
+        descriptionShort = "Medical carrier emphasizing dedicated aid and utility pouches.";
+        maximumLoad = 250;
+        mass = 40;
+        RHD_PouchSlots[] = {"medical","medical","medical","radio","magazine","utility","tool","utility"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Police: V_TacVest_oli
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Police Patrol";
+        descriptionShort = "Law-enforcement patrol vest with radio, magazine, restraint and utility pouch layout.";
+        maximumLoad = 250;
+        mass = 36;
+        RHD_PouchSlots[] = {"magazine","magazine","radio","restraint","medical","utility","tool","utility"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Security: V_TacVest_khk
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Security";
+        descriptionShort = "Private security carrier with discreet radio and utility pouches.";
+        maximumLoad = 250;
+        mass = 34;
+        RHD_PouchSlots[] = {"magazine","magazine","radio","radio","medical","utility","tool"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_SOF: V_PlateCarrier3_rgr
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Special Operations";
+        descriptionShort = "Dense modular plate carrier for high-tempo tactical loadouts.";
+        maximumLoad = 250;
+        mass = 45;
+        RHD_PouchSlots[] = {"magazine","magazine","magazine","magazine","radio","medical","grenade","utility","tool"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Utility: V_HarnessO_brn
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Utility";
+        descriptionShort = "Work-ready harness with large general-purpose pouches for civilian and industrial roles.";
+        maximumLoad = 250;
+        mass = 30;
+        RHD_PouchSlots[] = {"utility","utility","tool","radio","medical","magazine","magazine"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Comms: V_PlateCarrierIA2_dgtl
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Communications";
+        descriptionShort = "Communications-focused carrier with dual radio and cable-management pouches.";
+        maximumLoad = 250;
+        mass = 39;
+        RHD_PouchSlots[] = {"radio","radio","radio","magazine","medical","utility","tool","utility"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_LMG: V_HarnessOGL_brn
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Support Gunner";
+        descriptionShort = "Support-gunner rig with expanded ammunition and sustainment pouch coverage.";
+        maximumLoad = 250;
+        mass = 40;
+        RHD_PouchSlots[] = {"magazine","magazine","magazine","magazine","magazine","radio","utility","medical"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Marksman: V_HarnessO_gry
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Marksman";
+        descriptionShort = "Lean reconnaissance carrier with balanced ammunition, radio and sustainment storage.";
+        maximumLoad = 250;
+        mass = 33;
+        RHD_PouchSlots[] = {"magazine","magazine","radio","medical","utility","tool","grenade"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Contractor: V_PlateCarrierL_CTRG
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Contractor";
+        descriptionShort = "Private contractor carrier combining rifle, communications and utility pouches.";
+        maximumLoad = 250;
+        mass = 37;
+        RHD_PouchSlots[] = {"magazine","magazine","magazine","radio","medical","utility","tool","grenade"};
+        RHD_PouchCapacity = 1;
+    };
+
+    class RHD_Vest_Executive: V_TacVest_camo
+    {
+        scope = 2;
+        scopeArsenal = 2;
+        displayName = "RHD Vest | Executive Protection";
+        descriptionShort = "Low-profile protective vest for VIP and executive-security roles.";
+        maximumLoad = 250;
+        mass = 32;
+        RHD_PouchSlots[] = {"magazine","radio","radio","medical","restraint","utility","tool"};
+        RHD_PouchCapacity = 1;
     };
 };
