@@ -1,0 +1,10 @@
+player setVariable ["RHD_UID", getPlayerUID player, false];
+player setVariable ["RHD_CASH", 500, false];
+player setVariable ["RHD_BANK", 2500, false];
+player setVariable ["RHD_JOB", "civ", false];
+player setVariable ["RHD_INV", createHashMap, false];
+player setVariable ["RHD_LICENSES", ["driver"], false];
+player setVariable ["RHD_JAILED", false, false];
+player setVariable ["RHD_WORKING", false, false];
+player addEventHandler ["Killed", {player setVariable ["RHD_WORKING", false, false];}];
+[] call RHD_fnc_initActions;
