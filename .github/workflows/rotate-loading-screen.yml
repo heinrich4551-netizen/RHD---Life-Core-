@@ -1,0 +1,68 @@
+name: RHD LifeCore Loading Screen Rotation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rotate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select RHD loading screen
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f mission-template/RHD_LifeCore.TEMPLATE/description.ext
+          test -f assets/branding/loading_screen_01.jpg
+          test -f assets/branding/loading_screen_02.jpg
+          test -f assets/branding/loading_screen_03.jpg
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import datetime
+          import re
+
+          path = Path('mission-template/RHD_LifeCore.TEMPLATE/description.ext')
+          text = path.read_text(encoding='utf-8')
+          index = datetime.date.today().toordinal() % 3 + 1
+          selected = f'assets\\\\branding\\\\loading_screen_{index:02d}.jpg'
+          text, count = re.subn(
+              r'(?m)^loadScreen\s*=\s*"[^"]*"\s*;',
+              f'loadScreen = "{selected}";',
+              text,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit('Expected exactly one loadScreen assignment in description.ext')
+          path.write_text(text, encoding='utf-8')
+          Path('assets/branding/ACTIVE_LOADING_SCREEN.txt').write_text(
+              f'RHD LifeCore loading screen selected by daily round-robin: {index:02d}\n{selected}\n',
+              encoding='utf-8',
+          )
+          print(f'Selected loading screen {index:02d}: {selected}')
+          PY
+
+      - name: Commit selected loading screen
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add mission-template/RHD_LifeCore.TEMPLATE/description.ext assets/branding/ACTIVE_LOADING_SCREEN.txt
+          if git diff --cached --quiet; then
+            echo 'Loading screen already selected; nothing to commit.'
+            exit 0
+          fi
+          git commit -m 'Rotate RHD LifeCore loading screen'
+          git push
