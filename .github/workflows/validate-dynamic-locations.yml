@@ -1,0 +1,35 @@
+name: Validate RHD Dynamic Locations
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate dynamic location implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f addons/rhd_lifecore/functions/modules/fn_dynamicLocations.sqf
+          test -f addons/rhd_lifecore/functions/modules/fn_dynamicLocationSync.sqf
+          grep -Fq 'class dynamicLocations {server = 1;};' addons/rhd_lifecore/config.cpp
+          grep -Fq 'class dynamicLocationSync {server = 1;};' addons/rhd_lifecore/config.cpp
+          grep -Fq 'RHD_DYNAMIC_LOCATIONS_WAIT_FOR_A3A' core/fn_init.sqf
+          grep -Fq 'RHD_DYNAMIC_LOCATION_REFRESH_SECONDS' core/fn_init.sqf
+          grep -Fq 'RHD_LOCATION_REGISTRY' core/fn_init.sqf
+          grep -Fq 'RHD_fnc_dynamicLocationSync' addons/rhd_lifecore/functions/modules/fn_moduleLifeCore.sqf
+          grep -Fq 'serverInitDone' addons/rhd_lifecore/functions/modules/fn_dynamicLocations.sqf
+          grep -Fq 'controlsX' addons/rhd_lifecore/functions/modules/fn_dynamicLocations.sqf
+
+      - name: Static scan for RHD hard-coded location coordinates
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RInE 'rhd_(shop|bank|fuel|farm|mine|refine|police|ems|jail|zone)_.*(3[0-9]{3}|[0-9]{4,5}),.*[0-9]{4,5}' --include='*.sqf' --include='*.ext' addons core mission-template || true
+          echo 'Dynamic location validation completed.'
