@@ -7,6 +7,47 @@ import struct
 from pathlib import Path
 
 
+def validate_source(source: Path) -> None:
+    """Reject known-bad RHD LifeCore UI inheritance before a PBO is built."""
+    if source.name != "rhd_lifecore":
+        return
+
+    config = source / "config.cpp"
+    if not config.is_file():
+        raise SystemExit(f"RHD LifeCore source is missing {config}")
+
+    text = config.read_text(encoding="utf-8")
+    required = [
+        "class RHD_RscText",
+        "class RHD_RscStructuredText",
+        "class RHD_RscListbox",
+        "class RHD_RscButton",
+        "class RHD_RscEdit",
+        "class RHD_RscCombo",
+    ]
+    missing = [token for token in required if token not in text]
+    if missing:
+        raise SystemExit(
+            "RHD LifeCore config is missing self-contained UI base classes: "
+            + ", ".join(missing)
+        )
+
+    forbidden = [
+        ": RscStructuredText",
+        ": RscText",
+        ": RscListbox",
+        ": RscButton",
+        ": RscEdit",
+        ": RscCombo",
+    ]
+    found = [token for token in forbidden if token in text]
+    if found:
+        raise SystemExit(
+            "RHD LifeCore config contains global Rsc* inheritance and would "
+            "produce an undefined-base-class error: " + ", ".join(found)
+        )
+
+
 def write_entry(handle, name: str, size: int) -> None:
     """Write a standard uncompressed PBO directory entry."""
     handle.write(name.replace(os.sep, "/").encode("utf-8") + b"\x00")
@@ -18,6 +59,7 @@ def pack_directory(source: Path, output: Path) -> None:
     if not source.is_dir():
         raise SystemExit(f"Source directory does not exist: {source}")
 
+    validate_source(source)
     files = sorted(p for p in source.rglob("*") if p.is_file())
     output.parent.mkdir(parents=True, exist_ok=True)
 
