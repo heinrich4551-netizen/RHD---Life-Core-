@@ -17,7 +17,7 @@ if (!isServer) exitWith {};
 
 private _deadline = diag_tickTime + 60;
 waitUntil {
-    uiSleep 0.1;
+    sleep 0.1;
     diag_tickTime >= _deadline || {!isNil "RCIV_enabled"}
 };
 
