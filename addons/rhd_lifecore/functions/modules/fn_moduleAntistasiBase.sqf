@@ -4,6 +4,10 @@
 
     This module is used by the bundled Altis mission and custom 3DEN missions.
     Antistasi Ultimate is required by the published RHD profile.
+
+    The bridge owns the Antistasi startup hand-off. RHD's dynamic location
+    resolver is started after A3A has had a chance to finish world setup, with
+    a once-only guard shared with the Life RP Systems module.
 */
 
 params [
@@ -86,7 +90,24 @@ if (_terrainFallback) then {
     ["GENERIC"] call RHD_fnc_terrainFallback;
 };
 
+// Start Antistasi Ultimate and then let the shared RHD resolver populate
+// services, economy and industry from the active terrain/A3A state.
 [] spawn A3A_fnc_initServer;
+[] spawn {
+    private _deadline = time + (missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_WAIT_SECONDS", 180]);
+    waitUntil {
+        sleep 0.5;
+        (!isNil "serverInitDone" && {serverInitDone}) || {time >= _deadline}
+    };
+
+    if (!missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_STARTED", false]) then {
+        missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_STARTED", true, true];
+        private _ok = [] call RHD_fnc_dynamicLocations;
+        if (!_ok) then {
+            missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_STARTED", false, true];
+        };
+    };
+};
 
 diag_log format [
     "[RHD-LIFECORE] Antistasi Ultimate startup requested from 3DEN bridge at %1.",
