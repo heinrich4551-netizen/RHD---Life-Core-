@@ -34,6 +34,7 @@ class CfgFunctions
             class moduleAntistasiBase {};
             class moduleLifeCore {};
             class dynamicLocations {server = 1;};
+            class dynamicLocationSync {server = 1;};
             class terrainAudit {server = 1;};
             class terrainFallback {};
         };
@@ -152,7 +153,7 @@ class CfgVehicles
                 displayName = "Enable Ambient Life";
                 tooltip = "Enables RHD civilian traffic and roadside incident behavior.";
                 property = "RHD_EnableAmbient"; control = "Checkbox";
-                expression = "_this setVariable ['RHD_EnableAmbient', _value, true]";
+                expression = "_this setVariable ['RHD_EnableAmbient', _value, true];";
                 defaultValue = "true"; typeName = "BOOL";
             };
             class RHD_EnableBranding
@@ -160,7 +161,7 @@ class CfgVehicles
                 displayName = "Enable RHD Billboard Branding";
                 tooltip = "Applies the supplied RHD artwork to supported Land_Billboard_F objects.";
                 property = "RHD_EnableBranding"; control = "Checkbox";
-                expression = "_this setVariable ['RHD_EnableBranding', _value, true]";
+                expression = "_this setVariable ['RHD_EnableBranding', _value, true];";
                 defaultValue = "true"; typeName = "BOOL";
             };
             class RHD_EnableTablet
@@ -168,7 +169,7 @@ class CfgVehicles
                 displayName = "Enable cTab Player Tablet";
                 tooltip = "Uses the required cTab+ tablet surface for the RHD player interface.";
                 property = "RHD_EnableTablet"; control = "Checkbox";
-                expression = "_this setVariable ['RHD_EnableTablet', _value, true]";
+                expression = "_this setVariable ['RHD_EnableTablet', _value, true];";
                 defaultValue = "true"; typeName = "BOOL";
             };
             class RHD_EnableConflict
@@ -176,7 +177,7 @@ class CfgVehicles
                 displayName = "Enable Life District Pressure";
                 tooltip = "Enables civilian crime/heat pressure around rhd_zone_* markers.";
                 property = "RHD_EnableConflict"; control = "Checkbox";
-                expression = "_this setVariable ['RHD_EnableConflict', _value, true]";
+                expression = "_this setVariable ['RHD_EnableConflict', _value, true];";
                 defaultValue = "true"; typeName = "BOOL";
             };
         };
