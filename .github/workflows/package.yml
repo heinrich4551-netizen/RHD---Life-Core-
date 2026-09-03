@@ -44,6 +44,11 @@ jobs:
           grep -Fq '2262006564' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
           grep -Fq '3020755032' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
 
+          # Never allow the LifeCore addon config to inherit from global Rsc*
+          # controls. These were the source of the undefined-base-class crash.
+          ! grep -Eq ':[[:space:]]*Rsc(StructuredText|Text|Listbox|Button|Edit|Combo)[[:space:]]*[{]' addons/rhd_lifecore/config.cpp
+          ! grep -Eq ':[[:space:]]*Rsc(StructuredText|Text|Listbox|Button|Edit|Combo)[[:space:]]*[{]' core/ui/ctab.hpp
+
       - name: Build addon PBOs with repository packer
         shell: bash
         run: |
@@ -101,6 +106,7 @@ jobs:
                   b'functions/modules/fn_terrainAudit.sqf',
                   b'functions/modules/fn_terrainFallback.sqf',
                   b'file = "functions/modules"',
+                  b'class RHD_RscStructuredText',
               ],
               'build-addon/rhd_rhd_clothing.pbo': [
                   b'config.cpp', b'$PBOPREFIX$', b'RHD_Outfit_Tactical_Black',
