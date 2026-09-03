@@ -27,6 +27,9 @@ jobs:
           test -f addons/rhd_clothing/\$PBOPREFIX\$
           test -f addons/rhd_backpacks/config.cpp
           test -f addons/rhd_backpacks/\$PBOPREFIX\$
+          test -f addons/rhd_gsri_compat/config.cpp
+          test -f addons/rhd_gsri_compat/\$PBOPREFIX\$
+          test -f addons/rhd_gsri_compat/README.md
           test -f addons/rhd_lifecore/functions/modules/fn_moduleAntistasiBase.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_moduleLifeCore.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_dynamicLocations.sqf
@@ -38,6 +41,11 @@ jobs:
           test -f meta.cpp
           test -f assets/branding/RHDLifeCore.jpg
           grep -Fq 'requiredAddons[] = {"cba_main", "ctab_core", "A3A_core"};' addons/rhd_lifecore/config.cpp
+          grep -Fq 'requiredAddons[] = {"gsri_equipment"};' addons/rhd_gsri_compat/config.cpp
+          grep -Fq 'class GSRI_AssaultPack' addons/rhd_gsri_compat/config.cpp
+          grep -Fq 'class GSRI_vest_modular' addons/rhd_gsri_compat/config.cpp
+          grep -Fq 'class GSRI_helmet_modular' addons/rhd_gsri_compat/config.cpp
+          grep -Fq 'class GSRI_uniform' addons/rhd_gsri_compat/config.cpp
           grep -Fq 'maximumLoad = 150;' addons/rhd_backpacks/config.cpp
           test "$(grep -c 'class RHD_Bag_' addons/rhd_backpacks/config.cpp)" -eq 16
 
@@ -46,10 +54,11 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf build package dist
-          mkdir -p build
+          mkdir -p build build/optional
           python3 tools/pbo_pack.py addons/rhd_lifecore build/rhd_rhd_lifecore.pbo
           python3 tools/pbo_pack.py addons/rhd_clothing build/rhd_rhd_clothing.pbo
           python3 tools/pbo_pack.py addons/rhd_backpacks build/rhd_rhd_backpacks.pbo
+          python3 tools/pbo_pack.py addons/rhd_gsri_compat build/optional/rhd_rhd_gsri_compat.pbo
 
       - name: Build Altis mission PBO
         shell: bash
@@ -70,6 +79,7 @@ jobs:
               Path('build/rhd_rhd_lifecore.pbo'),
               Path('build/rhd_rhd_clothing.pbo'),
               Path('build/rhd_rhd_backpacks.pbo'),
+              Path('build/optional/rhd_rhd_gsri_compat.pbo'),
               Path('build/RHD_LifeCore.Altis.pbo'),
           ]
           for path in files:
@@ -113,6 +123,14 @@ jobs:
                   b'RHD_Bag_Executive',
                   b'maximumLoad = 150;',
               ],
+              'build/optional/rhd_rhd_gsri_compat.pbo': [
+                  b'config.cpp',
+                  b'gsri_equipment',
+                  b'GSRI_uniform',
+                  b'GSRI_helmet_modular',
+                  b'GSRI_vest_modular',
+                  b'GSRI_AssaultPack',
+              ],
               'build/RHD_LifeCore.Altis.pbo': [
                   b'description.ext',
                   b'mission.sqm',
@@ -137,15 +155,18 @@ jobs:
           mkdir -p package/@RHD-Life-Core/mpmissions
           mkdir -p package/@RHD-Life-Core/assets/branding
           mkdir -p package/@RHD-Life-Core/docs
+          mkdir -p package/@RHD-Life-Core/optional/RHD-GSRI-Compat/addons
           cp build/rhd_rhd_lifecore.pbo package/@RHD-Life-Core/addons/
           cp build/rhd_rhd_clothing.pbo package/@RHD-Life-Core/addons/
           cp build/rhd_rhd_backpacks.pbo package/@RHD-Life-Core/addons/
+          cp build/optional/rhd_rhd_gsri_compat.pbo package/@RHD-Life-Core/optional/RHD-GSRI-Compat/addons/
           cp build/RHD_LifeCore.Altis.pbo package/@RHD-Life-Core/Missions/
           cp -r mission-template/RHD_LifeCore.TEMPLATE package/@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis
           cp mod.cpp package/@RHD-Life-Core/
           cp meta.cpp package/@RHD-Life-Core/
           cp assets/branding/RHDLifeCore.jpg package/@RHD-Life-Core/assets/branding/
           cp addons/rhd_backpacks/RHD_BACKPACKS.md package/@RHD-Life-Core/docs/
+          cp addons/rhd_gsri_compat/README.md package/@RHD-Life-Core/docs/RHD_GSRI_COMPAT.md
           for f in README.md 3DEN_SETUP.md 3DEN_MODULES.md EDITOR_QUICKSTART.md ADDON_BUILD.md ADMIN_AND_ACE_SETUP.md CTAB_INTEGRATION.md ANTISTASI_BASE.md STEAM_WORKSHOP_DEPENDENCIES.md STEAM_WORKSHOP_REQUIRED_ITEMS.txt THIRD_PARTY_NOTICES.md PERFORMANCE.md UI_REFERENCES.md; do
             test -f "$f"
             cp "$f" package/@RHD-Life-Core/docs/
@@ -160,11 +181,18 @@ jobs:
             '' \
             'Optional: ACE3' \
             '' \
+            'Optional modern gear bridge:' \
+            'GSRI-Gear (Thibugs/GSRI-Gear or team-gsri/mods-gear)' \
+            'ACE Arsenal Extended (jetelain/AceArsenalExtended)' \
+            '' \
+            'The RHD GSRI compatibility PBO is shipped under optional/RHD-GSRI-Compat and requires gsri_equipment.' \
+            '' \
             'Install:' \
             '1. Extract @RHD-Life-Core intact.' \
             '2. Add @RHD-Life-Core to Arma 3 Launcher as a Local Mod.' \
             '3. Enable CBA_A3, cTab+, Antistasi Ultimate and RHD - LifeCore.' \
-            '4. Host RHD_LifeCore.Altis from Multiplayer.' \
+            '4. For GSRI gear, install GSRI-Gear and load the optional RHD-GSRI-Compat addon alongside RHD.' \
+            '5. Host RHD_LifeCore.Altis from Multiplayer.' \
             '' \
             'This package contains 16 RHD tactical backpacks, each with 150 maximum load.' \
             > package/@RHD-Life-Core/INSTALL.txt
@@ -182,9 +210,10 @@ jobs:
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_lifecore.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_clothing.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_backpacks.pbo'
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/optional/RHD-GSRI-Compat/addons/rhd_rhd_gsri_compat.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/Missions/RHD_LifeCore.Altis.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis/core/ui/ctab.hpp'
-          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/docs/RHD_BACKPACKS.md'
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/docs/RHD_GSRI_COMPAT.md'
 
       - name: Upload Actions artifact
         uses: actions/upload-artifact@v4
@@ -200,4 +229,4 @@ jobs:
         run: |
           set -euo pipefail
           gh release delete latest --yes --cleanup-tag || true
-          gh release create latest dist/RHD-Life-Core-Launcher-Package.zip --title 'RHD - LifeCore | Latest' --notes $'Latest verified @RHD-Life-Core package with 16 RHD tactical backpacks at 150 maximum load each.\n\nRequired: CBA_A3, cTab+, Antistasi Ultimate. ACE3 optional.\n\nExtract @RHD-Life-Core and import it into Arma 3 Launcher as a Local Mod.' --target "$GITHUB_SHA"
+          gh release create latest dist/RHD-Life-Core-Launcher-Package.zip --title 'RHD - LifeCore | Latest' --notes $'Latest verified @RHD-Life-Core package with 16 RHD tactical backpacks at 150 maximum load each.\n\nRequired: CBA_A3, cTab+, Antistasi Ultimate. ACE3 optional.\n\nOptional GSRI compatibility bridge included under optional/RHD-GSRI-Compat; it requires GSRI-Gear.\n\nExtract @RHD-Life-Core and import it into Arma 3 Launcher as a Local Mod.' --target "$GITHUB_SHA"
