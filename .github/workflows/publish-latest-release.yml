@@ -8,8 +8,6 @@ on:
 permissions:
   contents: write
 
-authorizations: {}
-
 jobs:
   publish:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
