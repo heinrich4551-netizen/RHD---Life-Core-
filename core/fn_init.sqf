@@ -1,8 +1,6 @@
 /*
     RHD - LifeCore | MISSION CONFIGURATION
     Author: LT. Toad
-
-    EDIT THIS FILE FOR SERVER-SIDE RHD CONFIGURATION.
     ---------------------------------------------------------------------------
     Map layout is resolved dynamically at server startup. Do not put terrain
     coordinates in this file.
@@ -59,10 +57,14 @@ missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_ENABLE", true, true];
 missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_WAIT_FOR_A3A", true, true];
 missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_REPLACE_STATIC", true, true];
 missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_WAIT_SECONDS", 180, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_REFRESH_SECONDS", 60, true];
 missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_READY", false, true];
+missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_STARTED", false, true];
 missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_COUNT", 0, true];
 missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_TERRAIN", worldName, true];
 missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_A3A", false, true];
+missionNamespace setVariable ["RHD_A3A_DYNAMIC_ZONE_COUNT", 0, true];
+missionNamespace setVariable ["RHD_LOCATION_REGISTRY", createHashMap, true];
 
 // ============================================================================
 // DYNAMIC SHOPS
@@ -78,7 +80,6 @@ missionNamespace setVariable ["RHD_SHOP_PRICE_OVERRIDES", createHashMap, true];
 
 // ============================================================================
 // JOBS
-// [job_id, [Display Name, Pay Per Minute]]
 // ============================================================================
 missionNamespace setVariable ["RHD_JOBS", createHashMapFromArray [
     ["civ",     ["Civilian",        0]],
@@ -91,7 +92,6 @@ missionNamespace setVariable ["RHD_JOBS", createHashMapFromArray [
 
 // ============================================================================
 // RHD VIRTUAL LIFE-RP ITEMS
-// These are independent of Arma inventory classnames.
 // ============================================================================
 missionNamespace setVariable ["RHD_ITEMS", createHashMapFromArray [
     ["apple",           ["Apple",           5,   2,   "food"]],
@@ -104,7 +104,7 @@ missionNamespace setVariable ["RHD_ITEMS", createHashMapFromArray [
     ["copper_ore",     ["Copper Ore",        22,   8,   "ore"]],
     ["gold_ore",       ["Gold Ore",          70,  25,   "ore"]],
     ["diamond",        ["Diamond",           350, 120,  "ore"]],
-    ["oil_sand",       ["Oil Sand",            30,  10,   "ore"]],
+    ["oil_sand",       ["Oil Sand",            30,  10,  "ore"]],
     ["iron",           ["Iron",                55,  20,   "refined"]],
     ["copper",         ["Copper",              65,  24,   "refined"]],
     ["gold",           ["Gold",               180,  70,   "refined"]],
@@ -175,6 +175,7 @@ missionNamespace setVariable ["RHD_STANDALONE_INIT_TIMEOUT_SECONDS", 15, true];
     "RHD_DYNAMIC_LOCATIONS_WAIT_FOR_A3A",
     "RHD_DYNAMIC_LOCATIONS_REPLACE_STATIC",
     "RHD_DYNAMIC_LOCATIONS_WAIT_SECONDS",
+    "RHD_DYNAMIC_LOCATION_REFRESH_SECONDS",
     "RHD_SHOP_AUTO_IMPORT",
     "RHD_JOBS",
     "RHD_ITEMS",
