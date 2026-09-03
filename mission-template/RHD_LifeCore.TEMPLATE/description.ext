@@ -36,7 +36,7 @@ onLoadName = "RHD - LifeCore";
 onLoadMission = "RHD - LifeCore | Altis Life RP";
 overviewText = "RHD - LifeCore | Altis Life RP | Jobs • Economy • Crime • Opportunity";
 overviewPicture = "assets\\branding\\RHDLifeCore.jpg";
-loadScreen = "assets\\branding\\RHDLifeCore.jpg";
+loadScreen = "assets\branding\loading_screen_03.jpg";
 
 class Header
 {

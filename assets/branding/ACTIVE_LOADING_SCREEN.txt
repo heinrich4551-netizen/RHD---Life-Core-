@@ -1,0 +1,2 @@
+RHD LifeCore loading screen selected by daily round-robin: 03
+assets\\branding\\loading_screen_03.jpg
