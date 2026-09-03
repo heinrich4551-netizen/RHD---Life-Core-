@@ -1,0 +1,4 @@
+RHD - LifeCore loading screens
+
+Only loading_screen_01.jpg, loading_screen_02.jpg and loading_screen_03.jpg are designated for the bundled mission loading screen.
+The rotation workflow selects one of the three on each daily build/update cycle.
