@@ -25,6 +25,8 @@ jobs:
           test -f addons/rhd_lifecore/\$PBOPREFIX\$
           test -f addons/rhd_clothing/config.cpp
           test -f addons/rhd_clothing/\$PBOPREFIX\$
+          test -f addons/rhd_backpacks/config.cpp
+          test -f addons/rhd_backpacks/\$PBOPREFIX\$
           test -f addons/rhd_lifecore/functions/modules/fn_moduleAntistasiBase.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_moduleLifeCore.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_dynamicLocations.sqf
@@ -36,6 +38,8 @@ jobs:
           test -f meta.cpp
           test -f assets/branding/RHDLifeCore.jpg
           grep -Fq 'requiredAddons[] = {"cba_main", "ctab_core", "A3A_core"};' addons/rhd_lifecore/config.cpp
+          grep -Fq 'maximumLoad = 150;' addons/rhd_backpacks/config.cpp
+          test "$(grep -c 'class RHD_Bag_' addons/rhd_backpacks/config.cpp)" -eq 16
 
       - name: Build addon PBOs
         shell: bash
@@ -45,6 +49,7 @@ jobs:
           mkdir -p build
           python3 tools/pbo_pack.py addons/rhd_lifecore build/rhd_rhd_lifecore.pbo
           python3 tools/pbo_pack.py addons/rhd_clothing build/rhd_rhd_clothing.pbo
+          python3 tools/pbo_pack.py addons/rhd_backpacks build/rhd_rhd_backpacks.pbo
 
       - name: Build Altis mission PBO
         shell: bash
@@ -64,6 +69,7 @@ jobs:
           files = [
               Path('build/rhd_rhd_lifecore.pbo'),
               Path('build/rhd_rhd_clothing.pbo'),
+              Path('build/rhd_rhd_backpacks.pbo'),
               Path('build/RHD_LifeCore.Altis.pbo'),
           ]
           for path in files:
@@ -88,6 +94,38 @@ jobs:
               if entries == 0 or pos + total != len(data):
                   raise SystemExit(f'{path}: payload mismatch')
               print(f'{path}: valid entries={entries} bytes={len(data)}')
+          checks = {
+              'build/rhd_rhd_lifecore.pbo': [
+                  b'config.cpp',
+                  b'fn_moduleAntistasiBase.sqf',
+                  b'fn_moduleLifeCore.sqf',
+                  b'fn_dynamicLocations.sqf',
+                  b'fn_dynamicLocationSync.sqf',
+              ],
+              'build/rhd_rhd_clothing.pbo': [
+                  b'config.cpp',
+                  b'RHD_Vest_Plate_Ranger',
+                  b'RHD_Vest_Executive',
+              ],
+              'build/rhd_rhd_backpacks.pbo': [
+                  b'config.cpp',
+                  b'RHD_Bag_Ranger',
+                  b'RHD_Bag_Executive',
+                  b'maximumLoad = 150;',
+              ],
+              'build/RHD_LifeCore.Altis.pbo': [
+                  b'description.ext',
+                  b'mission.sqm',
+                  b'RHD_Module_AntistasiBase',
+                  b'RHD_Module_LifeCore',
+                  b'core/ui/ctab.hpp',
+              ],
+          }
+          for filename, required in checks.items():
+              data = Path(filename).read_bytes()
+              missing = [x.decode('utf-8') for x in required if x not in data]
+              if missing:
+                  raise SystemExit(f'{filename}: missing {missing}')
           PY
 
       - name: Assemble Launcher package
@@ -101,11 +139,13 @@ jobs:
           mkdir -p package/@RHD-Life-Core/docs
           cp build/rhd_rhd_lifecore.pbo package/@RHD-Life-Core/addons/
           cp build/rhd_rhd_clothing.pbo package/@RHD-Life-Core/addons/
+          cp build/rhd_rhd_backpacks.pbo package/@RHD-Life-Core/addons/
           cp build/RHD_LifeCore.Altis.pbo package/@RHD-Life-Core/Missions/
           cp -r mission-template/RHD_LifeCore.TEMPLATE package/@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis
           cp mod.cpp package/@RHD-Life-Core/
           cp meta.cpp package/@RHD-Life-Core/
           cp assets/branding/RHDLifeCore.jpg package/@RHD-Life-Core/assets/branding/
+          cp addons/rhd_backpacks/RHD_BACKPACKS.md package/@RHD-Life-Core/docs/
           for f in README.md 3DEN_SETUP.md 3DEN_MODULES.md EDITOR_QUICKSTART.md ADDON_BUILD.md ADMIN_AND_ACE_SETUP.md CTAB_INTEGRATION.md ANTISTASI_BASE.md STEAM_WORKSHOP_DEPENDENCIES.md STEAM_WORKSHOP_REQUIRED_ITEMS.txt THIRD_PARTY_NOTICES.md PERFORMANCE.md UI_REFERENCES.md; do
             test -f "$f"
             cp "$f" package/@RHD-Life-Core/docs/
@@ -125,6 +165,8 @@ jobs:
             '2. Add @RHD-Life-Core to Arma 3 Launcher as a Local Mod.' \
             '3. Enable CBA_A3, cTab+, Antistasi Ultimate and RHD - LifeCore.' \
             '4. Host RHD_LifeCore.Altis from Multiplayer.' \
+            '' \
+            'This package contains 16 RHD tactical backpacks, each with 150 maximum load.' \
             > package/@RHD-Life-Core/INSTALL.txt
           mkdir -p dist
           cd package
@@ -139,8 +181,10 @@ jobs:
           unzip -t dist/RHD-Life-Core-Launcher-Package.zip >/dev/null
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_lifecore.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_clothing.pbo'
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_backpacks.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/Missions/RHD_LifeCore.Altis.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis/core/ui/ctab.hpp'
+          unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/docs/RHD_BACKPACKS.md'
 
       - name: Upload Actions artifact
         uses: actions/upload-artifact@v4
@@ -156,4 +200,4 @@ jobs:
         run: |
           set -euo pipefail
           gh release delete latest --yes --cleanup-tag || true
-          gh release create latest dist/RHD-Life-Core-Launcher-Package.zip --title 'RHD - LifeCore | Latest' --notes $'Latest verified @RHD-Life-Core package.\n\nRequired: CBA_A3, cTab+, Antistasi Ultimate. ACE3 optional.\n\nExtract @RHD-Life-Core and import it into Arma 3 Launcher as a Local Mod.' --target "$GITHUB_SHA"
+          gh release create latest dist/RHD-Life-Core-Launcher-Package.zip --title 'RHD - LifeCore | Latest' --notes $'Latest verified @RHD-Life-Core package with 16 RHD tactical backpacks at 150 maximum load each.\n\nRequired: CBA_A3, cTab+, Antistasi Ultimate. ACE3 optional.\n\nExtract @RHD-Life-Core and import it into Arma 3 Launcher as a Local Mod.' --target "$GITHUB_SHA"
