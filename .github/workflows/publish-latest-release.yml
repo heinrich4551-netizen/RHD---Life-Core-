@@ -1,0 +1,48 @@
+name: Publish RHD LifeCore Release
+
+on:
+  workflow_run:
+    workflows: ["RHD LifeCore Package"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+authorizations: {}
+
+jobs:
+  publish:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download verified Launcher package
+        uses: actions/download-artifact@v4
+        with:
+          name: RHD-LifeCore-Launcher-Package
+          path: release
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Verify release asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s release/RHD-Life-Core-Launcher-Package.zip
+          unzip -t release/RHD-Life-Core-Launcher-Package.zip >/dev/null
+          unzip -l release/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_lifecore.pbo'
+          unzip -l release/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_clothing.pbo'
+          unzip -l release/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis/description.ext'
+
+      - name: Replace rolling latest release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete latest --yes --cleanup-tag || true
+          gh release create latest \
+            release/RHD-Life-Core-Launcher-Package.zip \
+            --title "RHD - LifeCore | Latest" \
+            --notes "Latest verified Launcher-ready RHD - LifeCore package.\n\nRequired: CBA_A3, cTab+, Antistasi Ultimate. ACE3 remains optional.\n\nPackage contains the @RHD-Life-Core folder, compiled addon PBOs, bundled Altis multiplayer scenario, mission source, metadata and installation instructions." \
+            --target "${{ github.event.workflow_run.head_sha }}"
