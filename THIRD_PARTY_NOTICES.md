@@ -69,6 +69,19 @@ ACE Arsenal Extended provides gear categorisation/model-option support and confi
 
 RHD does not redistribute the ACE Arsenal Extended PBOs. The RHD GSRI compatibility layer uses the XtdGear configuration format so the selected GSRI gear can be grouped more cleanly when ACE Arsenal Extended is installed.
 
+## RCiv - Realistic Civilians — RHD/Antistasi compatibility bridge
+
+Project / Workshop ID supplied in the user package:
+https://steamcommunity.com/sharedfiles/filedetails/?id=3690291228
+
+**Runtime status: OPTIONAL.**
+
+The user-supplied RCiv package is installed separately. RHD adds `addons/rhd_rciv_compat`, a small compatibility PBO which depends on the published `RCiv` and `A3A_core` CfgPatches names.
+
+The bridge is deliberately not a copy of the RCiv PBO. It disables RCiv's independent civilian spawner while Antistasi is active, leaves RCiv's global AI explosion override disabled, and blacklists known A3A-managed civilian units from RCiv's ambient brain so Antistasi remains authoritative over campaign AI.
+
+RCiv author attribution remains external to RHD; RHD does not claim ownership of the RCiv addon or its original binaries.
+
 ## XEAT_AdminTool interface reference
 
 Project:

@@ -1,0 +1,101 @@
+name: RHD RCiv Compatibility Package
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate RCiv bridge source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f tools/pbo_pack.py
+          test -f addons/rhd_rciv_compat/config.cpp
+          test -f addons/rhd_rciv_compat/\$PBOPREFIX\$
+          test -f addons/rhd_rciv_compat/functions/fn_rcivAntistasiBridge.sqf
+          test -f addons/rhd_rciv_compat/README.md
+          grep -Fq 'class rhd_rciv_compat' addons/rhd_rciv_compat/config.cpp
+          grep -Fq 'requiredAddons[] = {"cba_main", "A3A_core", "RCiv"};' addons/rhd_rciv_compat/config.cpp
+          grep -Fq 'RCIV_spawnerEnabled' addons/rhd_rciv_compat/functions/fn_rcivAntistasiBridge.sqf
+          grep -Fq 'rciv_blacklist' addons/rhd_rciv_compat/functions/fn_rcivAntistasiBridge.sqf
+          grep -Fq 'A3A_core' addons/rhd_rciv_compat/functions/fn_rcivAntistasiBridge.sqf
+
+      - name: Build PBO
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf build dist
+          mkdir -p build dist/package/@RHD-Life-Core/optional/RHD-RCiv-Compat/addons dist/package/@RHD-Life-Core/docs
+          python3 tools/pbo_pack.py addons/rhd_rciv_compat build/rhd_rhd_rciv_compat.pbo
+          cp build/rhd_rhd_rciv_compat.pbo dist/package/@RHD-Life-Core/optional/RHD-RCiv-Compat/addons/
+          cp addons/rhd_rciv_compat/README.md dist/package/@RHD-Life-Core/docs/RHD_RCIV_COMPAT.md
+          cp THIRD_PARTY_NOTICES.md dist/package/@RHD-Life-Core/docs/THIRD_PARTY_NOTICES.md
+          printf '%s\n' \
+            'RHD - LifeCore | Optional RCiv Compatibility Package' \
+            '' \
+            'Requires:' \
+            'CBA_A3' \
+            'Antistasi Ultimate' \
+            'RCiv - Realistic Civilians (Workshop 3690291228)' \
+            '' \
+            'Install the supplied RCiv Workshop addon separately, then copy the optional/RHD-RCiv-Compat folder into your RHD package.' \
+            'The bridge disables RCiv standalone civilian spawning while Antistasi is active and blacklists known A3A-managed civilian units.' \
+            > dist/package/@RHD-Life-Core/optional/RHD-RCiv-Compat/INSTALL.txt
+          cd dist/package
+          zip -qr ../../RHD-Life-Core-RCiv-Compat.zip @RHD-Life-Core
+
+      - name: Validate PBO and package
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct
+          path = Path('build/rhd_rhd_rciv_compat.pbo')
+          data = path.read_bytes()
+          pos = 0
+          total = 0
+          entries = 0
+          while True:
+              end = data.find(b'\0', pos)
+              if end < 0 or end + 21 > len(data):
+                  raise SystemExit('invalid PBO header')
+              name = data[pos:end].decode('utf-8')
+              pos = end + 1
+              fields = struct.unpack('<IIIII', data[pos:pos + 20])
+              pos += 20
+              if name == '':
+                  if fields != (0, 0, 0, 0, 0):
+                      raise SystemExit('invalid PBO terminator')
+                  break
+              total += fields[4]
+              entries += 1
+          if entries == 0 or pos + total != len(data):
+              raise SystemExit('payload mismatch')
+          required = [
+              b'config.cpp',
+              b'$PBOPREFIX$',
+              b'fn_rcivAntistasiBridge.sqf',
+              b'RCIV_spawnerEnabled',
+              b'rciv_blacklist',
+              b'A3A_core',
+              b'RCiv',
+          ]
+          missing = [x.decode('utf-8') for x in required if x not in data]
+          if missing:
+              raise SystemExit(f'missing PBO payload strings: {missing}')
+          print(f'PBO valid: entries={entries} bytes={len(data)}')
+          PY
+          test -s dist/RHD-Life-Core-RCiv-Compat.zip
+          unzip -t dist/RHD-Life-Core-RCiv-Compat.zip >/dev/null
