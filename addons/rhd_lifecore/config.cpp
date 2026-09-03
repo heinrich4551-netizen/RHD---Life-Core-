@@ -1,5 +1,13 @@
 #define RHD_VERSION_TEXT "2.2.2"
 
+// Arma 3 UI base classes used by RHD dialogs/HUD. These are supplied by A3_UI_F.
+class RscText;
+class RscStructuredText;
+class RscListbox;
+class RscButton;
+class RscEdit;
+class RscCombo;
+
 class CfgPatches
 {
     class rhd_lifecore
@@ -7,7 +15,7 @@ class CfgPatches
         name = "RHD - LifeCore";
         author = "LT. Toad";
         requiredVersion = 2.20;
-        requiredAddons[] = {"cba_main", "ctab_core", "A3A_core"};
+        requiredAddons[] = {"cba_main", "ctab_core", "A3A_core", "A3_UI_F"};
         units[] = {"RHD_Module_AntistasiBase","RHD_Module_LifeCore"};
         weapons[] = {};
     };
