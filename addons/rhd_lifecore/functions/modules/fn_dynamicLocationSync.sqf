@@ -4,7 +4,7 @@
 
     Keeps the RHD location layer synchronized with the live Antistasi Ultimate
     campaign after initial world generation. The synchronizer never replaces
-    A3A's strategic locations; it mirrors the live A3A controlled-location set
+    A3A strategic locations; it mirrors the live A3A controlled-location set
     into RHD-prefixed district markers and refreshes the public location registry.
 */
 
@@ -47,8 +47,8 @@ private _syncA3AZones = {
 
     private _controlled = [];
 
-    // A3A's authoritative strategic location objects are represented by
-    // controlsX. Only mirror valid marker names that currently exist.
+    // A3A's live strategic location set is exposed through controlsX in the
+    // current campaign. Only mirror valid markers that currently exist.
     if (!isNil "controlsX") then {
         {
             if (_x isEqualType "" && {_x in allMapMarkers}) then {
@@ -59,7 +59,8 @@ private _syncA3AZones = {
 
     missionNamespace setVariable ["RHD_A3A_ZONE_MARKERS", _controlled, true];
 
-    // Rebuild only the RHD A3A mirror markers. Never delete native A3A markers.
+    // Rebuild only RHD-owned A3A mirror markers. Native A3A markers are never
+    // deleted or modified by this synchronizer.
     {
         if ((toLower _x) find "rhd_zone_a3a_" == 0) then {
             deleteMarker _x;
@@ -74,6 +75,8 @@ private _syncA3AZones = {
         _m setMarkerShape "ELLIPSE";
         _m setMarkerSize [250, 250];
         _m setMarkerAlpha 0.18;
+        _m setMarkerBrush "SolidBorder";
+        _m setMarkerColor "ColorOrange";
         _m setMarkerText (format ["Antistasi District %1", _index + 1]);
         _index = _index + 1;
     } forEach _controlled;
@@ -87,16 +90,20 @@ while {isServer && {missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_ENABLE"
 
     private _registry = [] call _readLocations;
     missionNamespace setVariable ["RHD_LOCATION_REGISTRY", _registry, true];
-    missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_COUNT", {
-        private _total = 0;
-        {
-            _total = _total + count (_registry getOrDefault [_x, []]);
-        } forEach ["shops","banks","fuel","farms","mines","refineries","police","ems","jails","zones"];
-        _total
-    }, false] call BIS_fnc_call;
+
+    private _total = 0;
+    {
+        _total = _total + count (_registry getOrDefault [_x, []]);
+    } forEach ["shops","banks","fuel","farms","mines","refineries","police","ems","jails","zones"];
+
+    missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_COUNT", _total, true];
+    missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_TERRAIN", worldName, true];
+    missionNamespace setVariable ["RHD_DYNAMIC_LOCATION_A3A", missionNamespace getVariable ["RHD_A3A_BASE_READY", false], true];
 
     publicVariable "RHD_LOCATION_REGISTRY";
     publicVariable "RHD_DYNAMIC_LOCATION_COUNT";
+    publicVariable "RHD_DYNAMIC_LOCATION_TERRAIN";
+    publicVariable "RHD_DYNAMIC_LOCATION_A3A";
 
     sleep _interval;
 };
