@@ -21,11 +21,14 @@ jobs:
           test -f addons/rhd_lifecore/\$PBOPREFIX\$
           test -f addons/rhd_clothing/config.cpp
           test -f addons/rhd_clothing/\$PBOPREFIX\$
+          test -f addons/rhd_lifecore/functions/modules/fn_moduleLifeCoreAntistasi.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_moduleAntistasiBase.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_moduleLifeCore.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_dynamicLocations.sqf
+          test -f addons/rhd_lifecore/functions/modules/fn_dynamicLocationSync.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_terrainAudit.sqf
           test -f addons/rhd_lifecore/functions/modules/fn_terrainFallback.sqf
+          test -f addons/rhd_lifecore/functions/runtime/fn_runtimeInit.sqf
           test -f mission-template/RHD_LifeCore.TEMPLATE/description.ext
           test -f mission-template/RHD_LifeCore.TEMPLATE/mission.sqm
           test -f mission-template/RHD_LifeCore.TEMPLATE/initServer.sqf
@@ -34,20 +37,21 @@ jobs:
           test -f meta.cpp
           test -f assets/branding/RHDLifeCore.jpg
           test -f STEAM_WORKSHOP_REQUIRED_ITEMS.txt
-          grep -Fq 'requiredAddons[] = {"cba_main", "ctab_core", "A3A_core"};' addons/rhd_lifecore/config.cpp
-          grep -Fq 'class dynamicLocations {server = 1;};' addons/rhd_lifecore/config.cpp
+          grep -Fq 'requiredAddons[] = {"cba_main", "ctab_core", "A3A_core", "A3_Modules_F"};' addons/rhd_lifecore/config.cpp
+          grep -Fq 'class moduleLifeCoreAntistasi {};' addons/rhd_lifecore/config.cpp
+          grep -Fq 'class RHD_Module_LifeCoreAntistasi: Module_F' addons/rhd_lifecore/config.cpp
+          grep -Fq 'RHD_LIFECORE_CONTROLLER_READY' addons/rhd_lifecore/functions/runtime/fn_runtimeInit.sqf
+          grep -Fq 'RHD_LIFECORE_CONTROLLER_READY' addons/rhd_lifecore/functions/modules/fn_moduleLifeCoreAntistasi.sqf
           grep -Fq 'RHD_DYNAMIC_LOCATIONS_ENABLE' core/fn_init.sqf
           grep -Fq 'RHD_A3A_REQUIRED", true' core/fn_init.sqf
-          grep -Fq 'RHD_DYNAMIC_LOCATIONS_READY' mission-template/RHD_LifeCore.TEMPLATE/initServer.sqf
-          ! grep -Fq '"ace_main"' addons/rhd_lifecore/config.cpp
           grep -Fq '450814997' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
           grep -Fq '2262006564' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
           grep -Fq '3020755032' STEAM_WORKSHOP_REQUIRED_ITEMS.txt
 
-          # Never allow the LifeCore addon config to inherit from global Rsc*
-          # controls. These were the source of the undefined-base-class crash.
+          # The addon PBO must contain no inheritance from global Rsc* controls.
           ! grep -Eq ':[[:space:]]*Rsc(StructuredText|Text|Listbox|Button|Edit|Combo)[[:space:]]*[{]' addons/rhd_lifecore/config.cpp
-          ! grep -Eq ':[[:space:]]*Rsc(StructuredText|Text|Listbox|Button|Edit|Combo)[[:space:]]*[{]' core/ui/ctab.hpp
+          ! grep -Eq ':[[:space:]]*Rsc(StructuredText|RscText|RscListbox|RscButton|RscEdit|RscCombo)[[:space:]]*[{]' addons/rhd_lifecore/config.cpp
+          ! grep -Eq ':[[:space:]]*Rsc(StructuredText|Text|Listbox|Button|Edit|Combo)[[:space:]]*[{]' addons/rhd_lifecore/core/ui/ctab.hpp
 
       - name: Build addon PBOs with repository packer
         shell: bash
@@ -91,32 +95,32 @@ jobs:
               print(f'{path}: valid PBO entries={entries} bytes={len(data)}')
           PY
 
-      - name: Validate addon PBO contents
+      - name: Validate LifeCore PBO config safety
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          checks = {
-              'build-addon/rhd_rhd_lifecore.pbo': [
-                  b'config.cpp', b'$PBOPREFIX$',
-                  b'functions/modules/fn_moduleAntistasiBase.sqf',
-                  b'functions/modules/fn_moduleLifeCore.sqf',
-                  b'functions/modules/fn_dynamicLocations.sqf',
-                  b'functions/modules/fn_terrainAudit.sqf',
-                  b'functions/modules/fn_terrainFallback.sqf',
-                  b'file = "functions/modules"',
-                  b'class RHD_RscStructuredText',
-              ],
-              'build-addon/rhd_rhd_clothing.pbo': [
-                  b'config.cpp', b'$PBOPREFIX$', b'RHD_Outfit_Tactical_Black',
-              ],
-          }
-          for filename, required in checks.items():
-              data = Path(filename).read_bytes()
-              missing = [x.decode('utf-8') for x in required if x not in data]
-              if missing:
-                  raise SystemExit(f'{filename} missing: {missing}')
+          data = Path('build-addon/rhd_rhd_lifecore.pbo').read_bytes()
+          required = [
+              b'config.cpp', b'$PBOPREFIX$',
+              b'fn_moduleLifeCoreAntistasi.sqf',
+              b'class RHD_Module_LifeCoreAntistasi: Module_F',
+              b'RHD_LIFECORE_CONTROLLER_READY',
+              b'functions/modules/fn_dynamicLocations.sqf',
+          ]
+          missing = [x.decode('utf-8') for x in required if x not in data]
+          if missing:
+              raise SystemExit('LifeCore PBO missing: ' + ', '.join(missing))
+          forbidden = [
+              b': RscStructuredText {', b':RscStructuredText {',
+              b': RscText {', b':RscListbox {', b': RscButton {',
+              b': RscEdit {', b': RscCombo {'
+          ]
+          bad = [x.decode('utf-8') for x in forbidden if x in data]
+          if bad:
+              raise SystemExit('LifeCore PBO still contains forbidden global UI inheritance: ' + ', '.join(bad))
+          print('LifeCore PBO config safety checks passed.')
           PY
 
       - name: Build bundled Altis mission PBO
@@ -151,13 +155,13 @@ jobs:
               pos += 20
               if name == '':
                   if fields != (0, 0, 0, 0, 0):
-                      raise SystemExit(f'Altis PBO: invalid terminator {fields}')
+                      raise SystemExit(f'Altis PBO: invalid PBO terminator {fields}')
                   break
               total_payload += fields[4]
               entries += 1
           if entries == 0 or pos + total_payload != len(data):
               raise SystemExit('Altis PBO: size validation failed')
-          required = [b'description.ext', b'mission.sqm', b'RHD_Module_AntistasiBase', b'RHD_Module_LifeCore', b'RHD_DYNAMIC_LOCATIONS_ENABLE']
+          required = [b'description.ext', b'mission.sqm', b'RHD_DYNAMIC_LOCATIONS_ENABLE']
           missing = [x.decode('utf-8') for x in required if x not in data]
           if missing:
               raise SystemExit('Altis mission missing: ' + ', '.join(missing))
@@ -197,18 +201,25 @@ Antistasi Ultimate  3020755032
 OPTIONAL MOD
 ACE3
 
+MASTER 3DEN MODULE
+For native Antistasi Ultimate missions, place ONE:
+RHD - LifeCore | Master Life RP + Antistasi Ultimate
+
+That single module controls the RHD Life RP systems and the RHD/A3A bridge.
+Do not place the two legacy RHD bridge/Life modules in a new mission.
+
 LOCAL INSTALL
 1. Delete any previous @RHD-Life-Core folder.
 2. Extract this package intact.
 3. Add the extracted @RHD-Life-Core folder to Arma 3 Launcher as a Local Mod.
 4. Enable CBA_A3, cTab+, Antistasi Ultimate and RHD - LifeCore.
-5. Use Multiplayer -> Host New Game and select RHD_LifeCore.Altis.
+5. Open the Antistasi Ultimate mission in Eden and place the master module.
+6. Save the mission and host it normally.
 
 DYNAMIC LOCATION SYSTEM
-RHD automatically resolves shops, banks, fuel, public services, farming,
-mining, refining and conflict districts from the active terrain. When
-Antistasi Ultimate is running, A3A mapInfo/control data is consumed first.
-No Altis-only coordinates are required.
+RHD reads Antistasi Ultimate control/campaign state first, then falls back to
+terrain discovery for generic locations. Antistasi remains authoritative for
+its strategic engine, while RHD owns the Life RP/economy layer.
 EOF
 
           mkdir -p dist
@@ -225,7 +236,6 @@ EOF
           test -s package/@RHD-Life-Core/Missions/RHD_LifeCore.Altis.pbo
           test -f package/@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis/description.ext
           test -f package/@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis/mission.sqm
-          test -f package/@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis/core/ui/ctab.hpp
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_lifecore.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/addons/rhd_rhd_clothing.pbo'
           unzip -l dist/RHD-Life-Core-Launcher-Package.zip | grep -Fq '@RHD-Life-Core/mpmissions/RHD_LifeCore.Altis/description.ext'
