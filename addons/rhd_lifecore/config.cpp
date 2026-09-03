@@ -431,7 +431,7 @@ class RHD_ADMIN
         class Value: RHD_RscEdit {idc = 8510; x = .453594 * safezoneW + safezoneX; y = .544 * safezoneH + safezoneY; w = .159844 * safezoneW; h = .022 * safezoneH; text = "1";};
         class VariableLabel: RHD_RscText {idc = 8511; x = .402031 * safezoneW + safezoneX; y = .577 * safezoneH + safezoneY; w = .0464063 * safezoneW; h = .022 * safezoneH; text = "ITEM / JOB";};
         class Variable: RHD_RscCombo {idc = 8512; x = .453594 * safezoneW + safezoneX; y = .577 * safezoneH + safezoneY; w = .159844 * safezoneW; h = .022 * safezoneH;};
-        class Settings: RHD_RscButton {idc = 8513; x = .573 * safezoneW + safezoneX; y = .269 * safezoneH + safezoneY; w = .022 * safezoneW + safezoneX; h = .0218 * safezoneH; text = "@"; action = "[\"ADMIN CONFIG: edit RHD_ADMIN_UIDS in core/fn_init.sqf\",\"info\"] call RHD_fnc_notify";};
+        class Settings: RHD_RscButton {idc = 8513; x = .573 * safezoneW + safezoneX; y = .269 * safezoneH + safezoneY; w = .022 * safezoneW; h = .0218 * safezoneH; text = "@"; action = "[\"ADMIN CONFIG: edit RHD_ADMIN_UIDS in core/fn_init.sqf\",\"info\"] call RHD_fnc_notify";};
         class Quit: RHD_RscButton {idc = 8514; x = .5155 * safezoneW + safezoneX; y = .269 * safezoneH + safezoneY; w = .055 * safezoneW; h = .0218 * safezoneH; text = "EXIT"; action = "closeDialog 0";};
         class Footer: RHD_RscText {idc = 8515; x = .402031 * safezoneW + safezoneX; y = .611 * safezoneH + safezoneY; w = .211406 * safezoneW; h = .022 * safezoneH; text = "RHD - LIFECORE | ADMIN"; sizeEx = .016;};
     };
