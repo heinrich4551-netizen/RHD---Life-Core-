@@ -21,8 +21,8 @@ jobs:
         run: |
           set -euo pipefail
           test -f tools/pbo_pack.py
-          test -f addons/rhd_rciv_compat/config.cpp
           test -f addons/rhd_rciv_compat/\$PBOPREFIX\$
+          test -f addons/rhd_rciv_compat/config.cpp
           test -f addons/rhd_rciv_compat/functions/fn_rcivAntistasiBridge.sqf
           test -f addons/rhd_rciv_compat/README.md
           grep -Fq 'class rhd_rciv_compat' addons/rhd_rciv_compat/config.cpp
@@ -53,7 +53,7 @@ jobs:
             'The bridge disables RCiv standalone civilian spawning while Antistasi is active and blacklists known A3A-managed civilian units.' \
             > dist/package/@RHD-Life-Core/optional/RHD-RCiv-Compat/INSTALL.txt
           cd dist/package
-          zip -qr ../../RHD-Life-Core-RCiv-Compat.zip @RHD-Life-Core
+          zip -qr ../RHD-Life-Core-RCiv-Compat.zip @RHD-Life-Core
 
       - name: Validate PBO and package
         shell: bash
