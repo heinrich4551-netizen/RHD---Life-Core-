@@ -50,9 +50,15 @@ missionNamespace setVariable ["RHD_LIFE_SETTINGS", _settings, true];
 // It waits for Antistasi Ultimate (when present), then uses A3A mapInfo,
 // controlsX, real fuel/industrial objects and terrain scoring fallbacks.
 if (isServer && {missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_ENABLE", true]}) then {
-    [] spawn {
-        sleep 1;
-        [] call RHD_fnc_dynamicLocations;
+    if (!missionNamespace getVariable ["RHD_DYNAMIC_LOCATIONS_STARTED", false]) then {
+        missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_STARTED", true, true];
+        [] spawn {
+            sleep 1;
+            private _ok = [] call RHD_fnc_dynamicLocations;
+            if (!_ok) then {
+                missionNamespace setVariable ["RHD_DYNAMIC_LOCATIONS_STARTED", false, true];
+            };
+        };
     };
 };
 
