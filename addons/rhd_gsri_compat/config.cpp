@@ -29,10 +29,10 @@ class XtdGearModels
             class variant
             {
                 label = "Variant";
-                values[] = {"Combat", "Rolled", "Raised Collar", "Shirt", "Gorka"};
+                values[] = {"Combat", "Rolled", "Raised_Collar", "Shirt", "Gorka"};
                 class Combat {label = "Combat";};
                 class Rolled {label = "Rolled Sleeves";};
-                class {Raised_Collar} {label = "Raised Collar";};
+                class Raised_Collar {label = "Raised Collar";};
                 class Shirt {label = "Shirt";};
                 class Gorka {label = "Gorka";};
             };
@@ -45,7 +45,7 @@ class XtdGearModels
             class type
             {
                 label = "Type";
-                values[] = {"Helmet", "Helmet Accessories", "Light Helmet", "Modular", "Modular Advanced", "Modular Half Integral", "Modular Integral", "Beret", "Watchcap"};
+                values[] = {"Helmet", "Helmet_Accessories", "Light_Helmet", "Modular", "Modular_Advanced", "Modular_Half_Integral", "Modular_Integral", "Beret", "Watchcap"};
             };
         };
         class RHD_GSRI_Vest
@@ -56,7 +56,7 @@ class XtdGearModels
             class type
             {
                 label = "Type";
-                values[] = {"Carrier", "Carrier Light", "Modular", "Modular Accessories", "Modular Reinforced", "GA Carrier", "BME Carrier", "BME Modular"};
+                values[] = {"Carrier", "Carrier_Light", "Modular", "Modular_Accessories", "Modular_Reinforced", "GA_Carrier", "BME_Carrier", "BME_Modular"};
             };
         };
     };
@@ -85,67 +85,39 @@ class XtdGearInfos
 {
     class CfgWeapons
     {
-        class GSRI_uniform
-        {
-            model = "RHD_GSRI_Uniform";
-            variant = "Combat";
-        };
-        class GSRI_uniform_rolled
-        {
-            model = "RHD_GSRI_Uniform";
-            variant = "Rolled";
-        };
-        class GSRI_uniform_raised_collar
-        {
-            model = "RHD_GSRI_Uniform";
-            variant = "Raised Collar";
-        };
-        class GSRI_shirt_camo
-        {
-            model = "RHD_GSRI_Uniform";
-            variant = "Shirt";
-        };
-        class GSRI_shirt_green
-        {
-            model = "RHD_GSRI_Uniform";
-            variant = "Shirt";
-        };
-        class GSRI_gorka_camo
-        {
-            model = "RHD_GSRI_Uniform";
-            variant = "Gorka";
-        };
-        class GSRI_gorka_green
-        {
-            model = "RHD_GSRI_Uniform";
-            variant = "Gorka";
-        };
+        class GSRI_uniform { model = "RHD_GSRI_Uniform"; variant = "Combat"; };
+        class GSRI_uniform_rolled { model = "RHD_GSRI_Uniform"; variant = "Rolled"; };
+        class GSRI_uniform_raised_collar { model = "RHD_GSRI_Uniform"; variant = "Raised_Collar"; };
+        class GSRI_shirt_camo { model = "RHD_GSRI_Uniform"; variant = "Shirt"; };
+        class GSRI_shirt_green { model = "RHD_GSRI_Uniform"; variant = "Shirt"; };
+        class GSRI_gorka_camo { model = "RHD_GSRI_Uniform"; variant = "Gorka"; };
+        class GSRI_gorka_green { model = "RHD_GSRI_Uniform"; variant = "Gorka"; };
 
         class GSRI_beret { model = "RHD_GSRI_Headgear"; type = "Beret"; };
         class GSRI_beret_gcap { model = "RHD_GSRI_Headgear"; type = "Beret"; };
         class H_watchcap_wht { model = "RHD_GSRI_Headgear"; type = "Watchcap"; };
         class GSRI_helmet { model = "RHD_GSRI_Headgear"; type = "Helmet"; };
-        class GSRI_helmet_spec { model = "RHD_GSRI_Headgear"; type = "Helmet Accessories"; };
-        class GSRI_helmet_light { model = "RHD_GSRI_Headgear"; type = "Light Helmet"; };
+        class GSRI_helmet_spec { model = "RHD_GSRI_Headgear"; type = "Helmet_Accessories"; };
+        class GSRI_helmet_light { model = "RHD_GSRI_Headgear"; type = "Light_Helmet"; };
         class GSRI_helmet_modular { model = "RHD_GSRI_Headgear"; type = "Modular"; };
-        class GSRI_helmet_modular_advanced { model = "RHD_GSRI_Headgear"; type = "Modular Advanced"; };
-        class GSRI_helmet_modular_halfintegral { model = "RHD_GSRI_Headgear"; type = "Modular Half Integral"; };
-        class GSRI_helmet_modular_integral { model = "RHD_GSRI_Headgear"; type = "Modular Integral"; };
+        class GSRI_helmet_modular_advanced { model = "RHD_GSRI_Headgear"; type = "Modular_Advanced"; };
+        class GSRI_helmet_modular_halfintegral { model = "RHD_GSRI_Headgear"; type = "Modular_Half_Integral"; };
+        class GSRI_helmet_modular_integral { model = "RHD_GSRI_Headgear"; type = "Modular_Integral"; };
         class GSRI_helmet_bme { model = "RHD_GSRI_Headgear"; type = "Helmet"; };
-        class GSRI_helmet_bme_spec { model = "RHD_GSRI_Headgear"; type = "Helmet Accessories"; };
-        class GSRI_helmet_bme_light { model = "RHD_GSRI_Headgear"; type = "Light Helmet"; };
+        class GSRI_helmet_bme_spec { model = "RHD_GSRI_Headgear"; type = "Helmet_Accessories"; };
+        class GSRI_helmet_bme_light { model = "RHD_GSRI_Headgear"; type = "Light_Helmet"; };
         class GSRI_helmet_modular_bme { model = "RHD_GSRI_Headgear"; type = "Modular"; };
 
         class GSRI_vest_carrier { model = "RHD_GSRI_Vest"; type = "Carrier"; };
-        class GSRI_vest_carrier_lite { model = "RHD_GSRI_Vest"; type = "Carrier Light"; };
+        class GSRI_vest_carrier_lite { model = "RHD_GSRI_Vest"; type = "Carrier_Light"; };
         class GSRI_vest_modular { model = "RHD_GSRI_Vest"; type = "Modular"; };
-        class GSRI_vest_modular_accessories { model = "RHD_GSRI_Vest"; type = "Modular Accessories"; };
-        class GSRI_vest_modular_reinforced { model = "RHD_GSRI_Vest"; type = "Modular Reinforced"; };
-        class GSRI_vest_ga_carrier_lite { model = "RHD_GSRI_Vest"; type = "GA Carrier"; };
-        class GSRI_vest_ga_carrier { model = "RHD_GSRI_Vest"; type = "GA Carrier"; };
-        class GSRI_vest_carrier_bme { model = "RHD_GSRI_Vest"; type = "BME Carrier"; };
-        class GSRI_vest_carrier_bme_lite { model = "RHD_GSRI_Vest"; type = "BME Carrier"; };
-        class GSRI_vest_modular_bme { model = "RHD_GSRI_Vest"; type = "BME Modular"; };
+        class GSRI_vest_modular_accessories { model = "RHD_GSRI_Vest"; type = "Modular_Accessories"; };
+        class GSRI_vest_modular_reinforced { model = "RHD_GSRI_Vest"; type = "Modular_Reinforced"; };
+        class GSRI_vest_ga_carrier_lite { model = "RHD_GSRI_Vest"; type = "GA_Carrier"; };
+        class GSRI_vest_ga_carrier { model = "RHD_GSRI_Vest"; type = "GA_Carrier"; };
+        class GSRI_vest_carrier_bme { model = "RHD_GSRI_Vest"; type = "BME_Carrier"; };
+        class GSRI_vest_carrier_bme_lite { model = "RHD_GSRI_Vest"; type = "BME_Carrier"; };
+        class GSRI_vest_modular_bme { model = "RHD_GSRI_Vest"; type = "BME_Modular"; };
     };
 
     class CfgVehicles
