@@ -14,9 +14,9 @@ https://github.com/Antistasi-Ultimate-Community/A3-Antistasi-Ultimate
 
 RHD - LifeCore is designed as a Life RP layer on top of the Antistasi Ultimate campaign framework. RHD relies on the installed A3A campaign for strategic world state rather than running a parallel war engine.
 
-RHD uses the A3A public function/state interface for selected operations including campaign initialization, aggression, enemy resources, strategic markers and collision-aware vehicle spawning. The RHD bridge waits for `serverInitDone` before enabling the A3A-dependent systems. fileciteturn426file0
+RHD uses the A3A public function/state interface for selected operations including campaign initialization, aggression, enemy resources, strategic markers and collision-aware vehicle spawning. The RHD bridge waits for `serverInitDone` before enabling the A3A-dependent systems.
 
-The upstream repository describes the main Antistasi Ultimate / Plus / Community Edition code as MIT-licensed while identifying separately licensed integrated components. The upstream license specifically identifies APL-ND material such as `Tools\\StreetArtist` and `A3-Antistasi\\Garage`. RHD does not modify or redistribute those restricted components. fileciteturn345file0
+The upstream repository describes the main Antistasi Ultimate / Plus / Community Edition code as MIT-licensed while identifying separately licensed integrated components. RHD does not modify or redistribute restricted upstream components.
 
 The selected upstream development revision is tracked by the RHD Git submodule:
 
@@ -42,11 +42,32 @@ CBA_A3 is a prerequisite for cTab+ and is installed separately through the norma
 Project:
 https://github.com/acemod/ACE3
 
-**Runtime status: REQUIRED for the full RHD feature set.**
+RHD uses ACE3 as an optional interaction layer where available. RHD does not redistribute ACE3 PBOs.
 
-ACE3 supplies the contextual interaction layer used by RHD for administrator access, EMS treatment and vehicle interaction.
+## GSRI Gear — modern clothing/equipment integration
 
-RHD does not redistribute ACE3 PBOs.
+Projects:
+https://github.com/Thibugs/GSRI-Gear  
+https://github.com/team-gsri/mods-gear
+
+**Runtime status: OPTIONAL for the GSRI compatibility bridge.**
+
+The public GSRI source tree provides modern uniforms, backpacks, headgear and vests. The two supplied GSRI repositories currently expose the same source-tree revision/content, so RHD treats `team-gsri/mods-gear` as a mirror rather than a second unique asset pool.
+
+GSRI's repository includes an MIT license. RHD does not duplicate the GSRI PAA/P3D binaries in the main RHD addons. Instead, `addons/rhd_gsri_compat` provides a separate compatibility PBO which depends on `gsri_equipment` and supplies RHD/Arsenal categorisation for selected GSRI classes.
+
+The selected GSRI compatibility classes are defined in `addons/rhd_gsri_compat/config.cpp`. The actual asset provider remains the installed GSRI-Gear addon.
+
+## ACE Arsenal Extended
+
+Project:
+https://github.com/jetelain/AceArsenalExtended
+
+**Runtime status: OPTIONAL.**
+
+ACE Arsenal Extended provides gear categorisation/model-option support and configuration patterns used by the RHD GSRI compatibility PBO. It is not an RHD asset source itself; its repository contains configuration for external gear packs and Arsenal organisation.
+
+RHD does not redistribute the ACE Arsenal Extended PBOs. The RHD GSRI compatibility layer uses the XtdGear configuration format so the selected GSRI gear can be grouped more cleanly when ACE Arsenal Extended is installed.
 
 ## XEAT_AdminTool interface reference
 
